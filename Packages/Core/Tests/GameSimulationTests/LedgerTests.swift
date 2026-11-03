@@ -31,7 +31,7 @@ struct LedgerTests {
     @Test func everyTreasuryChangeIsBooked() throws {
         var simulation = try Fixtures.flatSimulation { $0.startingStock = [GoodAmount(good: "bread", amount: 200)] }
         let start = simulation.world.treasury
-        try simulation.place("mill", x: 17, z: 16)
+        try simulation.placeZoned("mill", x: 17, z: 16)
         simulation.execute(BuildRoadCommand(cells: RoadPlanner.path(from: GridPoint(x: 2, z: 2), to: GridPoint(x: 5, z: 2))))
         simulation.execute(DemolishRoadCommand(cells: [GridPoint(x: 2, z: 2)]))
         simulation.advance(days: simulation.world.rules.daysPerYear)
