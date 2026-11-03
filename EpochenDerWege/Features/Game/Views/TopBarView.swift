@@ -78,6 +78,15 @@ struct TopBarView: View {
 
             Spacer()
 
+            Picker("Overlay", selection: Binding(get: { viewModel.overlay }, set: { viewModel.overlay = $0 })) {
+                ForEach(MapOverlay.allCases, id: \.self) { overlay in
+                    Text(GameText.name(of: overlay)).tag(overlay)
+                }
+            }
+            .labelsHidden()
+            .frame(width: 130)
+            .help(Text("Map overlay (O)"))
+
             Picker("Speed", selection: Binding(get: { viewModel.speed }, set: { viewModel.setSpeed($0) })) {
                 Image(systemName: "pause.fill")
                     .accessibilityLabel(Text("Pause"))

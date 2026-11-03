@@ -15,6 +15,7 @@ struct RenderContext {
     let zonePreview: ZonePreview?
     /// Seconds of animation time; advances with the game speed and stops while paused.
     let animationTime: TimeInterval
+    let overlay: MapOverlay
 
     var world: WorldState { frame.world }
 }
@@ -66,6 +67,7 @@ final class SceneRenderer {
         layers = [
             TerrainLayer(parent: root, space: space),
             ZoneLayer(parent: root, space: space),
+            MapOverlayLayer(parent: root, space: space),
             RoadLayer(parent: root, space: space),
             BuildingLayer(parent: root, space: space),
             CarrierLayer(parent: root, space: space),
