@@ -159,6 +159,14 @@ final class GameViewModel {
         cameraFocus = CameraFocus(id: (cameraFocus?.id ?? 0) + 1, cell: building.cell)
     }
 
+    func setPaused(_ paused: Bool, building: BuildingID) {
+        engine.submit(ConfigureBuildingCommand(buildingID: building, isPaused: paused))
+    }
+
+    func setPriority(_ priority: DeliveryPriority, building: BuildingID) {
+        engine.submit(ConfigureBuildingCommand(buildingID: building, priority: priority))
+    }
+
     // MARK: - Lines
 
     /// Creates a line from the stops picked with the line tool.

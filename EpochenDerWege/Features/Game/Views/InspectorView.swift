@@ -1,3 +1,4 @@
+import GameDomain
 import SwiftUI
 
 /// Details of the selected building.
@@ -5,6 +6,8 @@ struct InspectorView: View {
     let details: BuildingDetails
     let onDemolish: () -> Void
     let onClose: () -> Void
+    var onPause: (Bool) -> Void = { _ in }
+    var onPriority: (DeliveryPriority) -> Void = { _ in }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -39,6 +42,19 @@ struct InspectorView: View {
                         .monospacedDigit()
                 }
                 .font(.callout)
+            }
+
+            if details.isConfigurable {
+                Divider()
+                Toggle("Paused", isOn: Binding(get: { details.isPaused }, set: onPause))
+                    .help(Text("A paused building does no work, releases its workers and receives no deliveries."))
+                Picker("Delivery priority", selection: Binding(get: { details.priority }, set: onPriority)) {
+                    ForEach(DeliveryPriority.allCases, id: \.self) { priority in
+                        Text(GameText.name(of: priority)).tag(priority)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .help(Text("Carriers serve buildings with high priority first."))
             }
 
             Divider()

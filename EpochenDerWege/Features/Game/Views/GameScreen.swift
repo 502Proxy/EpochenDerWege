@@ -20,7 +20,9 @@ struct GameScreen: View {
                         InspectorView(
                             details: details,
                             onDemolish: viewModel.demolishSelected,
-                            onClose: { viewModel.selectBuilding(nil) }
+                            onClose: { viewModel.selectBuilding(nil) },
+                            onPause: { viewModel.setPaused($0, building: details.id) },
+                            onPriority: { viewModel.setPriority($0, building: details.id) }
                         )
                         .transition(.move(edge: .trailing).combined(with: .opacity))
                     }

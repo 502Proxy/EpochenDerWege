@@ -85,7 +85,7 @@ final class BuildingLayer: SceneLayer {
                 } else {
                     self = .hidden
                 }
-            case .awaitingGoods:
+            case .awaitingGoods, .paused:
                 self = .warning
             case .idle, .storing, .trading:
                 self = .hidden
