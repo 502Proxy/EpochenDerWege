@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E0D0000000000000000000A1 /* Simulation in Frameworks */ = {isa = PBXBuildFile; productRef = E0D0000000000000000000A2 /* Simulation */; };
+		E0D0000000000000000000A1 /* GameSimulation in Frameworks */ = {isa = PBXBuildFile; productRef = E0D0000000000000000000A2 /* GameSimulation */; };
+		E0D0000000000000000000A4 /* GameDomain in Frameworks */ = {isa = PBXBuildFile; productRef = E0D0000000000000000000A5 /* GameDomain */; };
+		E0D0000000000000000000A6 /* GameData in Frameworks */ = {isa = PBXBuildFile; productRef = E0D0000000000000000000A7 /* GameData */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +29,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E0D0000000000000000000A1 /* Simulation in Frameworks */,
+				E0D0000000000000000000A1 /* GameSimulation in Frameworks */,
+				E0D0000000000000000000A4 /* GameDomain in Frameworks */,
+				E0D0000000000000000000A6 /* GameData in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,7 +74,9 @@
 			);
 			name = EpochenDerWege;
 			packageProductDependencies = (
-				E0D0000000000000000000A2 /* Simulation */,
+				E0D0000000000000000000A2 /* GameSimulation */,
+				E0D0000000000000000000A5 /* GameDomain */,
+				E0D0000000000000000000A7 /* GameData */,
 			);
 			productName = EpochenDerWege;
 			productReference = E0D0000000000000000000B1 /* EpochenDerWege.app */;
@@ -83,25 +89,26 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 1600;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					E0D0000000000000000000F1 = {
-						CreatedOnToolsVersion = 16.0;
+						CreatedOnToolsVersion = 26.0;
 					};
 				};
 			};
 			buildConfigurationList = E0D000000000000000000101 /* Build configuration list for PBXProject "EpochenDerWege" */;
-			developmentRegion = de;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				en,
 				de,
 				Base,
 			);
 			mainGroup = E0D0000000000000000000E1;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				E0D0000000000000000000A3 /* XCLocalSwiftPackageReference "Packages/Simulation" */,
+				E0D0000000000000000000A3 /* XCLocalSwiftPackageReference "Packages/Core" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E0D0000000000000000000E2 /* Products */;
@@ -146,6 +153,7 @@
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -153,7 +161,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -175,8 +183,9 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -204,8 +213,12 @@
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = de.502proxy.EpochenDerWege;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -229,8 +242,12 @@
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = de.502proxy.EpochenDerWege;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -258,16 +275,24 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		E0D0000000000000000000A3 /* XCLocalSwiftPackageReference "Packages/Simulation" */ = {
+		E0D0000000000000000000A3 /* XCLocalSwiftPackageReference "Packages/Core" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = Packages/Simulation;
+			relativePath = Packages/Core;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E0D0000000000000000000A2 /* Simulation */ = {
+		E0D0000000000000000000A2 /* GameSimulation */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Simulation;
+			productName = GameSimulation;
+		};
+		E0D0000000000000000000A5 /* GameDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GameDomain;
+		};
+		E0D0000000000000000000A7 /* GameData */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GameData;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

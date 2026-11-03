@@ -1,348 +1,329 @@
 # Epochen der Wege – Game Design Document
 
-Stand: 3. November 2026
+## Vision and key facts
 
-## Vision & Eckdaten
+A peaceful 3D city-building and logistics game: you lead a people from antiquity to the
+modern age, and growth only happens when goods and people are physically transported.
 
-Ein friedliches 3D-Aufbau- und Logistikspiel: Du führst ein Volk von der Antike in die Moderne, und Wachstum entsteht nur, wenn Waren und Menschen physisch transportiert werden.
-
-| Eckdatum | Festlegung |
+| Aspect | Decision |
 | --- | --- |
-| Plattform | macOS, Swift, Xcode |
-| Darstellung | 3D, frei drehbare Kamera, Stil zwischen Modellbahn und Strategiekarte |
-| Zeitmodell | Echtzeit mit Pause und Zeitraffer (1×, 2×, 4×) |
-| Konflikt | Kein Militär, kein Krieg; Konkurrenz nur wirtschaftlich |
-| Karte | Eine Region, ca. 16 × 16 km, 3 bis 6 Städte und Dörfer |
-| Startepoche | Antike, Ende in der Moderne |
-| Bewohner | Mittelweg: Simulation in Gruppen pro Haus, sichtbare Figuren nur als Darstellung |
+| Platform | macOS, Swift, Xcode |
+| Presentation | 3D, freely rotating camera, look between model railway and strategy map |
+| Time | Real time with pause and fast-forward (1×, 2×, 4×) |
+| Conflict | No military, no war; competition is economic only |
+| Map | One region of about 16 × 16 km with 3 to 6 towns and villages |
+| Starting era | Antiquity, ending in the modern age |
+| Residents | Middle ground: simulated in groups per house, visible figures are for show only |
 
-**Design-Säulen** – jede Entscheidung wird an diesen drei gemessen:
+**Design pillars** – every decision is measured against these three:
 
-1. **Alles fließt sichtbar.** Jede Ware, jeder Pendler ist ein Objekt auf einem Weg. Kein unsichtbares Lager.
-2. **Logistik ist das Rätsel.** Die Herausforderung ist nicht, was ich baue, sondern wie ich es verbinde.
-3. **Epochen schichten sich.** Alte Wege bleiben, werden ausgebaut oder ersetzt; die Landschaft erzählt die Geschichte des Spiels.
+1. **Everything flows visibly.** Every good and every commuter is an object on a path. No invisible storage.
+2. **Logistics is the puzzle.** The challenge is not *what* to build but *how to connect* it.
+3. **Eras build on each other.** Old paths remain, get upgraded or replaced; the landscape tells the story of the game.
 
-## Kern-Kreislauf & Spielablauf
+## Core loop and progression
 
-Der Spieler durchläuft immer wieder denselben Kreislauf; jede Runde wird größer, weil neue Epochen längere Ketten und weitere Wege bringen.
+The player runs through the same loop again and again; each round grows because new eras bring longer chains and wider networks.
 
 ```mermaid
 flowchart LR
-    A["1 Erschließen<br/>Holz, Stein, Getreide, Erz"] --> B["2 Verarbeiten<br/>Getreide → Mehl → Brot"]
-    B --> C["3 Transportieren<br/>Wege, Linien, Fahrzeuge"]
-    C --> D["4 Versorgen<br/>Bedürfnisse der Häuser"]
-    D --> E["5 Wachsen und Forschen<br/>Steuern, Aufstieg, Technik"]
-    E -- "neue Gebäude, Fahrzeuge, Epochen" --> A
+    A["1 Develop<br/>wood, stone, grain, ore"] --> B["2 Process<br/>grain → flour → bread"]
+    B --> C["3 Transport<br/>paths, lines, vehicles"]
+    C --> D["4 Supply<br/>needs of the houses"]
+    D --> E["5 Grow and research<br/>taxes, promotion, technology"]
+    E -- "new buildings, vehicles, eras" --> A
 ```
 
-Transport ist das Nadelöhr: Ohne Verbindung erreichen Waren weder Weiterverarbeitung noch Häuser.
+Transport is the bottleneck: without a connection, goods reach neither the next production step nor the houses.
 
-**Spielverlauf**
+**Progression**
 
-1. **Start (Jahr 0–10):** Ein Dorf mit 20 Bauern, ein Lager, 10.000 Taler. Erste Ketten mit Trägern und Trampelpfaden.
-2. **Frühe Phase:** Straßen und Ochsenkarren verbinden Dorf und Rohstoffe; erste Bürger, erste neutrale Stadt angebunden.
-3. **Mittlere Phase:** Mehrere Städte, Flüsse und Kanäle als Güterachsen, Epochenwechsel ins Mittelalter und in die Industrie.
-4. **Späte Phase:** Bahn- und Straßennetz über die ganze Region, Modernisierung alter Wege, Wettlauf um Weltwunder.
+1. **Start (years 0–10):** a village with 20 farmers, a storehouse and 10,000 thalers. First chains with carriers on footpaths.
+2. **Early game:** roads and ox carts connect the village to resources; first citizens, first neutral town connected.
+3. **Mid game:** several towns, rivers and canals as freight axes, transition to the Middle Ages and the industrial age.
+4. **Late game:** rail and road network across the whole region, modernising old routes, race for wonders.
 
-**Zeitmodell**
+**Time model**
 
-- Simulation läuft in festen Ticks: 10 Ticks pro Sekunde bei 1×
-- 1 Spieltag = 2 Sekunden bei 1×; 1 Spieljahr = 60 Spieltage (2 Minuten)
-- Zeitraffer 2× und 4× verkürzt nur die Wartezeit zwischen Ticks; die Regeln bleiben gleich
-- Pause erlaubt Bauen und Planen ohne Zeitdruck
-- Eine Partie bis zur Moderne dauert ca. 220 Spieljahre, also rund 7 bis 8 Stunden bei 1×
+- The simulation runs in fixed ticks: 10 ticks per second at 1×
+- 1 day = 2 seconds at 1×; 1 year = 60 days (2 minutes)
+- Fast-forward 2× and 4× only shortens the wait between ticks; the rules stay the same
+- Pause allows building and planning without time pressure
+- A game up to the modern age takes about 220 in-game years, roughly 7 to 8 hours at 1×
 
-## Welt & Karte
+## World and map
 
-Die Karte ist ein prozedural erzeugtes Höhenfeld mit Flüssen und Küste; das Gelände bestimmt, wo sich Bauen lohnt und wie teuer Wege werden.
+The map is a procedurally generated height field with rivers and coast; the terrain decides where building pays off and how expensive routes become.
 
-**Aufbau**
+**Structure**
 
-- Höhenfeld mit 4-m-Raster (ca. 4.000 × 4.000 Punkte), in Kacheln von 256 × 256 für Darstellung und Detailstufen
-- Biome: Ebene, Wald, Hügelland, Gebirge, Feuchtgebiet, Küste, Fluss
-- Ein Seed erzeugt die Karte; derselbe Seed ergibt dieselbe Welt (wichtig für Szenarien und Tests)
+- Height field on a 4 m grid (about 4,000 × 4,000 points), split into 256 × 256 tiles for rendering and level of detail
+- Biomes: plains, forest, hills, mountains, wetland, coast, river
+- A seed generates the map; the same seed always produces the same world (important for scenarios and tests)
 
-**Ressourcen**
+**Resources**
 
-| Ressource | Vorkommen | Art | Regeneration |
+| Resource | Found in | Kind | Regeneration |
 | --- | --- | --- | --- |
-| Holz | Wald | erneuerbar | Wald wächst nach, 1 Baum pro 10 Spieltage, wenn Förster vorhanden |
-| Getreide, Flachs, Weintrauben | Ebene, Feld | erneuerbar | Ernte pro Jahreszeit |
-| Fisch | Küste, Fluss | erneuerbar | Bestand erholt sich, Überfischung möglich |
-| Lehm, Stein | Hügel, Flussäufer | endlich, sehr groß | keine |
-| Erz, Kohle | Gebirge | endlich | keine; Vorkommen von 20.000 bis 200.000 t |
-| Öl | späte Epoche, versteckt | endlich | keine; erst nach Forschung sichtbar |
+| Wood | Forest | renewable | Forest regrows, 1 tree per 10 days with a forester |
+| Grain, flax, grapes | Plains, fields | renewable | Harvest per season |
+| Fish | Coast, river | renewable | Stock recovers; overfishing is possible |
+| Clay, stone | Hills, river banks | finite, very large | none |
+| Ore, coal | Mountains | finite | none; deposits of 20,000 to 200,000 t |
+| Oil | Late era, hidden | finite | none; visible only after research |
 
-**Gelände-Regeln**
+**Terrain rules**
 
-- Bauen auf Hang über 15 % kostet doppelt; Gelände kann gegen Geld angeglichen werden
-- Steigung bremst Fahrzeuge je nach Zugkraft: Karren ab 6 %, Dampfloks ab 2,5 %, LKW ab 8 %
-- Brücken und Tunnel kosten das 5- bis 15-Fache eines normalen Wegstücks und brauchen eine passende Forschung
-- Flüsse sind natürliche Wasserwege: schiffbar ab einer Mindestbreite, Kanäle ab dem Mittelalter baubar
+- Building on slopes above 15 % costs double; terrain can be levelled for money
+- Slopes slow vehicles depending on traction: carts from 6 %, steam locomotives from 2.5 %, trucks from 8 %
+- Bridges and tunnels cost 5 to 15 times a normal segment and need research
+- Rivers are natural waterways: navigable above a minimum width; canals can be built from the Middle Ages
 
-## Bevölkerung & Siedlungen
+## Population and settlements
 
-Bewohner werden pro Haus als Gruppe gerechnet; sie wachsen und steigen auf, wenn ihre Bedürfnisse in Reichweite erfüllt sind, und schrumpfen, wenn nicht.
+Residents are simulated as a group per house; they grow and get promoted when their needs are met within reach, and shrink when they are not.
 
-**Berufsstände und Bedürfnisse** (jede Stufe braucht zusätzlich die Waren der Stufe davor)
+**Social tiers and needs** (each tier also needs the goods of the tier before)
 
-| Stand | Ab Epoche | Bewohner pro Haus | Bedürfnisse | Leistet |
+| Tier | From era | Residents per house | Needs | Provides |
 | --- | --- | --- | --- | --- |
-| Bauern | Antike | 4 | Nahrung (Brot oder Fisch), Wasser | Arbeit in Rohstoff-Betrieben |
-| Bürger | Antike | 6 | + Kleidung, Wein, Markt in Reichweite | Handwerk, Steuern |
-| Handwerker | Mittelalter | 8 | + Werkzeuge, Möbel, Kirche oder Tempel | Werkstätten, Forschung (gering) |
-| Arbeiter | Industrie | 12 | + Kohle zum Heizen, Fleisch, öffentlicher Verkehr | Fabriken |
-| Ingenieure | Industrie | 10 | + Bildung, Zeitung, Konsumgüter | Forschung, Verwaltung |
-| Angestellte | Moderne | 14 | + Elektrik, Autos oder ÖPNV, Freizeit | Dienstleistung, hohe Steuern |
+| Farmers | Antiquity | 4 | Food (bread or fish), water | Work in raw material production |
+| Citizens | Antiquity | 6 | + clothing, wine, market in reach | Crafts, taxes |
+| Craftsmen | Middle Ages | 8 | + tools, furniture, church or temple | Workshops, some research |
+| Workers | Industrial | 12 | + coal for heating, meat, public transport | Factories |
+| Engineers | Industrial | 10 | + education, newspaper, consumer goods | Research, administration |
+| Employees | Modern | 14 | + electricity, cars or public transport, leisure | Services, high taxes |
 
-**Versorgungsregel**
+**Supply rule**
 
-- Jedes Haus prüft alle 10 Spieltage seine Versorgung: Anteil der erfüllten Bedürfnisse in 0 bis 100 %
-- Unter 50 %: Haus verliert Bewohner; 50 bis 90 %: stabil; über 90 % für 2 Spieljahre: Aufstieg zum nächsten Stand, wenn freigeschaltet
-- Waren gelten als „in Reichweite“, wenn ein Markt, Laden oder Bahnhof sie auf Lager hat und das Haus in dessen Radius liegt (Markt 300 m, Laden 200 m)
+- Every house checks its supply every 10 days: share of needs met, 0 to 100 %
+- Below 50 %: the house loses residents; 50 to 90 %: stable; above 90 % for 2 years: promotion to the next tier, if unlocked
+- Goods count as "in reach" when a market, shop or station has them in stock and the house is within its radius (market 300 m, shop 200 m)
 
-**Pendeln**
+**Commuting**
 
-- Jeder Betrieb braucht Arbeitskräfte eines bestimmten Standes
-- Arbeiter gehen zu Fuß bis 1,5 km; weiter nur mit Personenverkehr
-- Ein Betrieb mit 50 % der Arbeiter produziert mit 50 % Leistung
+- Every production building needs workers of a specific tier
+- Workers walk up to 1.5 km; further only by passenger transport
+- A building with 50 % of its workers produces at 50 % efficiency
 
-**Darstellung (Mittelweg)**
+**Presentation (middle ground)**
 
-- Gerechnet wird pro Haus und pro Linie als Zahl; sichtbare Figuren laufen als Stichprobe (ca. 1 Figur pro 10 Pendler)
-- Ein Klick auf ein Haus zeigt die Bewohner, ihre Arbeitsstelle und welche Bedürfnisse fehlen
+- Simulation is per house and per line as numbers; visible figures are a sample (about 1 figure per 10 commuters)
+- Clicking a house shows its residents, their workplace and which needs are missing
 
-**Städte**
+**Towns**
 
-- Die Karte startet mit 3 bis 6 neutralen Siedlungen (200 bis 1.500 Einwohner) und deinem Start-Dorf
-- Neutrale Städte wachsen von selbst, wenn du sie versorgst und anbindest; sie werden so zu Kunden und Arbeitskräfte-Quellen
-- Häuser baut die Stadt selbst innerhalb ausgewiesener Wohnzonen; du baust Betriebe, Wege und Versorgungsgebäude
+- The map starts with 3 to 6 neutral settlements (200 to 1,500 residents) and the player's starting village
+- Neutral towns grow on their own when supplied and connected, becoming customers and sources of labour
+- Towns build houses themselves within designated residential zones; the player builds production, routes and supply buildings
 
-## Produktion & Waren
+## Production and goods
 
-Jeder Betrieb wandelt Eingangswaren in einem festen Zyklus in Ausgangswaren um; Ketten werden pro Epoche länger, und alle Werte stehen in JSON-Dateien, damit wir sie ohne Code-Änderung ausbalancieren können.
+Every production building turns inputs into outputs in a fixed cycle; chains get longer with each era, and all values live in JSON files so they can be balanced without code changes.
 
-**Regeln für Betriebe**
+**Building rules**
 
-- Ein Betrieb hat Eingangslager, Ausgangslager (je 20 Einheiten), Arbeiterbedarf und Zykluszeit
-- Volles Ausgangslager = Stillstand. Leeres Eingangslager = Stillstand
-- Waren verlassen den Betrieb nur über eine angebundene Haltestelle oder einen Weg zu einem Lager
-- Lagerhäuser (200 Einheiten) puffern Waren und dienen als Umschlagpunkt zwischen Verkehrsmitteln
+- A building has input stock, output stock (20 units each), required workers and a cycle time
+- Full output stock = standstill. Empty input stock = standstill
+- Goods leave a building only via a connected stop or a path to a storehouse
+- Storehouses (200 units) buffer goods and act as transfer points between modes of transport
 
-**Produktionsketten (Startwerte, Zyklus in Spieltagen)**
+**Production chains (starting values, cycle in days)**
 
-| Epoche | Betrieb | Eingang | Ausgang | Zyklus | Arbeiter |
+| Era | Building | Input | Output | Cycle | Workers |
 | --- | --- | --- | --- | --- | --- |
-| Antike | Holzfäller | – | 1 Holz | 2 | 4 Bauern |
-| Antike | Steinbruch | – | 1 Stein | 3 | 6 Bauern |
-| Antike | Getreidehof | – | 2 Getreide | 4 | 6 Bauern |
-| Antike | Mühle | 2 Getreide | 2 Mehl | 2 | 2 Bauern |
-| Antike | Bäckerei | 2 Mehl | 3 Brot | 2 | 3 Bürger |
-| Antike | Fischer | – | 2 Fisch | 3 | 3 Bauern |
-| Antike | Schaffarm + Weberei | Wolle | 1 Kleidung | 4 | 4 Bauern, 3 Bürger |
-| Antike | Weingut | – | 1 Wein | 6 | 5 Bauern |
-| Mittelalter | Erzmine + Köhlerei | Holz | Erz, Holzkohle | 3 | 8 Bauern |
-| Mittelalter | Schmelze | 2 Erz, 1 Holzkohle | 1 Eisen | 3 | 4 Handwerker |
-| Mittelalter | Schmiede | 1 Eisen, 1 Holz | 2 Werkzeuge | 3 | 3 Handwerker |
-| Mittelalter | Schreinerei | 2 Holz | 1 Möbel | 3 | 3 Handwerker |
-| Industrie | Kohlemine | – | 3 Kohle | 2 | 12 Arbeiter |
-| Industrie | Stahlwerk | 2 Erz, 2 Kohle | 2 Stahl | 2 | 20 Arbeiter |
-| Industrie | Maschinenfabrik | 2 Stahl, 1 Werkzeuge | 1 Maschinen | 4 | 20 Arbeiter, 4 Ingenieure |
-| Industrie | Schlachthof | 2 Vieh | 3 Fleisch | 2 | 8 Arbeiter |
-| Moderne | Raffinerie | 3 Öl | 2 Treibstoff, 1 Kunststoff | 2 | 15 Arbeiter |
-| Moderne | Kraftwerk | 2 Kohle oder Treibstoff | Strom im Netz | 1 | 10 Arbeiter |
-| Moderne | Konsumgüterfabrik | 1 Kunststoff, 1 Stahl | 2 Konsumgüter | 3 | 25 Angestellte |
+| Antiquity | Woodcutter | – | 1 wood | 2 | 4 farmers |
+| Antiquity | Quarry | – | 1 stone | 3 | 6 farmers |
+| Antiquity | Grain farm | – | 2 grain | 4 | 6 farmers |
+| Antiquity | Mill | 2 grain | 2 flour | 2 | 2 farmers |
+| Antiquity | Bakery | 2 flour | 3 bread | 2 | 3 citizens |
+| Antiquity | Fisher's hut | – | 2 fish | 3 | 3 farmers |
+| Antiquity | Sheep farm + weaver | wool | 1 clothing | 4 | 4 farmers, 3 citizens |
+| Antiquity | Vineyard | – | 1 wine | 6 | 5 farmers |
+| Middle Ages | Ore mine + charcoal burner | wood | ore, charcoal | 3 | 8 farmers |
+| Middle Ages | Smelter | 2 ore, 1 charcoal | 1 iron | 3 | 4 craftsmen |
+| Middle Ages | Smithy | 1 iron, 1 wood | 2 tools | 3 | 3 craftsmen |
+| Middle Ages | Joinery | 2 wood | 1 furniture | 3 | 3 craftsmen |
+| Industrial | Coal mine | – | 3 coal | 2 | 12 workers |
+| Industrial | Steelworks | 2 ore, 2 coal | 2 steel | 2 | 20 workers |
+| Industrial | Machine factory | 2 steel, 1 tools | 1 machines | 4 | 20 workers, 4 engineers |
+| Industrial | Slaughterhouse | 2 livestock | 3 meat | 2 | 8 workers |
+| Modern | Refinery | 3 oil | 2 fuel, 1 plastic | 2 | 15 workers |
+| Modern | Power plant | 2 coal or fuel | electricity in the grid | 1 | 10 workers |
+| Modern | Consumer goods factory | 1 plastic, 1 steel | 2 consumer goods | 3 | 25 employees |
 
-**Verderbliche Waren**
+**Perishable goods**
 
-- Fisch, Fleisch, Milch und Brot haben eine Haltbarkeit (Fisch 5, Fleisch 8, Brot 10 Spieltage)
-- Abgelaufene Waren verschwinden aus Lagern und Fahrzeugen
-- Damit lohnen sich schnelle Verkehrsmittel und kurze Wege auch dann, wenn langsame billiger sind
+- Fish, meat, milk and bread have a shelf life (fish 5, meat 8, bread 10 days)
+- Expired goods disappear from storage and vehicles
+- This makes fast transport and short routes worthwhile even when slow ones are cheaper
 
-**Baumaterial**
+**Construction materials**
 
-- Gebäude kosten Geld und Baumaterial (Holz, Stein, später Ziegel, Stahl, Beton)
-- Das Material muss zur Baustelle transportiert werden; die Baustelle ist ein normales Ziel im Logistiknetz
+- Buildings cost money and materials (wood, stone, later bricks, steel, concrete)
+- Materials must be delivered to the construction site; the site is a regular target in the logistics network
 
-## Transport & Logistik
+## Transport and logistics
 
-Du baust Wege und richtest Linien ein; Fahrzeuge fahren Linien ab, laden an Haltestellen und erzeugen Einnahmen pro transportierter Einheit und Kilometer.
+The player builds routes and sets up lines; vehicles run the lines, load at stops and earn income per unit and kilometre.
 
-**Netze**
+**Networks**
 
-| Netz | Ab Epoche | Baukosten pro km | Besonderheit |
+| Network | From era | Cost per km | Notes |
 | --- | --- | --- | --- |
-| Trampelpfad | Antike | 0 (entsteht durch Nutzung) | nur Träger, langsam |
-| Straße (Schotter) | Antike | 2.000 | Karren und Wagen |
-| Pflasterstraße | Mittelalter | 6.000 | +30 % Tempo, weniger Verschleiß |
-| Wasserweg (Fluss, Kanal) | Antike / Mittelalter | Kanal 25.000 | große Mengen, langsam |
-| Eisenbahn | Industrie | 40.000 | Steigung kritisch, sehr hohe Kapazität |
-| Asphaltstraße | Moderne | 15.000 | LKW, Busse, Autos |
-| Elektrifizierte Bahn | Moderne | +20.000 auf Bahn | schnellere, stärkere Loks |
+| Footpath | Antiquity | 0 (emerges through use) | carriers only, slow |
+| Gravel road | Antiquity | 2,000 | carts and wagons |
+| Paved road | Middle Ages | 6,000 | +30 % speed, less wear |
+| Waterway (river, canal) | Antiquity / Middle Ages | canal 25,000 | large volumes, slow |
+| Railway | Industrial | 40,000 | slopes are critical, very high capacity |
+| Asphalt road | Modern | 15,000 | trucks, buses, cars |
+| Electrified railway | Modern | +20,000 on rail | faster, stronger locomotives |
 
-**Fahrzeuge (Startwerte)**
+**Vehicles (starting values)**
 
-| Fahrzeug | Epoche | Kapazität | Tempo km/h | Kaufpreis | Unterhalt pro Jahr | Lebensdauer Jahre |
+| Vehicle | Era | Capacity | Speed km/h | Price | Upkeep per year | Lifetime years |
 | --- | --- | --- | --- | --- | --- | --- |
-| Träger | Antike | 1 | 4 | 50 | 20 | 20 |
-| Ochsenkarren | Antike | 4 | 5 | 400 | 80 | 20 |
-| Flusskahn | Antike | 20 | 6 | 1.500 | 200 | 30 |
-| Pferdewagen | Mittelalter | 8 | 10 | 1.200 | 200 | 20 |
-| Postkutsche | Mittelalter | 8 Personen | 12 | 1.500 | 250 | 20 |
-| Segelschiff | Mittelalter | 60 | 10 | 8.000 | 800 | 35 |
-| Dampflok + Güterwagen | Industrie | 30 pro Wagen | 40 | 30.000 | 3.000 | 30 |
-| Pferdestraßenbahn | Industrie | 30 Personen | 12 | 5.000 | 600 | 25 |
-| LKW | Moderne | 15 | 60 | 20.000 | 2.500 | 15 |
-| Bus | Moderne | 50 Personen | 60 | 25.000 | 3.000 | 15 |
-| E-Lok + Güterwagen | Moderne | 50 pro Wagen | 100 | 120.000 | 8.000 | 35 |
+| Carrier | Antiquity | 1 | 4 | 50 | 20 | 20 |
+| Ox cart | Antiquity | 4 | 5 | 400 | 80 | 20 |
+| River barge | Antiquity | 20 | 6 | 1,500 | 200 | 30 |
+| Horse wagon | Middle Ages | 8 | 10 | 1,200 | 200 | 20 |
+| Stagecoach | Middle Ages | 8 passengers | 12 | 1,500 | 250 | 20 |
+| Sailing ship | Middle Ages | 60 | 10 | 8,000 | 800 | 35 |
+| Steam locomotive + freight wagons | Industrial | 30 per wagon | 40 | 30,000 | 3,000 | 30 |
+| Horse tram | Industrial | 30 passengers | 12 | 5,000 | 600 | 25 |
+| Truck | Modern | 15 | 60 | 20,000 | 2,500 | 15 |
+| Bus | Modern | 50 passengers | 60 | 25,000 | 3,000 | 15 |
+| Electric locomotive + freight wagons | Modern | 50 per wagon | 100 | 120,000 | 8,000 | 35 |
 
-**Linien**
+**Lines**
 
-- Eine Linie ist eine geordnete Liste von Haltestellen plus zugewiesene Fahrzeuge
-- Pro Halt einstellbar: einladen, ausladen, warten bis voll (mit Höchstwartezeit)
-- Fahrzeuge nehmen nur Waren mit, deren Ziel auf der Linie liegt oder über eine Umsteigekette erreichbar ist
-- Personen und Waren wählen ihre Route nach Reisezeit; zu volle Linien verlieren Fahrgäste an die nächstbeste Route
+- A line is an ordered list of stops plus assigned vehicles
+- Per stop: load, unload, wait until full (with a maximum waiting time)
+- Vehicles only take goods whose destination is on the line or reachable via transfers
+- People and goods choose their route by travel time; overcrowded lines lose passengers to the next best route
 
-**Haltestellen**
+**Stops**
 
-- Marktplatz/Ablage (Antike), Hafen, Bahnhof, Bushaltestelle, Logistikhof
-- Einzugsradius für Waren und Personen; ein Bahnhof mit 4 Gleisen bedient deutlich mehr Fahrzeuge als einer mit 2
-- Haltestellen haben Kapazität; überfüllte Halte bilden Warteschlangen, die man sieht
+- Market place (antiquity), harbour, station, bus stop, logistics yard
+- Catchment radius for goods and people; a station with 4 tracks serves many more vehicles than one with 2
+- Stops have capacity; overcrowded stops form visible queues
 
-**Alterung**
+**Ageing**
 
-- Ab 75 % der Lebensdauer steigt der Unterhalt um 50 % und Fahrzeuge fallen öfter kurz aus
-- Ersetzen per Knopf: das alte Fahrzeug wird zum Restwert verkauft, ein Nachfolgemodell übernimmt die Linie
+- From 75 % of the lifetime, upkeep rises by 50 % and vehicles break down briefly more often
+- Replace with one click: the old vehicle is sold at residual value, a successor model takes over the line
 
-## Epochen & Forschung
+## Eras and research
 
-Vier Epochen, jede wird durch Forschung und eine Bevölkerungsschwelle freigeschaltet; ein Epochenwechsel erweitert alles auf einmal, alte Technik bleibt aber nutzbar.
+Four eras, each unlocked by research and a population threshold; an era change expands everything at once, but old technology remains usable.
 
-| Epoche | Spieljahre (Richtwert) | Wechsel-Bedingung | Neu freigeschaltet |
+| Era | In-game years (guide) | Condition | Unlocks |
 | --- | --- | --- | --- |
-| Antike | 0–60 | Start | Träger, Karren, Kahn, Grundketten, Bauern und Bürger |
-| Mittelalter | 60–140 | 300 Bürger + 4 Schlüsseltechnologien | Eisen, Werkzeuge, Pflaster, Kanäle, Segelschiffe, Handwerker |
-| Industrie | 140–220 | 500 Handwerker + Dampfmaschine erforscht | Eisenbahn, Kohle, Stahl, Fabriken, Arbeiter, Ingenieure |
-| Moderne | 220+ | 400 Ingenieure + Elektrizität erforscht | Strom, Öl, LKW, Bus, E-Lok, Angestellte |
+| Antiquity | 0–60 | Start | Carriers, carts, barges, basic chains, farmers and citizens |
+| Middle Ages | 60–140 | 300 citizens + 4 key technologies | Iron, tools, paved roads, canals, sailing ships, craftsmen |
+| Industrial | 140–220 | 500 craftsmen + steam engine researched | Railway, coal, steel, factories, workers, engineers |
+| Modern | 220+ | 400 engineers + electricity researched | Electricity, oil, trucks, buses, electric locomotives, employees |
 
-**Forschungspunkte**
+**Research points**
 
-- Bürger: 0,1 Punkte pro Kopf und Jahr; Handwerker 0,3; Ingenieure 1,0; Angestellte 0,6
-- Gebäude verstärken: Bibliothek +20 %, Kloster +30 % (Mittelalter), Universität +50 % (Industrie)
-- Eine Technologie kostet zwischen 50 (frühe Antike) und 5.000 Punkten (späte Moderne)
+- Citizens: 0.1 points per head and year; craftsmen 0.3; engineers 1.0; employees 0.6
+- Buildings boost research: library +20 %, monastery +30 % (Middle Ages), university +50 % (industrial)
+- A technology costs between 50 (early antiquity) and 5,000 points (late modern)
 
-**Technologiebaum (Ausschnitt)**
+**Technology tree (excerpt)**
 
-- Antike: Rad → Ochsenkarren → Schotterstraße; Bootsbau → Flusskahn; Weberei → Kleidung; Schrift → Bibliothek
-- Mittelalter: Metallurgie → Schmiede → Werkzeuge; Pflasterbau; Wasserbau → Kanal → Schleuse; Kompass → Segelschiff
-- Industrie: Dampfmaschine → Eisenbahn → Brückenbau → Tunnelbau; Hochofen → Stahl; Mechanik → Maschinen
-- Moderne: Elektrizität → Kraftwerk → E-Lok; Verbrennungsmotor → LKW, Bus; Petrochemie → Raffinerie
+- Antiquity: wheel → ox cart → gravel road; boat building → river barge; weaving → clothing; writing → library
+- Middle Ages: metallurgy → smithy → tools; paving; hydraulic engineering → canal → lock; compass → sailing ship
+- Industrial: steam engine → railway → bridge building → tunnelling; blast furnace → steel; mechanics → machines
+- Modern: electricity → power plant → electric locomotive; combustion engine → truck, bus; petrochemistry → refinery
 
-**Infrastruktur-Upgrade**
+**Infrastructure upgrades**
 
-- Vorhandene Wege können ohne Abriss ausgebaut werden (Schotter → Pflaster → Asphalt), Kosten = Differenz plus 20 %
-- Fahrzeuge alter Epochen bleiben fahrbar, verlieren aber gegenüber neuen deutlich an Wirtschaftlichkeit
+- Existing routes can be upgraded without demolition (gravel → paved → asphalt); cost = difference plus 20 %
+- Vehicles of older eras keep running but become much less economical than new ones
 
-## Wirtschaft & Finanzen
+## Economy and finances
 
-Eine Währung (Taler) für alles; Geld kommt aus Steuern, Transport und Handel, Geld geht an Bau, Unterhalt und Fahrzeuge.
+One currency (thalers) for everything; money comes from taxes, transport and trade and goes to construction, upkeep and vehicles.
 
-**Einnahmen**
+**Income**
 
-- Steuern pro Einwohner und Jahr: Bauer 1, Bürger 3, Handwerker 6, Arbeiter 8, Ingenieur 15, Angestellter 20 Taler; nur bei Versorgung über 50 %
-- Transporteinnahmen: Grundpreis der Ware × Entfernung × Tempo-Bonus (schneller als erwartet = bis +50 %)
-- Handel: Überschüsse an Handelsposten am Kartenrand oder an andere Völker verkaufen
+- Taxes per resident and year: farmer 1, citizen 3, craftsman 6, worker 8, engineer 15, employee 20 thalers; only when supplied above 50 %
+- Transport income: base price of the good × distance × speed bonus (faster than expected = up to +50 %)
+- Trade: sell surpluses at trading posts on the map edge or to other peoples
 
-**Ausgaben**
+**Expenses**
 
-- Bau: Geld plus Material (siehe Produktion)
-- Unterhalt: Gebäude, Wege und Fahrzeuge pro Jahr
-- Kauf von Fahrzeugen
+- Construction: money plus materials (see production)
+- Upkeep: buildings, routes and vehicles per year
+- Buying vehicles
 
-**Warenpreise (Grundwerte pro Einheit)**
+**Base prices per unit**
 
-| Ware | Preis | Ware | Preis |
+| Good | Price | Good | Price |
 | --- | --- | --- | --- |
-| Holz, Stein, Getreide | 2 | Werkzeuge, Möbel | 15 |
-| Mehl, Fisch, Wolle | 4 | Kohle, Erz | 5 |
-| Brot, Kleidung | 8 | Stahl | 20 |
-| Wein | 10 | Maschinen | 60 |
-| Eisen | 12 | Konsumgüter | 40 |
+| Wood, stone, grain | 2 | Tools, furniture | 15 |
+| Flour, fish, wool | 4 | Coal, ore | 5 |
+| Bread, clothing | 8 | Steel | 20 |
+| Wine | 10 | Machines | 60 |
+| Iron | 12 | Consumer goods | 40 |
 
-**Startkapital und Kredite**
+**Starting capital and loans**
 
-- Start: 10.000 Taler (normal), 25.000 (leicht), 5.000 (schwer)
-- Kredite in Schritten von 5.000 Taler, Zins 5 % pro Jahr, Rückzahlung jederzeit
-- Bankrott, wenn der Kontostand 2 Jahre unter dem Kreditlimit liegt (nur im Wettbewerbsmodus)
+- Start: 10,000 thalers (normal), 25,000 (easy), 5,000 (hard)
+- Loans in steps of 5,000 thalers, 5 % interest per year, repayable at any time
+- Bankruptcy when the balance stays below the credit limit for 2 years (competitive mode only)
 
-## Andere Völker & Territorium
+## Other peoples and territory
 
-1 bis 3 KI-Völker teilen sich die Region mit dir; sie konkurrieren um Ressourcen, Städte und Handel, aber nie mit Waffen.
+One to three AI peoples share the region with the player; they compete for resources, towns and trade, but never with weapons.
 
-**Einflussgebiet**
+**Influence area**
 
-- Jedes Volk hat ein Einflussgebiet um seine Gebäude und versorgten Häuser
-- Einfluss wächst durch Versorgung und Anbindung: Eine neutrale Stadt, die du zu mehr als 60 % versorgst, schließt sich dir an
-- Bauen ist nur im eigenen oder neutralen Gebiet erlaubt; Wege dürfen fremdes Gebiet gegen eine Durchfahrtsgebühr queren
+- Every people has an influence area around its buildings and supplied houses
+- Influence grows through supply and connection: a neutral town supplied above 60 % joins that people
+- Building is only allowed on own or neutral land; routes may cross foreign land for a toll
 
-**Wettbewerb**
+**Competition**
 
-- Zwei Völker können dieselbe neutrale Stadt beliefern; wer besser versorgt, gewinnt ihren Einfluss
-- Ressourcenvorkommen gehören dem, in dessen Gebiet sie liegen
+- Two peoples can supply the same neutral town; whoever supplies it better wins its influence
+- Resource deposits belong to whoever's land they are on
 
-**Diplomatie und Handel**
+**Diplomacy and trade**
 
-- Handelsvertrag: feste Warenmenge pro Jahr zu festem Preis
-- Wegerecht: kostenlose Durchfahrt durch fremdes Gebiet
-- Gemeinschaftsprojekt: Brücke, Kanal oder Bahnstrecke, Kosten geteilt, beide dürfen nutzen
-- Beziehungswert -100 bis +100; er steigt durch erfüllte Verträge und sinkt durch Abwerben von Städten
+- Trade contract: fixed amount of goods per year at a fixed price
+- Right of way: free passage through foreign land
+- Joint project: bridge, canal or railway with shared costs, usable by both
+- Relationship value from -100 to +100; rises with fulfilled contracts, falls when towns are poached
 
-**KI-Charaktere**
+**AI personalities**
 
-- Händler (handelt viel, baut weniger), Baumeister (große Netze, wenig Diplomatie), Gelehrter (schnelle Forschung)
+- Trader (trades a lot, builds less), builder (large networks, little diplomacy), scholar (fast research)
 
-## Ziele & Spielmodi
+## Goals and game modes
 
-Drei Modi teilen dieselben Regeln und unterscheiden sich nur in Zielen und Gegnern.
+Three modes share the same rules and differ only in goals and opponents.
 
-| Modus | Gegner | Ziel | Ende |
+| Mode | Opponents | Goal | End |
 | --- | --- | --- | --- |
-| Freies Spiel | optional 0–3 KI | keins; Meilensteine als Belohnung | nie |
-| Szenario | vorgegeben | feste Aufgabe, z. B. „Versorge 3 Städte mit Brot bis Jahr 40“ | Aufgabe erfüllt oder Frist verpasst |
-| Wettbewerb | 1–3 KI | als Erster ein Weltwunder fertigstellen oder bei Spielende den höchsten Wohlstand haben | Wunder fertig oder Jahr 300 |
+| Free play | optional 0–3 AI | none; milestones as rewards | never |
+| Scenario | predefined | fixed task, e.g. "Supply 3 towns with bread by year 40" | task done or deadline missed |
+| Competition | 1–3 AI | be the first to finish a wonder, or have the highest prosperity at the end | wonder finished or year 300 |
 
-**Weltwunder** (je Epoche eins, jedes braucht große Mengen bestimmter Waren auf einer Baustelle)
+**Wonders** (one per era; each needs large amounts of specific goods delivered to a construction site)
 
-- Antike: Leuchtturm – 5.000 Stein, 2.000 Holz
-- Mittelalter: Kathedrale – 8.000 Stein, 2.000 Werkzeuge, 1.000 Wein
-- Industrie: Weltausstellung – 3.000 Stahl, 1.000 Maschinen
-- Moderne: Großer Hauptbahnhof – 5.000 Stahl, 3.000 Konsumgüter, Bahnanbindung zu allen Städten
+- Antiquity: lighthouse – 5,000 stone, 2,000 wood
+- Middle Ages: cathedral – 8,000 stone, 2,000 tools, 1,000 wine
+- Industrial: world's fair – 3,000 steel, 1,000 machines
+- Modern: grand central station – 5,000 steel, 3,000 consumer goods, rail connection to every town
 
-**Wohlstand** = Einwohner × Durchschnittsstand + Wert des Verkehrsnetzes + Kontostand / 100
+**Prosperity** = residents × average tier + value of the transport network + balance / 100
 
-## Offene Fragen & nächste Schritte
+## Open questions
 
-Der erste Prototyp deckt nur die Antike ab: Karte, ein Dorf, drei Ketten, Straßen und Karren. Er soll zeigen, ob der Kern-Kreislauf Spaß macht, bevor wir in die Breite gehen.
+- [ ] Art style: low-poly with clear colours (faster to build) or more realistic?
+- [ ] Seasons affecting harvests and shipping (frozen rivers)?
+- [ ] Endless play: what happens after the modern age?
+- [ ] Final name of the game
 
-**Offene Fragen**
-
-- [ ] Grafikstil: Low-Poly mit klaren Farben (schneller machbar) oder eher realistisch?
-- [ ] Technik: RealityKit (schneller Start) oder eigene Metal-Engine (mehr Kontrolle bei großen Karten)? Vorschlag: RealityKit für den Prototyp, Simulation so trennen, dass ein Wechsel möglich bleibt
-- [ ] Jahreszeiten mit Auswirkung auf Ernte und Schifffahrt (zugefrorene Flüsse)?
-- [ ] Endlos-Spiel: was passiert nach der Moderne?
-- [ ] Name des Spiels
-
-**Prototyp-Umfang (Meilenstein 1)**
-
-1. Xcode-Projekt, 3D-Szene, Kamera (drehen, zoomen, verschieben)
-2. Terrain aus Seed erzeugen, Wald und Felder platzieren
-3. Gebäude setzen: Holzfäller, Getreidehof, Mühle, Bäckerei, Lager, Haus
-4. Simulation: Tick-Schleife, Produktion, Bedürfnisse, Wachstum
-5. Straßen bauen, Wegfindung, Ochsenkarren auf Linien
-6. Einfache Oberfläche: Baumenü, Geld, Warenanzeige, Pause und Zeitraffer
-
-**Architektur-Grundsatz**
-
-- Simulation als eigenes Swift-Paket ohne Grafik-Abhängigkeit, testbar mit Unit-Tests
-- Spielwerte (Ketten, Fahrzeuge, Preise) in JSON-Dateien
-- Darstellung liest nur den Simulationszustand und schickt Befehle zurück
+The roadmap lives in the [GitHub milestones](https://github.com/502Proxy/EpochenDerWege/milestones).
