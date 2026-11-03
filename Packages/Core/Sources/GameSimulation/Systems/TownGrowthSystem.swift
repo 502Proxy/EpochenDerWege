@@ -1,8 +1,10 @@
 import GameDomain
 
-/// Lets towns build houses in residential zones on their own.
+/// Lets towns build houses, markets and workshops in their zones on their own.
 ///
-/// Every `zoneGrowthIntervalDays` the town checks its demand. It grows when jobs are
+/// Every `zoneGrowthIntervalDays` the town checks its demand for each zone kind.
+/// Commerce buildings follow the population: one per `residentsPerBuilding` residents.
+/// For housing, it grows when jobs are
 /// open, or when enough food is stored and the existing houses are well supplied. It
 /// then builds one house, free of charge, on the best free zoned cell next to a road:
 /// closest to the settlement centre first. New houses start empty and are moved into
@@ -15,13 +17,29 @@ public struct TownGrowthSystem: SimulationSystem {
 
     public func update(_ world: inout WorldState) {
         guard world.clock.isStartOfPeriod(days: world.rules.zoneGrowthIntervalDays) else { return }
-        guard Self.hasHousingDemand(in: world),
-              let house = world.catalog.firstBuilding(of: .housing),
-              let cell = Self.bestBuildingSite(for: house, in: world)
-        else { return }
 
-        let id = world.addBuilding(house, at: cell, resourceFactor: 1)
+        if Self.hasHousingDemand(in: world), let house = world.catalog.firstBuilding(of: .housing) {
+            build(house, in: .residential, world: &world)
+        }
+        // Commerce: one building of each type per `residentsPerBuilding` residents.
+        for kind in [ZoneKind.commercial, .industrial] {
+            for definition in world.catalog.buildings(forZone: kind) where Self.wantsAnother(definition, in: world) {
+                build(definition, in: kind, world: &world)
+            }
+        }
+    }
+
+    private func build(_ definition: BuildingDefinition, in zone: ZoneKind, world: inout WorldState) {
+        guard let cell = Self.bestBuildingSite(for: definition, in: zone, world: world) else { return }
+        let id = world.addBuilding(definition, at: cell, resourceFactor: 1)
         world.emit(.townGrew(id))
+    }
+
+    /// Whether the town supports another commerce building of this type.
+    static func wantsAnother(_ definition: BuildingDefinition, in world: WorldState) -> Bool {
+        guard let residentsPerBuilding = definition.residentsPerBuilding, residentsPerBuilding > 0 else { return false }
+        let existing = world.buildings.filter { $0.definition.id == definition.id }.count
+        return world.population / residentsPerBuilding > existing
     }
 
     /// Whether the town wants another house.
@@ -37,13 +55,13 @@ public struct TownGrowthSystem: SimulationSystem {
         return storedFood >= world.rules.zoneGrowthFoodThreshold && averageSupply >= requiredSupply
     }
 
-    /// The free residential cell next to a road that is closest to the settlement centre.
-    static func bestBuildingSite(for house: BuildingDefinition, in world: WorldState) -> GridPoint? {
+    /// The free cell of a zone next to a road that is closest to the settlement centre.
+    static func bestBuildingSite(for definition: BuildingDefinition, in zone: ZoneKind, world: WorldState) -> GridPoint? {
         let center = world.startCell ?? GridPoint(x: world.terrain.size / 2, z: world.terrain.size / 2)
         var best: (cell: GridPoint, score: Int)?
-        for (cell, kind) in world.zones where kind == .residential {
+        for (cell, kind) in world.zones where kind == zone {
             guard isNextToRoad(cell, in: world),
-                  case .success = PlacementValidator.validate(house, at: cell, in: world, ignoringCost: true)
+                  case .success = PlacementValidator.validate(definition, at: cell, in: world, ignoringCost: true)
             else { continue }
             let dx = cell.x - center.x
             let dz = cell.z - center.z

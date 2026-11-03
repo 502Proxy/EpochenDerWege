@@ -8,6 +8,10 @@ public enum BuildingStatus: Hashable, Sendable, Codable {
     case noResources
     case storing
     case housing
+    /// A commerce building has goods and is selling them to the townspeople.
+    case trading
+    /// A commerce building waits for deliveries.
+    case awaitingGoods
 }
 
 /// A placed building.

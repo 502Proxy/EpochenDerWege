@@ -25,7 +25,7 @@ enum BuildTool: Hashable {
 /// Groups of tools in the build toolbar.
 enum ToolCategory: String, CaseIterable, Identifiable {
     case roads
-    case housing
+    case zones
     case production
     case storage
 
@@ -34,7 +34,7 @@ enum ToolCategory: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .roads: String(localized: "Roads")
-        case .housing: String(localized: "Housing")
+        case .zones: String(localized: "Zones")
         case .production: String(localized: "Production")
         case .storage: String(localized: "Storage")
         }
@@ -43,7 +43,7 @@ enum ToolCategory: String, CaseIterable, Identifiable {
     var symbol: String {
         switch self {
         case .roads: "road.lanes"
-        case .housing: "house.fill"
+        case .zones: "square.grid.3x3.fill"
         case .production: "hammer.fill"
         case .storage: "shippingbox.fill"
         }
@@ -53,7 +53,7 @@ enum ToolCategory: String, CaseIterable, Identifiable {
     var shortcut: Character {
         switch self {
         case .roads: "1"
-        case .housing: "2"
+        case .zones: "2"
         case .production: "3"
         case .storage: "4"
         }
@@ -64,9 +64,9 @@ enum ToolCategory: String, CaseIterable, Identifiable {
         switch self {
         case .roads:
             [.road, .bulldoze]
-        case .housing:
-            // Houses are built by the towns themselves inside residential zones.
-            [.zone(.residential), .unzone]
+        case .zones:
+            // Houses, markets and workshops are built by the towns themselves inside zones.
+            ZoneKind.allCases.map { .zone($0) } + [.unzone]
         case .production:
             catalog.buildings.filter { $0.category == .production }.map { .building($0.id) }
         case .storage:
@@ -80,10 +80,10 @@ enum ToolCategory: String, CaseIterable, Identifiable {
         case .road, .bulldoze:
             return .roads
         case .zone, .unzone:
-            return .housing
+            return .zones
         case .building(let type):
             switch catalog.building(type)?.category {
-            case .housing: return .housing
+            case .housing, .commerce: return .zones
             case .storage: return .storage
             default: return .production
             }

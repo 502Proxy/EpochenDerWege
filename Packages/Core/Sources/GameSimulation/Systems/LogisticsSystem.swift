@@ -24,7 +24,8 @@ public protocol DeliveryPlanner: Sendable {
 ///
 /// 1. Consumers that need the good (production inputs, house food) come first.
 /// 2. Among houses, those with little food are preferred so shortages are shared fairly.
-/// 3. Storehouses take whatever no consumer in range needs.
+/// 3. Commerce buildings (markets, workshops) buy what consumers do not need.
+/// 4. Storehouses take whatever nobody in range buys.
 public struct NearestConsumerPlanner: DeliveryPlanner {
     /// Extra "distance" in metres per unit of food a house already has.
     public var houseStockPenaltyMeters: Double
@@ -48,6 +49,8 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
             switch candidate.category {
             case .storage:
                 score += rules.carrierRangeMeters * 2
+            case .commerce:
+                score += rules.carrierRangeMeters
             case .housing:
                 let stock = rules.foodGoods.reduce(0) { $0 + candidate.input.count(of: $1) + candidate.incomingAmount(of: $1) }
                 score += Double(stock) * houseStockPenaltyMeters
@@ -72,6 +75,9 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
         case .housing:
             guard rules.foodGoods.contains(good) else { return 0 }
             return building.input.space(for: good) - incoming
+        case .commerce:
+            guard building.definition.consumes(good) else { return 0 }
+            return building.input.space(for: good) - incoming
         case .storage:
             return building.output.space(for: good) - incoming
         }
@@ -94,7 +100,7 @@ public struct LogisticsSystem: SimulationSystem {
     }
 
     private func dispatchCarriers(in world: inout WorldState) {
-        for sourceIndex in world.buildings.indices where world.buildings[sourceIndex].category != .housing {
+        for sourceIndex in world.buildings.indices where world.buildings[sourceIndex].definition.maxCarriers > 0 {
             var freeSlots = world.buildings[sourceIndex].definition.maxCarriers - world.buildings[sourceIndex].activeCarriers
             guard freeSlots > 0 else { continue }
 
@@ -164,6 +170,11 @@ public struct LogisticsSystem: SimulationSystem {
             world.buildings[index].output.add(good, amount: carrier.cargo.amount)
         case .production, .housing:
             world.buildings[index].input.add(good, amount: carrier.cargo.amount)
+        case .commerce:
+            // Markets and workshops pay the base price for every delivered unit.
+            let accepted = world.buildings[index].input.add(good, amount: carrier.cargo.amount)
+            let price = world.catalog.good(good)?.basePrice ?? 0
+            world.book(accepted * price, as: .sales)
         }
     }
 }

@@ -2,4 +2,8 @@
 public enum ZoneKind: String, CaseIterable, Hashable, Sendable, Codable {
     /// Houses appear here when the town has demand.
     case residential
+    /// Markets appear here; they buy food and consumer goods.
+    case commercial
+    /// Workshops appear here; they buy raw materials.
+    case industrial
 }

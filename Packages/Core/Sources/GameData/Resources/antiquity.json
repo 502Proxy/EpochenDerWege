@@ -16,83 +16,365 @@
     "maxRoadSlopePercent": 25,
     "zoneGrowthIntervalDays": 5,
     "zoneGrowthFoodThreshold": 12,
-    "foodGoods": ["bread", "fish"],
+    "foodGoods": [
+      "bread",
+      "fish"
+    ],
     "startingHouses": 5,
     "startingResidentsPerHouse": 4,
     "startingStock": [
-      { "good": "wood", "amount": 30 },
-      { "good": "stone", "amount": 20 },
-      { "good": "bread", "amount": 30 }
+      {
+        "good": "wood",
+        "amount": 30
+      },
+      {
+        "good": "stone",
+        "amount": 20
+      },
+      {
+        "good": "bread",
+        "amount": 30
+      }
     ]
   },
   "goods": [
-    { "id": "wood",  "name": "Wood",  "basePrice": 2, "color": { "red": 0.55, "green": 0.36, "blue": 0.20 } },
-    { "id": "stone", "name": "Stone", "basePrice": 2, "color": { "red": 0.62, "green": 0.62, "blue": 0.64 } },
-    { "id": "grain", "name": "Grain", "basePrice": 2, "color": { "red": 0.93, "green": 0.80, "blue": 0.30 } },
-    { "id": "flour", "name": "Flour", "basePrice": 4, "color": { "red": 0.97, "green": 0.95, "blue": 0.88 } },
-    { "id": "bread", "name": "Bread", "basePrice": 8, "color": { "red": 0.80, "green": 0.50, "blue": 0.22 } },
-    { "id": "fish",  "name": "Fish",  "basePrice": 4, "color": { "red": 0.40, "green": 0.65, "blue": 0.85 } }
+    {
+      "id": "wood",
+      "name": "Wood",
+      "basePrice": 2,
+      "color": {
+        "red": 0.55,
+        "green": 0.36,
+        "blue": 0.2
+      }
+    },
+    {
+      "id": "stone",
+      "name": "Stone",
+      "basePrice": 2,
+      "color": {
+        "red": 0.62,
+        "green": 0.62,
+        "blue": 0.64
+      }
+    },
+    {
+      "id": "grain",
+      "name": "Grain",
+      "basePrice": 2,
+      "color": {
+        "red": 0.93,
+        "green": 0.8,
+        "blue": 0.3
+      }
+    },
+    {
+      "id": "flour",
+      "name": "Flour",
+      "basePrice": 4,
+      "color": {
+        "red": 0.97,
+        "green": 0.95,
+        "blue": 0.88
+      }
+    },
+    {
+      "id": "bread",
+      "name": "Bread",
+      "basePrice": 8,
+      "color": {
+        "red": 0.8,
+        "green": 0.5,
+        "blue": 0.22
+      }
+    },
+    {
+      "id": "fish",
+      "name": "Fish",
+      "basePrice": 4,
+      "color": {
+        "red": 0.4,
+        "green": 0.65,
+        "blue": 0.85
+      }
+    }
   ],
   "buildings": [
     {
-      "id": "storehouse", "name": "Storehouse", "category": "storage",
-      "cost": 800, "upkeepPerYear": 20, "workers": 0,
-      "inputs": [], "outputs": [], "cycleDays": 0,
-      "storagePerGood": 200, "maxCarriers": 3, "maxResidents": 0,
-      "color": { "red": 0.60, "green": 0.45, "blue": 0.30 }
+      "id": "storehouse",
+      "name": "Storehouse",
+      "category": "storage",
+      "cost": 800,
+      "upkeepPerYear": 20,
+      "workers": 0,
+      "inputs": [],
+      "outputs": [],
+      "cycleDays": 0,
+      "storagePerGood": 200,
+      "maxCarriers": 3,
+      "maxResidents": 0,
+      "color": {
+        "red": 0.6,
+        "green": 0.45,
+        "blue": 0.3
+      }
     },
     {
-      "id": "house", "name": "House", "category": "housing",
-      "cost": 150, "upkeepPerYear": 0, "workers": 0,
-      "inputs": [], "outputs": [], "cycleDays": 0,
-      "storagePerGood": 6, "maxCarriers": 0, "maxResidents": 4,
-      "color": { "red": 0.85, "green": 0.75, "blue": 0.60 }
+      "id": "house",
+      "name": "House",
+      "category": "housing",
+      "cost": 150,
+      "upkeepPerYear": 0,
+      "workers": 0,
+      "inputs": [],
+      "outputs": [],
+      "cycleDays": 0,
+      "storagePerGood": 6,
+      "maxCarriers": 0,
+      "maxResidents": 4,
+      "color": {
+        "red": 0.85,
+        "green": 0.75,
+        "blue": 0.6
+      }
     },
     {
-      "id": "woodcutter", "name": "Woodcutter", "category": "production",
-      "cost": 300, "upkeepPerYear": 10, "workers": 4,
-      "inputs": [], "outputs": [{ "good": "wood", "amount": 1 }], "cycleDays": 2,
-      "storagePerGood": 20, "maxCarriers": 1, "maxResidents": 0,
-      "resource": { "biome": "forest", "radius": 3, "idealCount": 8 },
-      "color": { "red": 0.35, "green": 0.55, "blue": 0.25 }
+      "id": "woodcutter",
+      "name": "Woodcutter",
+      "category": "production",
+      "cost": 300,
+      "upkeepPerYear": 10,
+      "workers": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "good": "wood",
+          "amount": 1
+        }
+      ],
+      "cycleDays": 2,
+      "storagePerGood": 20,
+      "maxCarriers": 1,
+      "maxResidents": 0,
+      "resource": {
+        "biome": "forest",
+        "radius": 3,
+        "idealCount": 8
+      },
+      "color": {
+        "red": 0.35,
+        "green": 0.55,
+        "blue": 0.25
+      }
     },
     {
-      "id": "quarry", "name": "Quarry", "category": "production",
-      "cost": 400, "upkeepPerYear": 15, "workers": 6,
-      "inputs": [], "outputs": [{ "good": "stone", "amount": 1 }], "cycleDays": 3,
-      "storagePerGood": 20, "maxCarriers": 1, "maxResidents": 0,
-      "resource": { "biome": "rock", "radius": 3, "idealCount": 6 },
-      "color": { "red": 0.55, "green": 0.55, "blue": 0.58 }
+      "id": "quarry",
+      "name": "Quarry",
+      "category": "production",
+      "cost": 400,
+      "upkeepPerYear": 15,
+      "workers": 6,
+      "inputs": [],
+      "outputs": [
+        {
+          "good": "stone",
+          "amount": 1
+        }
+      ],
+      "cycleDays": 3,
+      "storagePerGood": 20,
+      "maxCarriers": 1,
+      "maxResidents": 0,
+      "resource": {
+        "biome": "rock",
+        "radius": 3,
+        "idealCount": 6
+      },
+      "color": {
+        "red": 0.55,
+        "green": 0.55,
+        "blue": 0.58
+      }
     },
     {
-      "id": "grainFarm", "name": "Grain Farm", "category": "production",
-      "cost": 350, "upkeepPerYear": 10, "workers": 6,
-      "inputs": [], "outputs": [{ "good": "grain", "amount": 2 }], "cycleDays": 4,
-      "storagePerGood": 20, "maxCarriers": 1, "maxResidents": 0,
-      "resource": { "biome": "grass", "radius": 2, "idealCount": 12 },
-      "color": { "red": 0.90, "green": 0.78, "blue": 0.35 }
+      "id": "grainFarm",
+      "name": "Grain Farm",
+      "category": "production",
+      "cost": 350,
+      "upkeepPerYear": 10,
+      "workers": 6,
+      "inputs": [],
+      "outputs": [
+        {
+          "good": "grain",
+          "amount": 2
+        }
+      ],
+      "cycleDays": 4,
+      "storagePerGood": 20,
+      "maxCarriers": 1,
+      "maxResidents": 0,
+      "resource": {
+        "biome": "grass",
+        "radius": 2,
+        "idealCount": 12
+      },
+      "color": {
+        "red": 0.9,
+        "green": 0.78,
+        "blue": 0.35
+      }
     },
     {
-      "id": "mill", "name": "Mill", "category": "production",
-      "cost": 600, "upkeepPerYear": 20, "workers": 2,
-      "inputs": [{ "good": "grain", "amount": 2 }], "outputs": [{ "good": "flour", "amount": 2 }], "cycleDays": 2,
-      "storagePerGood": 20, "maxCarriers": 1, "maxResidents": 0,
-      "color": { "red": 0.92, "green": 0.90, "blue": 0.85 }
+      "id": "mill",
+      "name": "Mill",
+      "category": "production",
+      "cost": 600,
+      "upkeepPerYear": 20,
+      "workers": 2,
+      "inputs": [
+        {
+          "good": "grain",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "good": "flour",
+          "amount": 2
+        }
+      ],
+      "cycleDays": 2,
+      "storagePerGood": 20,
+      "maxCarriers": 1,
+      "maxResidents": 0,
+      "color": {
+        "red": 0.92,
+        "green": 0.9,
+        "blue": 0.85
+      }
     },
     {
-      "id": "bakery", "name": "Bakery", "category": "production",
-      "cost": 500, "upkeepPerYear": 20, "workers": 3,
-      "inputs": [{ "good": "flour", "amount": 2 }], "outputs": [{ "good": "bread", "amount": 3 }], "cycleDays": 2,
-      "storagePerGood": 20, "maxCarriers": 1, "maxResidents": 0,
-      "color": { "red": 0.78, "green": 0.45, "blue": 0.25 }
+      "id": "bakery",
+      "name": "Bakery",
+      "category": "production",
+      "cost": 500,
+      "upkeepPerYear": 20,
+      "workers": 3,
+      "inputs": [
+        {
+          "good": "flour",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "good": "bread",
+          "amount": 3
+        }
+      ],
+      "cycleDays": 2,
+      "storagePerGood": 20,
+      "maxCarriers": 1,
+      "maxResidents": 0,
+      "color": {
+        "red": 0.78,
+        "green": 0.45,
+        "blue": 0.25
+      }
     },
     {
-      "id": "fishersHut", "name": "Fisher's Hut", "category": "production",
-      "cost": 300, "upkeepPerYear": 10, "workers": 3,
-      "inputs": [], "outputs": [{ "good": "fish", "amount": 2 }], "cycleDays": 3,
-      "storagePerGood": 20, "maxCarriers": 1, "maxResidents": 0,
-      "resource": { "biome": "water", "radius": 3, "idealCount": 6 },
-      "color": { "red": 0.35, "green": 0.55, "blue": 0.75 }
+      "id": "fishersHut",
+      "name": "Fisher's Hut",
+      "category": "production",
+      "cost": 300,
+      "upkeepPerYear": 10,
+      "workers": 3,
+      "inputs": [],
+      "outputs": [
+        {
+          "good": "fish",
+          "amount": 2
+        }
+      ],
+      "cycleDays": 3,
+      "storagePerGood": 20,
+      "maxCarriers": 1,
+      "maxResidents": 0,
+      "resource": {
+        "biome": "water",
+        "radius": 3,
+        "idealCount": 6
+      },
+      "color": {
+        "red": 0.35,
+        "green": 0.55,
+        "blue": 0.75
+      }
+    },
+    {
+      "id": "market",
+      "name": "Market",
+      "category": "commerce",
+      "cost": 0,
+      "upkeepPerYear": 0,
+      "workers": 0,
+      "inputs": [
+        {
+          "good": "bread",
+          "amount": 1
+        },
+        {
+          "good": "fish",
+          "amount": 1
+        }
+      ],
+      "outputs": [],
+      "cycleDays": 2,
+      "storagePerGood": 10,
+      "maxCarriers": 0,
+      "maxResidents": 0,
+      "zone": "commercial",
+      "residentsPerBuilding": 15,
+      "color": {
+        "red": 0.3,
+        "green": 0.55,
+        "blue": 0.9
+      }
+    },
+    {
+      "id": "workshop",
+      "name": "Workshop",
+      "category": "commerce",
+      "cost": 0,
+      "upkeepPerYear": 0,
+      "workers": 0,
+      "inputs": [
+        {
+          "good": "wood",
+          "amount": 1
+        },
+        {
+          "good": "stone",
+          "amount": 1
+        },
+        {
+          "good": "grain",
+          "amount": 1
+        }
+      ],
+      "outputs": [],
+      "cycleDays": 2,
+      "storagePerGood": 10,
+      "maxCarriers": 0,
+      "maxResidents": 0,
+      "zone": "industrial",
+      "residentsPerBuilding": 20,
+      "color": {
+        "red": 0.85,
+        "green": 0.55,
+        "blue": 0.25
+      }
     }
   ]
 }
