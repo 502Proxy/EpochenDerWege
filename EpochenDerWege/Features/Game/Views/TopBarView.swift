@@ -4,6 +4,7 @@ import SwiftUI
 struct TopBarView: View {
     let viewModel: GameViewModel
     @State private var showsFinances = false
+    @State private var showsLines = false
 
     var body: some View {
         let hud = viewModel.hud
@@ -28,6 +29,16 @@ struct TopBarView: View {
             stat("hammer.fill", Text("Jobs \(hud.workersEmployed)/\(hud.workersNeeded)"))
                 .help(Text("\(hud.unemployed) unemployed"))
             stat("figure.walk", Text("\(hud.carriers) carriers"))
+            Button {
+                showsLines.toggle()
+            } label: {
+                stat("point.topleft.down.to.point.bottomright.curvepath", Text("\(viewModel.lines.count) lines"))
+            }
+            .buttonStyle(.plain)
+            .help(Text("Show transport lines and vehicles"))
+            .popover(isPresented: $showsLines, arrowEdge: .bottom) {
+                LinesView(viewModel: viewModel)
+            }
 
             Divider().frame(height: 18)
 

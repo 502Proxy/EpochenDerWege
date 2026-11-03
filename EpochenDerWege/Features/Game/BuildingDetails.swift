@@ -58,6 +58,16 @@ struct BuildingDetails: Equatable {
                 row(goodName(item.good), "\(item.amount) / \(building.output.capacityPerGood)")
             }
             row(String(localized: "Carriers out"), "\(building.activeCarriers) / \(definition.maxCarriers)")
+        case .stop:
+            let stock = building.output.sortedItems
+            if stock.isEmpty {
+                row(String(localized: "Waiting goods"), String(localized: "None"))
+            }
+            for item in stock {
+                row(goodName(item.good), "\(item.amount) / \(building.output.capacityPerGood)")
+            }
+            let lines = world.lines(servingStop: building.id).map { "\($0.number)" }
+            row(String(localized: "Lines"), lines.isEmpty ? String(localized: "None") : lines.joined(separator: ", "))
         case .commerce:
             for input in definition.inputs {
                 let price = catalog.good(input.good)?.basePrice ?? 0
@@ -73,7 +83,7 @@ struct BuildingDetails: Equatable {
 
         let status = GameText.status(of: building)
         id = building.id
-        name = GameText.name(of: definition)
+        name = building.category == .stop ? String(localized: "Stop \(building.id.rawValue)") : GameText.name(of: definition)
         self.status = status.text
         tone = status.tone
         self.rows = rows

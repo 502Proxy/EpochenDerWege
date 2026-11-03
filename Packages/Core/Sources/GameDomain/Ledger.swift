@@ -6,11 +6,13 @@ public enum FinanceCategory: String, CaseIterable, Hashable, Sendable, Codable {
     case construction
     case roads
     case upkeep
+    /// Buying vehicles and their yearly upkeep.
+    case vehicles
 
     public var isIncome: Bool {
         switch self {
         case .taxes, .sales, .refunds: true
-        case .construction, .roads, .upkeep: false
+        case .construction, .roads, .upkeep, .vehicles: false
         }
     }
 

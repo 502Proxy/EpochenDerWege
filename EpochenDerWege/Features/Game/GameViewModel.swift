@@ -41,6 +41,9 @@ final class GameViewModel {
     private(set) var toast: Toast?
     private(set) var speed: Int
     private(set) var finances = FinanceSummary()
+    private(set) var lines: [LineSummary] = []
+    /// Stops picked so far with the line tool, in order.
+    private(set) var pendingLineStops: [BuildingID] = []
 
     let catalog: GameCatalog
 
@@ -77,6 +80,7 @@ final class GameViewModel {
     /// Selects a tool; selecting the active tool again deselects it.
     func toggleTool(_ tool: BuildTool) {
         selectedTool = selectedTool == tool ? nil : tool
+        pendingLineStops = []
         if selectedTool != nil {
             selectBuilding(nil)
         }
@@ -94,7 +98,9 @@ final class GameViewModel {
 
     /// Escape or right click: drop the tool first, then the selection.
     func cancel() {
-        if selectedTool != nil {
+        if !pendingLineStops.isEmpty {
+            pendingLineStops = []
+        } else if selectedTool != nil {
             selectedTool = nil
         } else {
             selectBuilding(nil)
@@ -112,6 +118,10 @@ final class GameViewModel {
             engine.submit(ZoneCommand(cells: [cell], kind: kind))
         case .unzone:
             engine.submit(ZoneCommand(cells: [cell], kind: nil))
+        case .line:
+            if let stop = world.building(at: cell), stop.category == .stop, pendingLineStops.last != stop.id {
+                pendingLineStops.append(stop.id)
+            }
         case .bulldoze:
             let world = world
             if let building = world.building(at: cell) {
@@ -133,9 +143,35 @@ final class GameViewModel {
             engine.submit(ZoneCommand(cells: ZonePlanner.rectangle(from: start, to: end), kind: kind))
         case .unzone:
             engine.submit(ZoneCommand(cells: ZonePlanner.rectangle(from: start, to: end), kind: nil))
-        case .building, .bulldoze, nil:
+        case .building, .bulldoze, .line, nil:
             break
         }
+    }
+
+    // MARK: - Lines
+
+    /// Creates a line from the stops picked with the line tool.
+    func createPendingLine() {
+        guard pendingLineStops.count >= 2 else { return }
+        engine.submit(CreateLineCommand(stops: pendingLineStops))
+        pendingLineStops = []
+    }
+
+    func cancelPendingLine() {
+        pendingLineStops = []
+    }
+
+    func buyVehicle(for line: LineID) {
+        guard let vehicle = catalog.vehicles.first else { return }
+        engine.submit(BuyVehicleCommand(lineID: line, vehicleType: vehicle.id))
+    }
+
+    func sellVehicle(of line: LineID) {
+        engine.submit(SellVehicleCommand(lineID: line))
+    }
+
+    func deleteLine(_ line: LineID) {
+        engine.submit(DeleteLineCommand(lineID: line))
     }
 
     func demolishSelected() {
@@ -179,6 +215,10 @@ final class GameViewModel {
         }
         if next != hud {
             hud = next
+        }
+        let lineSummaries = LineSummary.make(for: world)
+        if lineSummaries != lines {
+            lines = lineSummaries
         }
         let summary = FinanceSummary(world: world)
         if summary != finances {

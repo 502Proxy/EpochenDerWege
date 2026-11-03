@@ -25,7 +25,8 @@ public protocol DeliveryPlanner: Sendable {
 /// 1. Consumers that need the good (production inputs, house food) come first.
 /// 2. Among houses, those with little food are preferred so shortages are shared fairly.
 /// 3. Commerce buildings (markets, workshops) buy what consumers do not need.
-/// 4. Storehouses take whatever nobody in range buys.
+/// 4. Stops take goods that one of their lines carries to where they are wanted.
+/// 5. Storehouses take whatever nobody in range buys.
 public struct NearestConsumerPlanner: DeliveryPlanner {
     /// Extra "distance" in metres per unit of food a house already has.
     public var houseStockPenaltyMeters: Double
@@ -40,6 +41,15 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
 
         for candidate in world.buildings where candidate.id != source.id {
             if source.category == .storage && candidate.category == .storage { continue }
+            // Stops only take goods a line can bring somewhere they are wanted, and never
+            // pass goods to another stop by carrier.
+            if candidate.category == .stop {
+                guard source.category != .stop, StopDemand.canExport(good, from: candidate.id, in: world) else { continue }
+            }
+            // Goods waiting at a stop for a vehicle are not carried off to a storehouse.
+            if source.category == .stop && candidate.category == .storage && StopDemand.canExport(good, from: source.id, in: world) {
+                continue
+            }
             let capacity = Self.demand(of: candidate, for: good, rules: rules)
             guard capacity > 0 else { continue }
             let distance = source.center.distance(to: candidate.center)
@@ -51,6 +61,8 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
                 score += rules.carrierRangeMeters * 2
             case .commerce:
                 score += rules.carrierRangeMeters
+            case .stop:
+                score += rules.carrierRangeMeters * 1.5
             case .housing:
                 let stock = rules.foodGoods.reduce(0) { $0 + candidate.input.count(of: $1) + candidate.incomingAmount(of: $1) }
                 score += Double(stock) * houseStockPenaltyMeters
@@ -78,6 +90,8 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
         case .commerce:
             guard building.definition.consumes(good) else { return 0 }
             return building.input.space(for: good) - incoming
+        case .stop:
+            return building.output.space(for: good) - incoming
         case .storage:
             return building.output.space(for: good) - incoming
         }
@@ -166,7 +180,7 @@ public struct LogisticsSystem: SimulationSystem {
         let good = carrier.cargo.good
         world.buildings[index].incoming[good] = max(0, world.buildings[index].incomingAmount(of: good) - carrier.cargo.amount)
         switch world.buildings[index].category {
-        case .storage:
+        case .storage, .stop:
             world.buildings[index].output.add(good, amount: carrier.cargo.amount)
         case .production, .housing:
             world.buildings[index].input.add(good, amount: carrier.cargo.amount)

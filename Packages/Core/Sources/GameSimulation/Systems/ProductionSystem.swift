@@ -11,7 +11,7 @@ public struct ProductionSystem: SimulationSystem {
             switch building.category {
             case .housing:
                 building.status = .housing
-            case .storage:
+            case .storage, .stop:
                 building.status = .storing
             case .commerce:
                 Self.trade(&building, ticksPerDay: ticksPerDay)

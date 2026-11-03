@@ -53,6 +53,7 @@ final class BuildingModelFactory {
         case "bakery": return bakery()
         case "fishersHut": return fishersHut()
         case "market": return market()
+        case "stop": return stop()
         case "workshop": return workshop()
         default: return generic(definition)
         }
@@ -194,6 +195,22 @@ final class BuildingModelFactory {
         }
         root.addChild(ModelKit.box(SIMD3<Float>(0.1, 0.1, 1.6), P.darkWood, at: SIMD3<Float>(-2.2, 1.75, 2.3)))
         root.addChild(ModelKit.box(SIMD3<Float>(0.05, 1.0, 1.3), P.sailCloth.darkened(by: 0.25), at: SIMD3<Float>(-2.2, 1.2, 2.3), cornerRadius: 0))
+        return (root, 6)
+    }
+
+    private static func stop() -> (Entity, Float) {
+        let root = Entity()
+        // Loading platform with a roof on four posts and a sign.
+        root.addChild(ModelKit.box(SIMD3<Float>(5.6, 0.5, 4.4), P.timber.darkened(by: 0.1), at: SIMD3<Float>(0, 0.1, 0)))
+        for corner in [SIMD2<Float>(-2.4, -1.8), SIMD2<Float>(2.4, -1.8), SIMD2<Float>(-2.4, 1.8), SIMD2<Float>(2.4, 1.8)] {
+            root.addChild(ModelKit.box(SIMD3<Float>(0.2, 2.8, 0.2), P.darkWood, at: SIMD3<Float>(corner.x, 1.7, corner.y)))
+        }
+        root.addChild(ModelKit.gableRoof(width: 5.8, depth: 4.6, height: 1.2, roof: P.thatch, gable: P.timber, baseY: 3.1))
+        for (index, x) in [Float(-1.2), 0, 1.2].enumerated() {
+            root.addChild(ModelKit.box(SIMD3<Float>(0.8, 0.7, 0.8), P.timber.darkened(by: 0.08 * Double(index)), at: SIMD3<Float>(x, 0.7, -0.8), yaw: 0.2 * Float(index)))
+        }
+        root.addChild(ModelKit.box(SIMD3<Float>(0.15, 2.6, 0.15), P.darkWood, at: SIMD3<Float>(3.1, 1.3, 2.2)))
+        root.addChild(ModelKit.box(SIMD3<Float>(1.2, 0.7, 0.1), GameColor(red: 0.85, green: 0.70, blue: 0.20), at: SIMD3<Float>(3.1, 2.5, 2.25), cornerRadius: 0.05))
         return (root, 6)
     }
 

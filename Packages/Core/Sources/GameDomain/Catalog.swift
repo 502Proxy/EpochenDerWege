@@ -134,6 +134,8 @@ public enum BuildingCategory: String, Hashable, Sendable, Codable {
     case housing
     /// Built by towns in commercial or industrial zones; buys goods and pays for them.
     case commerce
+    /// Transport stop next to a road; collects goods for lines and hands them out again.
+    case stop
 }
 
 /// Terrain a building needs nearby, such as forest for a woodcutter.
@@ -178,6 +180,8 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
     public var residentsPerBuilding: Int?
     /// Zones the player may place this building in; `nil` means anywhere.
     public var allowedZones: [ZoneKind]?
+    /// Whether the building must stand next to a road (stops).
+    public var requiresRoadAccess: Bool?
 
     public init(
         id: BuildingTypeID,
@@ -196,7 +200,8 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         color: GameColor,
         zone: ZoneKind? = nil,
         residentsPerBuilding: Int? = nil,
-        allowedZones: [ZoneKind]? = nil
+        allowedZones: [ZoneKind]? = nil,
+        requiresRoadAccess: Bool? = nil
     ) {
         self.id = id
         self.name = name
@@ -215,6 +220,7 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         self.zone = zone
         self.residentsPerBuilding = residentsPerBuilding
         self.allowedZones = allowedZones
+        self.requiresRoadAccess = requiresRoadAccess
     }
 
     /// Whether this building consumes the given good as a production input.
@@ -228,20 +234,22 @@ public struct GameCatalog: Sendable, Codable {
     public let rules: GameRules
     public let goods: [GoodDefinition]
     public let buildings: [BuildingDefinition]
+    public let vehicles: [VehicleDefinition]
 
     private let goodsByID: [GoodID: GoodDefinition]
     private let buildingsByID: [BuildingTypeID: BuildingDefinition]
 
-    public init(rules: GameRules, goods: [GoodDefinition], buildings: [BuildingDefinition]) {
+    public init(rules: GameRules, goods: [GoodDefinition], buildings: [BuildingDefinition], vehicles: [VehicleDefinition] = []) {
         self.rules = rules
         self.goods = goods
         self.buildings = buildings
+        self.vehicles = vehicles
         goodsByID = Dictionary(goods.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         buildingsByID = Dictionary(buildings.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
     private enum CodingKeys: String, CodingKey {
-        case rules, goods, buildings
+        case rules, goods, buildings, vehicles
     }
 
     public init(from decoder: any Decoder) throws {
@@ -249,7 +257,8 @@ public struct GameCatalog: Sendable, Codable {
         self.init(
             rules: try container.decode(GameRules.self, forKey: .rules),
             goods: try container.decode([GoodDefinition].self, forKey: .goods),
-            buildings: try container.decode([BuildingDefinition].self, forKey: .buildings)
+            buildings: try container.decode([BuildingDefinition].self, forKey: .buildings),
+            vehicles: try container.decodeIfPresent([VehicleDefinition].self, forKey: .vehicles) ?? []
         )
     }
 
@@ -258,10 +267,15 @@ public struct GameCatalog: Sendable, Codable {
         try container.encode(rules, forKey: .rules)
         try container.encode(goods, forKey: .goods)
         try container.encode(buildings, forKey: .buildings)
+        try container.encode(vehicles, forKey: .vehicles)
     }
 
     public func good(_ id: GoodID) -> GoodDefinition? {
         goodsByID[id]
+    }
+
+    public func vehicle(_ id: VehicleTypeID) -> VehicleDefinition? {
+        vehicles.first { $0.id == id }
     }
 
     public func building(_ id: BuildingTypeID) -> BuildingDefinition? {
@@ -270,7 +284,7 @@ public struct GameCatalog: Sendable, Codable {
 
     /// Returns a copy with different rules. Handy for tests and scenarios.
     public func replacingRules(_ rules: GameRules) -> GameCatalog {
-        GameCatalog(rules: rules, goods: goods, buildings: buildings)
+        GameCatalog(rules: rules, goods: goods, buildings: buildings, vehicles: vehicles)
     }
 
     /// Buildings that towns build on their own in a zone.

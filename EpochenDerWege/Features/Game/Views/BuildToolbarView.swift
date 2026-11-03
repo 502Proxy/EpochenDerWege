@@ -118,6 +118,12 @@ private struct ToolPresentation {
             costLabel = nil
             symbol = "square.dashed"
             color = .orange
+        case .line:
+            name = String(localized: "New line")
+            detail = String(localized: "Click stops one after another, then press Return or Create line. Buy ox carts for the line in the lines window.")
+            costLabel = nil
+            symbol = "point.topleft.down.to.point.bottomright.curvepath"
+            color = .blue
         case .bulldoze:
             name = String(localized: "Demolish")
             detail = String(localized: "Click a building or road to remove it. Half of the cost is refunded.")

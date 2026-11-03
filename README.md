@@ -37,7 +37,7 @@ If Xcode asks for signing, choose *Sign to Run Locally* or your own team under
 
 | Input | Action |
 | --- | --- |
-| 1 – 4 | Open a category of the build toolbar (roads, zones, production, storage) |
+| 1 – 4 | Open a category of the build toolbar (transport, zones, production, storage) |
 | Click | Build (with a building selected) or select a building |
 | Drag | Move the map; with the road or zone tool, draw a road or zone an area |
 | Right-drag | Rotate and tilt the camera |
@@ -89,13 +89,12 @@ Playable today:
 - Processing businesses (mill, bakery) may only be built in commercial or industrial zones; raw material producers sit at their resources
 - Building with live preview and rules for terrain, slope, money and nearby resources
 - Production chains: grain → flour → bread, fish, wood, stone
-- Carriers visibly transport goods between buildings, houses and storehouses
+- Carriers visibly transport goods within 150 m; for longer distances the player builds stops, creates lines and buys ox carts that drive on the road network (A* pathfinding)
 - Workers, food supply, growth and hunger
 - Yearly taxes and upkeep; finance overview with income and expenses per category and a balance chart (click the money in the top bar)
 - Pause and 1× / 2× / 4× speed
 
-Known simplifications of the prototype: carriers walk in straight lines and do not use
-roads yet (pathfinding comes in 0.2), farmers and citizens are not yet distinguished, buildings cost only money, and there is no save game yet.
+Known simplifications of the prototype: carriers walk in straight lines within their short range, farmers and citizens are not yet distinguished, buildings cost only money, and there is no save game yet.
 
 ## Contributing
 

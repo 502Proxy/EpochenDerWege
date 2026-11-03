@@ -26,6 +26,10 @@ public struct WorldState: Sendable {
     public internal(set) var roads: Set<GridPoint> = []
     /// Road cells that run through a tunnel. Always a subset of `roads`.
     public internal(set) var tunnels: Set<GridPoint> = []
+    /// Transport lines in creation order.
+    public internal(set) var lines: [TransportLine] = []
+    /// Vehicles on all lines.
+    public internal(set) var vehicles: [Vehicle] = []
     /// Zoned cells. A zone stays when a building is placed on it.
     public internal(set) var zones: [GridPoint: ZoneKind] = [:]
     /// Recent events, oldest first. Capped to `maximumEventCount`.
@@ -36,6 +40,8 @@ public struct WorldState: Sendable {
     private var nextBuildingID = 1
     private var nextCarrierID = 1
     private var nextEventSequence = 1
+    private var nextLineID = 1
+    private var nextVehicleID = 1
 
     /// How many events are kept for the UI.
     public static let maximumEventCount = 32
@@ -128,6 +134,25 @@ public struct WorldState: Sendable {
             indexByID[buildings[i].id] = i
         }
         return removed
+    }
+
+    mutating func makeLineID() -> LineID {
+        defer { nextLineID += 1 }
+        return LineID(nextLineID)
+    }
+
+    mutating func makeVehicleID() -> VehicleID {
+        defer { nextVehicleID += 1 }
+        return VehicleID(nextVehicleID)
+    }
+
+    public func line(_ id: LineID) -> TransportLine? {
+        lines.first { $0.id == id }
+    }
+
+    /// Lines that call at a stop.
+    public func lines(servingStop stop: BuildingID) -> [TransportLine] {
+        lines.filter { $0.stops.contains(stop) }
     }
 
     mutating func makeCarrierID() -> CarrierID {

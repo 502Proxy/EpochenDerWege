@@ -22,6 +22,8 @@ public struct EconomySystem: SimulationSystem {
         let closedYear = world.clock.year - 1
         world.book(taxes, as: .taxes, year: closedYear)
         world.book(-upkeep, as: .upkeep, year: closedYear)
+        let vehicleUpkeep = world.vehicles.reduce(0) { $0 + $1.definition.upkeepPerYear }
+        world.book(-vehicleUpkeep, as: .vehicles, year: closedYear)
         world.emit(.yearClosed(year: world.clock.year, taxes: taxes, upkeep: upkeep))
     }
 }

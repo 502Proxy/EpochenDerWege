@@ -36,6 +36,11 @@ struct GameScreen: View {
                         .padding(.bottom, 8)
                 }
 
+                if viewModel.selectedTool == .line {
+                    PendingLineBar(viewModel: viewModel)
+                        .padding(.bottom, 8)
+                }
+
                 BuildToolbarView(viewModel: viewModel)
                     .padding(.bottom, 14)
             }

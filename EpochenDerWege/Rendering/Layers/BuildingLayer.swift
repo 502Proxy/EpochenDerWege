@@ -45,6 +45,7 @@ final class BuildingLayer: SceneLayer {
         case .production: SIMD3<Float>(7, 5.5, 7)
         case .storage: SIMD3<Float>(7.5, 5, 7.5)
         case .commerce: SIMD3<Float>(6.5, 5, 6.5)
+        case .stop: SIMD3<Float>(5, 3.5, 5)
         }
     }
 

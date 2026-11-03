@@ -69,6 +69,7 @@ final class SceneRenderer {
             RoadLayer(parent: root, space: space),
             BuildingLayer(parent: root, space: space),
             CarrierLayer(parent: root, space: space),
+            VehicleLayer(parent: root, space: space),
             SelectionLayer(parent: root, space: space),
             PlacementPreviewLayer(parent: root, space: space),
             RoadPreviewLayer(parent: root, space: space),
