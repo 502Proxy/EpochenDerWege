@@ -32,6 +32,8 @@ struct RoadPreview: Equatable {
     let cells: [GridPoint]
     /// Cells that will be (or already are) road; the others are shown as blocked.
     let valid: Set<GridPoint>
+    /// New cells that will be built as tunnels.
+    let tunnels: Set<GridPoint>
 }
 
 /// Area being zoned (or unzoned) while dragging a zone tool.

@@ -22,8 +22,10 @@ public struct WorldState: Sendable {
     public internal(set) var unemployed = 0
     /// Centre of the starting settlement, if one was founded.
     public internal(set) var startCell: GridPoint?
-    /// Cells covered by roads.
+    /// Cells covered by roads, including tunnels.
     public internal(set) var roads: Set<GridPoint> = []
+    /// Road cells that run through a tunnel. Always a subset of `roads`.
+    public internal(set) var tunnels: Set<GridPoint> = []
     /// Zoned cells. A zone stays when a building is placed on it.
     public internal(set) var zones: [GridPoint: ZoneKind] = [:]
     /// Recent events, oldest first. Capped to `maximumEventCount`.

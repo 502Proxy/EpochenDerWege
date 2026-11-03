@@ -180,8 +180,10 @@ final class SceneCoordinator: NSObject {
             return cached.preview
         }
         let path = RoadPlanner.path(from: ends.start, to: ends.end)
-        let buildable = Set(RoadPlanner.buildableCells(path, in: world))
-        let preview = RoadPreview(cells: path, valid: buildable.union(path.filter(world.hasRoad(at:))))
+        let plan = RoadPlanner.plan(path, in: world)
+        let buildable = Set(plan.map(\.cell))
+        let tunnels = Set(plan.filter { $0.kind == .tunnel }.map(\.cell))
+        let preview = RoadPreview(cells: path, valid: buildable.union(path.filter(world.hasRoad(at:))), tunnels: tunnels)
         cachedRoadPreview = (ends.start, ends.end, world.clock.tick, preview)
         return preview
     }
