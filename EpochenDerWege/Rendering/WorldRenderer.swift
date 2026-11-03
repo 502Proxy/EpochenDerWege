@@ -175,7 +175,7 @@ final class WorldRenderer {
         var water = PhysicallyBasedMaterial()
         water.baseColor = .init(tint: NSColor(srgbRed: 0.20, green: 0.45, blue: 0.70, alpha: 1))
         water.roughness = 0.2
-        water.metallic = 0
+        water.metallic = 0.0
         water.blending = .transparent(opacity: 0.8)
         let size = Float(terrain.extent)
         let entity = ModelEntity(mesh: .generatePlane(width: size, depth: size), materials: [water])

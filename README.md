@@ -1,5 +1,7 @@
 # Epochen der Wege
 
+[![CI](https://github.com/502Proxy/EpochenDerWege/actions/workflows/ci.yml/badge.svg)](https://github.com/502Proxy/EpochenDerWege/actions/workflows/ci.yml)
+
 Ein friedliches 3D-Aufbau- und Logistikspiel für macOS (Swift, SwiftUI, RealityKit).
 Du führst ein Volk von der Antike in die Moderne – Wachstum entsteht nur,
 wenn Waren und Menschen physisch transportiert werden.
