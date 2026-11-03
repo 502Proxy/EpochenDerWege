@@ -37,7 +37,7 @@ If Xcode asks for signing, choose *Sign to Run Locally* or your own team under
 
 | Input | Action |
 | --- | --- |
-| 1 – 4 | Open a category of the build toolbar (roads, housing, production, storage) |
+| 1 – 4 | Open a category of the build toolbar (roads, zones, production, storage) |
 | Click | Build (with a building selected) or select a building |
 | Drag | Move the map; with the road or zone tool, draw a road or zone an area |
 | Right-drag | Rotate and tilt the camera |
@@ -84,7 +84,8 @@ Playable today:
 - Procedural low-poly 3D map with water, sand, grassland, forest, rock and snow
 - Starting settlement with a storehouse and five houses (20 farmers)
 - Build toolbar with categories; gravel roads drawn by dragging, demolish tool
-- Residential zones: towns build houses next to roads on their own when they need workers or have food to spare
+- Residential, commercial and industrial zones: towns build houses, markets and workshops next to roads on their own
+- Markets buy food and workshops buy raw materials; every delivery earns its base price as sales income
 - Building with live preview and rules for terrain, slope, money and nearby resources
 - Production chains: grain → flour → bread, fish, wood, stone
 - Carriers visibly transport goods between buildings, houses and storehouses

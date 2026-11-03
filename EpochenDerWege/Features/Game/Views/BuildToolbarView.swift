@@ -106,12 +106,12 @@ private struct ToolPresentation {
             costLabel = "\(catalog.rules.roadCostPerCell)"
             symbol = "road.lanes"
             color = Color(red: 0.66, green: 0.60, blue: 0.50)
-        case .zone:
-            name = String(localized: "Residential zone")
-            detail = String(localized: "Drag to zone an area. Houses appear next to roads when the town needs them.")
+        case .zone(let kind):
+            name = GameText.name(of: kind)
+            detail = GameText.zoneDescription(kind)
             costLabel = nil
             symbol = "square.dashed.inset.filled"
-            color = .green
+            color = Color(ZoneLayer.color(of: kind))
         case .unzone:
             name = String(localized: "Remove zone")
             detail = String(localized: "Drag to remove zoning. Existing houses stay.")

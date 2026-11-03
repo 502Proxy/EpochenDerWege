@@ -128,6 +128,8 @@ public enum BuildingCategory: String, Hashable, Sendable, Codable {
     case storage
     /// Home of residents; consumes food.
     case housing
+    /// Built by towns in commercial or industrial zones; buys goods and pays for them.
+    case commerce
 }
 
 /// Terrain a building needs nearby, such as forest for a woodcutter.
@@ -166,6 +168,10 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
     public var maxResidents: Int
     public var resource: ResourceRequirement?
     public var color: GameColor
+    /// Zone in which towns build this building on their own (commerce only).
+    public var zone: ZoneKind?
+    /// Towns build one of these per this many residents (commerce only).
+    public var residentsPerBuilding: Int?
 
     public init(
         id: BuildingTypeID,
@@ -181,7 +187,9 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         maxCarriers: Int,
         maxResidents: Int,
         resource: ResourceRequirement?,
-        color: GameColor
+        color: GameColor,
+        zone: ZoneKind? = nil,
+        residentsPerBuilding: Int? = nil
     ) {
         self.id = id
         self.name = name
@@ -197,6 +205,8 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         self.maxResidents = maxResidents
         self.resource = resource
         self.color = color
+        self.zone = zone
+        self.residentsPerBuilding = residentsPerBuilding
     }
 
     /// Whether this building consumes the given good as a production input.
@@ -253,6 +263,11 @@ public struct GameCatalog: Sendable, Codable {
     /// Returns a copy with different rules. Handy for tests and scenarios.
     public func replacingRules(_ rules: GameRules) -> GameCatalog {
         GameCatalog(rules: rules, goods: goods, buildings: buildings)
+    }
+
+    /// Buildings that towns build on their own in a zone.
+    public func buildings(forZone zone: ZoneKind) -> [BuildingDefinition] {
+        buildings.filter { $0.zone == zone }
     }
 
     /// The first building of a category, e.g. the storehouse used for a new settlement.

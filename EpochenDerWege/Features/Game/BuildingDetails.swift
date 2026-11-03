@@ -58,6 +58,11 @@ struct BuildingDetails: Equatable {
                 row(goodName(item.good), "\(item.amount) / \(building.output.capacityPerGood)")
             }
             row(String(localized: "Carriers out"), "\(building.activeCarriers) / \(definition.maxCarriers)")
+        case .commerce:
+            for input in definition.inputs {
+                let price = catalog.good(input.good)?.basePrice ?? 0
+                row(String(localized: "Buys \(goodName(input.good))"), "\(building.input.count(of: input.good)) / \(building.input.capacityPerGood)  (\(price))")
+            }
         case .housing:
             row(String(localized: "Residents"), "\(building.residents) / \(definition.maxResidents)")
             row(String(localized: "Supply"), GameText.percent(building.supplyRatio))

@@ -97,7 +97,7 @@ simulation slightly but can never drop a frame.
 | 3 | `LogisticsSystem` | dispatch every 5 ticks, movement every tick | Sends carriers and moves them |
 | 4 | `PopulationSystem` | every 10 days | Feeds houses, grows or shrinks them |
 | 5 | `EconomySystem` | yearly | Taxes and upkeep |
-| 6 | `TownGrowthSystem` | every 5 days | Builds houses in residential zones next to roads when the town has demand |
+| 6 | `TownGrowthSystem` | every 5 days | Builds houses, markets and workshops in their zones next to roads when the town has demand |
 
 The simulation is **deterministic**: the same seed, commands and number of ticks always
 produce the same world. Collections are iterated in a stable order (buildings in

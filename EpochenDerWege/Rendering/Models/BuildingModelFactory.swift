@@ -52,6 +52,8 @@ final class BuildingModelFactory {
         case "mill": return mill()
         case "bakery": return bakery()
         case "fishersHut": return fishersHut()
+        case "market": return market()
+        case "workshop": return workshop()
         default: return generic(definition)
         }
     }
@@ -193,6 +195,39 @@ final class BuildingModelFactory {
         root.addChild(ModelKit.box(SIMD3<Float>(0.1, 0.1, 1.6), P.darkWood, at: SIMD3<Float>(-2.2, 1.75, 2.3)))
         root.addChild(ModelKit.box(SIMD3<Float>(0.05, 1.0, 1.3), P.sailCloth.darkened(by: 0.25), at: SIMD3<Float>(-2.2, 1.2, 2.3), cornerRadius: 0))
         return (root, 6)
+    }
+
+    private static func market() -> (Entity, Float) {
+        let root = Entity()
+        root.addChild(plinth(SIMD2(6.4, 6.4), top: 0.25))
+        // Two stalls with striped awnings.
+        let awnings = [P.sailCloth, GameColor(red: 0.30, green: 0.50, blue: 0.85), GameColor(red: 0.80, green: 0.30, blue: 0.25)]
+        for (index, x) in [Float(-1.6), 1.6].enumerated() {
+            for corner in [SIMD2<Float>(-1.1, -1), SIMD2<Float>(1.1, -1), SIMD2<Float>(-1.1, 1), SIMD2<Float>(1.1, 1)] {
+                root.addChild(ModelKit.box(SIMD3<Float>(0.15, 2.4, 0.15), P.darkWood, at: SIMD3<Float>(x + corner.x, 1.45, corner.y)))
+            }
+            for stripe in 0..<3 {
+                let color = awnings[(stripe + index) % awnings.count]
+                root.addChild(ModelKit.box(SIMD3<Float>(0.8, 0.12, 2.4), color, at: SIMD3<Float>(x - 0.8 + Float(stripe) * 0.8, 2.7, 0), cornerRadius: 0))
+            }
+            root.addChild(ModelKit.box(SIMD3<Float>(2.2, 0.8, 1.2), P.timber, at: SIMD3<Float>(x, 0.65, 0)))
+            root.addChild(ModelKit.box(SIMD3<Float>(0.5, 0.35, 0.4), P.field, at: SIMD3<Float>(x - 0.5, 1.2, 0)))
+            root.addChild(ModelKit.sphere(radius: 0.25, GameColor(red: 0.80, green: 0.50, blue: 0.22), at: SIMD3<Float>(x + 0.5, 1.25, 0)))
+        }
+        root.addChild(ModelKit.cylinder(height: 0.9, radius: 0.35, P.darkWood, at: SIMD3<Float>(0, 0.7, 2.4)))
+        return (root, 5.5)
+    }
+
+    private static func workshop() -> (Entity, Float) {
+        let root = Entity()
+        root.addChild(plinth(SIMD2(6.2, 5)))
+        root.addChild(cottage(width: 5.6, depth: 4.4, wallHeight: 3.2, roofHeight: 2, wall: P.timber, roof: P.roofTiles, at: SIMD2(-0.2, -0.3)))
+        root.addChild(ModelKit.box(SIMD3<Float>(0.7, 2.8, 0.7), P.darkStone, at: SIMD3<Float>(-1.8, 5.4, -1)))
+        // Workbench and material in front.
+        root.addChild(ModelKit.box(SIMD3<Float>(2, 0.9, 0.8), P.timber.darkened(by: 0.2), at: SIMD3<Float>(1.3, 0.85, 2.6)))
+        root.addChild(ModelKit.box(SIMD3<Float>(0.8, 0.6, 0.8), P.stone, at: SIMD3<Float>(-1.6, 0.7, 2.6), yaw: 0.3))
+        root.addChild(ModelKit.log(length: 1.8, radius: 0.22, P.timber, at: SIMD3<Float>(-0.4, 0.62, 2.7)))
+        return (root, 8)
     }
 
     private static func generic(_ definition: BuildingDefinition) -> (Entity, Float) {

@@ -44,6 +44,7 @@ final class BuildingLayer: SceneLayer {
         case .housing: SIMD3<Float>(5.5, 5, 5.5)
         case .production: SIMD3<Float>(7, 5.5, 7)
         case .storage: SIMD3<Float>(7.5, 5, 7.5)
+        case .commerce: SIMD3<Float>(6.5, 5, 6.5)
         }
     }
 
@@ -83,7 +84,9 @@ final class BuildingLayer: SceneLayer {
                 } else {
                     self = .hidden
                 }
-            case .idle, .storing:
+            case .awaitingGoods:
+                self = .warning
+            case .idle, .storing, .trading:
                 self = .hidden
             }
         }

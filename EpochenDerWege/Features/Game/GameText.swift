@@ -22,6 +22,25 @@ enum GameText {
         return String(localized: String.LocalizationValue(good.name))
     }
 
+    static func name(of zone: ZoneKind) -> String {
+        switch zone {
+        case .residential: String(localized: "Residential zone")
+        case .commercial: String(localized: "Commercial zone")
+        case .industrial: String(localized: "Industrial zone")
+        }
+    }
+
+    static func zoneDescription(_ zone: ZoneKind) -> String {
+        switch zone {
+        case .residential:
+            String(localized: "Drag to zone an area. Houses appear next to roads when the town needs them.")
+        case .commercial:
+            String(localized: "Drag to zone an area. The town builds markets next to roads; they buy food and pay for every delivery.")
+        case .industrial:
+            String(localized: "Drag to zone an area. The town builds workshops next to roads; they buy wood, stone and grain.")
+        }
+    }
+
     static func name(of biome: Biome) -> String {
         switch biome {
         case .water: String(localized: "Water")
@@ -104,6 +123,10 @@ enum GameText {
             (String(localized: "Storehouse"), .neutral)
         case .housing:
             housingStatus(of: building)
+        case .trading:
+            (String(localized: "Trading"), .good)
+        case .awaitingGoods:
+            (String(localized: "Waiting for goods"), .warning)
         }
     }
 

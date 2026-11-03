@@ -13,10 +13,27 @@ public struct ProductionSystem: SimulationSystem {
                 building.status = .housing
             case .storage:
                 building.status = .storing
+            case .commerce:
+                Self.trade(&building, ticksPerDay: ticksPerDay)
             case .production:
                 Self.advance(&building, ticksPerDay: ticksPerDay)
             }
             world.buildings[index] = building
+        }
+    }
+
+    /// Commerce buildings sell part of their stock to the townspeople every cycle,
+    /// which frees space for further deliveries.
+    static func trade(_ building: inout Building, ticksPerDay: Double) {
+        let hasStock = building.definition.inputs.contains { building.input.count(of: $0.good) > 0 }
+        building.status = hasStock ? .trading : .awaitingGoods
+        guard hasStock else { return }
+        building.progress += 1 / (max(0.1, building.definition.cycleDays) * ticksPerDay)
+        if building.progress >= 1 {
+            for input in building.definition.inputs {
+                building.input.remove(input.good, amount: input.amount)
+            }
+            building.progress = 0
         }
     }
 

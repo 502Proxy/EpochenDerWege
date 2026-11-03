@@ -8,12 +8,14 @@ import RealityKit
 /// The mesh is rebuilt only when zones, buildings, roads or the preview change.
 final class ZoneLayer: SceneLayer {
     private static let previewFrame = GameColor(red: 1, green: 1, blue: 1)
-    private static let removal = GameColor(red: 0.95, green: 0.50, blue: 0.15)
+    private static let removal = GameColor(red: 0.95, green: 0.25, blue: 0.20)
 
     /// Colour per zone kind.
     static func color(of kind: ZoneKind) -> GameColor {
         switch kind {
         case .residential: GameColor(red: 0.30, green: 0.85, blue: 0.35)
+        case .commercial: GameColor(red: 0.30, green: 0.55, blue: 0.95)
+        case .industrial: GameColor(red: 0.92, green: 0.62, blue: 0.20)
         }
     }
 

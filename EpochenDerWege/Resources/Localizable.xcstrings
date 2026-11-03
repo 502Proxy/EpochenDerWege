@@ -171,6 +171,16 @@
         }
       }
     },
+    "Buys %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kauft %@"
+          }
+        }
+      }
+    },
     "Cannot build on water.": {
       "localizations": {
         "de": {
@@ -217,6 +227,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Schließen"
+          }
+        }
+      }
+    },
+    "Commercial zone": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gewerbegebiet"
           }
         }
       }
@@ -277,6 +297,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ziehen, um ein Gebiet auszuweisen. Häuser entstehen an Straßen, sobald die Stadt sie braucht."
+          }
+        }
+      }
+    },
+    "Drag to zone an area. The town builds markets next to roads; they buy food and pay for every delivery.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziehen, um ein Gebiet auszuweisen. Die Stadt baut Märkte an Straßen; sie kaufen Lebensmittel und bezahlen jede Lieferung."
+          }
+        }
+      }
+    },
+    "Drag to zone an area. The town builds workshops next to roads; they buy wood, stone and grain.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziehen, um ein Gebiet auszuweisen. Die Stadt baut Werkstätten an Straßen; sie kaufen Holz, Stein und Getreide."
           }
         }
       }
@@ -451,16 +491,6 @@
         }
       }
     },
-    "Housing": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wohnen"
-          }
-        }
-      }
-    },
     "Hungry": {
       "localizations": {
         "de": {
@@ -481,12 +511,32 @@
         }
       }
     },
+    "Industrial zone": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Industriegebiet"
+          }
+        }
+      }
+    },
     "Jobs %lld/%lld": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Arbeitsplätze %lld/%lld"
+          }
+        }
+      }
+    },
+    "Market": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markt"
           }
         }
       }
@@ -941,6 +991,16 @@
         }
       }
     },
+    "Trading": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Handelt"
+          }
+        }
+      }
+    },
     "Unknown building %@.": {
       "localizations": {
         "de": {
@@ -977,6 +1037,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "WASD, Q/E, Leertaste"
+          }
+        }
+      }
+    },
+    "Waiting for goods": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wartet auf Waren"
           }
         }
       }
@@ -1051,6 +1121,16 @@
         }
       }
     },
+    "Workshop": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Werkstatt"
+          }
+        }
+      }
+    },
     "Year": {
       "localizations": {
         "de": {
@@ -1087,6 +1167,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Jahr %lld: %lld Taler Steuern, %lld Taler Unterhalt."
+          }
+        }
+      }
+    },
+    "Zones": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zonen"
           }
         }
       }
