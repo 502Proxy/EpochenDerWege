@@ -15,6 +15,7 @@ final class MaterialLibrary {
     private var unlitMaterials: [UnlitKey: UnlitMaterial] = [:]
     private var boxes: [BoxKey: MeshResource] = [:]
     private var spheres: [Float: MeshResource] = [:]
+    private var shapes: [ShapeKey: MeshResource] = [:]
 
     private init() {}
 
@@ -51,6 +52,39 @@ final class MaterialLibrary {
         let mesh = MeshResource.generateSphere(radius: radius)
         spheres[radius] = mesh
         return mesh
+    }
+
+    func cylinder(height: Float, radius: Float) -> MeshResource {
+        let key = ShapeKey(kind: .cylinder, a: height, b: radius, c: 0)
+        if let cached = shapes[key] { return cached }
+        let mesh = MeshResource.generateCylinder(height: height, radius: radius)
+        shapes[key] = mesh
+        return mesh
+    }
+
+    func cone(height: Float, radius: Float) -> MeshResource {
+        let key = ShapeKey(kind: .cone, a: height, b: radius, c: 0)
+        if let cached = shapes[key] { return cached }
+        let mesh = MeshResource.generateCone(height: height, radius: radius)
+        shapes[key] = mesh
+        return mesh
+    }
+
+    func gableRoof(width: Float, depth: Float, height: Float) -> MeshResource {
+        let key = ShapeKey(kind: .gableRoof, a: width, b: depth, c: height)
+        if let cached = shapes[key] { return cached }
+        let mesh = (try? ModelKit.makeGableRoofMesh(width: width, depth: depth, height: height))
+            ?? box(SIMD3<Float>(width, height, depth))
+        shapes[key] = mesh
+        return mesh
+    }
+
+    private struct ShapeKey: Hashable {
+        enum Kind: Hashable { case cylinder, cone, gableRoof }
+        let kind: Kind
+        let a: Float
+        let b: Float
+        let c: Float
     }
 
     private struct UnlitKey: Hashable {

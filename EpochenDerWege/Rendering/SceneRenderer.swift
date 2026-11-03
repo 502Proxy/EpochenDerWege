@@ -11,6 +11,8 @@ struct RenderContext {
     let fraction: Double
     let selectedBuildingID: BuildingID?
     let preview: PlacementPreview?
+    /// Seconds of animation time; advances with the game speed and stops while paused.
+    let animationTime: TimeInterval
 
     var world: WorldState { frame.world }
 }

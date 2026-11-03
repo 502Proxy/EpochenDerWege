@@ -1,13 +1,19 @@
 import GameDomain
 import RealityKit
+import simd
 
 /// Buildings with a coloured status marker above them.
 ///
-/// Entities are created when a building appears in a snapshot and removed when it
-/// disappears. Markers only change their material when the status changes.
+/// Models come from `BuildingModelFactory`. Entities are created when a building
+/// appears in a snapshot and removed when it disappears. Markers only change their
+/// material when the status changes; rotors (mill sails) turn while the building works.
 final class BuildingLayer: SceneLayer {
+    /// Rotor speed in radians per second of game time at 1×.
+    private static let rotorSpeed: Float = 1.2
+
     private let parent: Entity
     private let space: SceneSpace
+    private let factory = BuildingModelFactory()
     private var visuals: [BuildingID: Visual] = [:]
 
     init(parent: Entity, space: SceneSpace) {
@@ -22,47 +28,39 @@ final class BuildingLayer: SceneLayer {
             let visual = visuals[building.id] ?? makeVisual(for: building)
             visuals[building.id] = visual
             visual.show(MarkerState(building))
+            if let rotor = visual.rotor, building.status == .working {
+                rotor.orientation = simd_quatf(angle: Float(context.animationTime) * Self.rotorSpeed, axis: SIMD3<Float>(0, 0, 1))
+            }
         }
         for (id, visual) in visuals where !alive.contains(id) {
-            visual.body.removeFromParent()
+            visual.root.removeFromParent()
             visuals[id] = nil
         }
     }
 
-    /// Body size per category in metres (width, height, depth).
-    static func size(of category: BuildingCategory) -> SIMD3<Float> {
+    /// Footprint and height of the placement preview per category (width, height, depth).
+    static func previewSize(of category: BuildingCategory) -> SIMD3<Float> {
         switch category {
-        case .housing: SIMD3<Float>(5.5, 4.5, 5.5)
-        case .production: SIMD3<Float>(6.5, 5.5, 6.5)
-        case .storage: SIMD3<Float>(7.5, 4.5, 7.5)
+        case .housing: SIMD3<Float>(5.5, 5, 5.5)
+        case .production: SIMD3<Float>(7, 5.5, 7)
+        case .storage: SIMD3<Float>(7.5, 5, 7.5)
         }
     }
 
     private func makeVisual(for building: Building) -> Visual {
-        let library = MaterialLibrary.shared
-        let size = Self.size(of: building.category)
-        // The base reaches 3 m into the ground so buildings on slopes do not float.
-        let sink: Float = 3
-        let body = ModelEntity(
-            mesh: library.box(SIMD3<Float>(size.x, size.y + sink, size.z)),
-            materials: [library.matte(building.definition.color)]
-        )
-        body.position = space.local(building.center, lift: (size.y - sink) / 2)
+        let model = factory.makeModel(for: building.definition)
+        model.root.position = space.local(building.center)
+        // Quarter-turn variety, stable per cell, keeps buildings aligned to the grid.
+        let turns = (building.cell.x &* 31 &+ building.cell.z &* 17) & 3
+        model.root.orientation = simd_quatf(angle: Float(turns) * .pi / 2, axis: SIMD3<Float>(0, 1, 0))
 
-        let roof = ModelEntity(
-            mesh: library.box(SIMD3<Float>(size.x * 0.8, 1.4, size.z * 0.8), cornerRadius: 0.4),
-            materials: [library.matte(building.definition.color.darkened(by: 0.45))]
-        )
-        roof.position = SIMD3<Float>(0, (size.y + sink) / 2 + 0.7, 0)
-        body.addChild(roof)
-
-        let marker = ModelEntity(mesh: library.sphere(radius: 1.1), materials: [])
-        marker.position = SIMD3<Float>(0, (size.y + sink) / 2 + 4, 0)
+        let marker = ModelEntity(mesh: MaterialLibrary.shared.sphere(radius: 1.1), materials: [])
+        marker.position = SIMD3<Float>(0, model.markerHeight, 0)
         marker.isEnabled = false
-        body.addChild(marker)
+        model.root.addChild(marker)
 
-        parent.addChild(body)
-        return Visual(body: body, marker: marker)
+        parent.addChild(model.root)
+        return Visual(root: model.root, marker: marker, rotor: model.rotor)
     }
 
     /// What the marker above a building shows.
@@ -101,13 +99,15 @@ final class BuildingLayer: SceneLayer {
     }
 
     private final class Visual {
-        let body: ModelEntity
+        let root: Entity
         let marker: ModelEntity
+        let rotor: Entity?
         private var state: MarkerState = .hidden
 
-        init(body: ModelEntity, marker: ModelEntity) {
-            self.body = body
+        init(root: Entity, marker: ModelEntity, rotor: Entity?) {
+            self.root = root
             self.marker = marker
+            self.rotor = rotor
         }
 
         func show(_ newState: MarkerState) {
