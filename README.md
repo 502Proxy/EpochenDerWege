@@ -89,7 +89,7 @@ Playable today:
 - Production chains: grain → flour → bread, fish, wood, stone
 - Carriers visibly transport goods between buildings, houses and storehouses
 - Workers, food supply, growth and hunger
-- Yearly taxes and upkeep
+- Yearly taxes and upkeep; finance overview with income and expenses per category and a balance chart (click the money in the top bar)
 - Pause and 1× / 2× / 4× speed
 
 Known simplifications of the prototype: carriers walk in straight lines and do not use

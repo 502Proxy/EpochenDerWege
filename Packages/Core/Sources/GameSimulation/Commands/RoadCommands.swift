@@ -70,7 +70,7 @@ public struct BuildRoadCommand: GameCommand {
             world.emit(.placementRejected(.insufficientFunds(cost: cost)))
             return
         }
-        world.treasury -= cost
+        world.book(-cost, as: .roads)
         world.roads.formUnion(buildable)
         world.emit(.roadBuilt(cells: buildable.count, cost: cost))
     }
@@ -98,7 +98,7 @@ public struct DemolishRoadCommand: GameCommand {
         guard !removed.isEmpty else { return }
         world.roads.subtract(removed)
         let refund = removed.count * world.rules.roadCostPerCell * world.rules.demolitionRefundPercent / 100
-        world.treasury += refund
+        world.book(refund, as: .refunds)
         world.emit(.roadDemolished(cells: removed.count, refund: refund))
     }
 }

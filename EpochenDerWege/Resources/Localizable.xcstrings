@@ -131,6 +131,16 @@
         }
       }
     },
+    "Balance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontostand"
+          }
+        }
+      }
+    },
     "Barely supplied": {
       "localizations": {
         "de": {
@@ -207,6 +217,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Schließen"
+          }
+        }
+      }
+    },
+    "Construction": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bau"
           }
         }
       }
@@ -297,6 +317,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Leer – wartet auf Essen"
+          }
+        }
+      }
+    },
+    "Expenses": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgaben"
+          }
+        }
+      }
+    },
+    "Finances": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finanzen"
           }
         }
       }
@@ -427,6 +467,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hunger"
+          }
+        }
+      }
+    },
+    "Income": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einnahmen"
           }
         }
       }
@@ -571,6 +621,16 @@
         }
       }
     },
+    "Profit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gewinn"
+          }
+        }
+      }
+    },
     "Progress": {
       "localizations": {
         "de": {
@@ -597,6 +657,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bereit"
+          }
+        }
+      }
+    },
+    "Refunds": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstattungen"
           }
         }
       }
@@ -691,6 +761,16 @@
         }
       }
     },
+    "Sales": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verkäufe"
+          }
+        }
+      }
+    },
     "Sand": {
       "localizations": {
         "de": {
@@ -707,6 +787,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Scrollen: zoomen"
+          }
+        }
+      }
+    },
+    "Show income and expenses": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einnahmen und Ausgaben anzeigen"
           }
         }
       }
@@ -801,6 +891,16 @@
         }
       }
     },
+    "Taxes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steuern"
+          }
+        }
+      }
+    },
     "The game data could not be loaded.": {
       "localizations": {
         "de": {
@@ -857,6 +957,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bis zu %lld Bewohner"
+          }
+        }
+      }
+    },
+    "Upkeep": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unterhalt"
           }
         }
       }
@@ -937,6 +1047,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Arbeitet"
+          }
+        }
+      }
+    },
+    "Year": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jahr"
+          }
+        }
+      }
+    },
+    "Year %lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jahr %lld"
           }
         }
       }

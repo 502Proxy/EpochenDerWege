@@ -40,6 +40,7 @@ final class GameViewModel {
     private(set) var inspector: BuildingDetails?
     private(set) var toast: Toast?
     private(set) var speed: Int
+    private(set) var finances = FinanceSummary()
 
     let catalog: GameCatalog
 
@@ -178,6 +179,10 @@ final class GameViewModel {
         }
         if next != hud {
             hud = next
+        }
+        let summary = FinanceSummary(world: world)
+        if summary != finances {
+            finances = summary
         }
 
         let details = selectedBuildingID

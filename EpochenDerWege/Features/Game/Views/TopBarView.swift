@@ -3,6 +3,7 @@ import SwiftUI
 /// Date, money, population, stock and game speed.
 struct TopBarView: View {
     let viewModel: GameViewModel
+    @State private var showsFinances = false
 
     var body: some View {
         let hud = viewModel.hud
@@ -13,7 +14,16 @@ struct TopBarView: View {
             Divider().frame(height: 18)
 
             stat("calendar", Text("Year \(hud.year + 1), day \(hud.dayOfYear + 1)"))
-            stat("banknote", Text("\(hud.treasury) thalers"))
+            Button {
+                showsFinances.toggle()
+            } label: {
+                stat("banknote", Text("\(hud.treasury) thalers"))
+            }
+            .buttonStyle(.plain)
+            .help(Text("Show income and expenses"))
+            .popover(isPresented: $showsFinances, arrowEdge: .bottom) {
+                FinanceView(summary: viewModel.finances)
+            }
             stat("person.3.fill", Text("\(hud.population) residents"))
             stat("hammer.fill", Text("Jobs \(hud.workersEmployed)/\(hud.workersNeeded)"))
                 .help(Text("\(hud.unemployed) unemployed"))

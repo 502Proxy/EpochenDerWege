@@ -11,7 +11,10 @@ public struct WorldState: Sendable {
     public let terrain: Terrain
 
     public internal(set) var clock: GameClock
-    public internal(set) var treasury: Int
+    /// Current money. Change it only through ``book(_:as:year:)`` so the ledger stays complete.
+    public private(set) var treasury: Int
+    /// Income and expenses by year and category, plus the balance history.
+    public internal(set) var ledger = Ledger()
     /// Buildings in placement order. The order is stable, which keeps the simulation deterministic.
     public internal(set) var buildings: [Building] = []
     public internal(set) var carriers: [Carrier] = []
@@ -128,6 +131,14 @@ public struct WorldState: Sendable {
     mutating func makeCarrierID() -> CarrierID {
         defer { nextCarrierID += 1 }
         return CarrierID(nextCarrierID)
+    }
+
+    /// Changes the treasury and records the booking. Positive amounts are income.
+    ///
+    /// - Parameter year: The year to book into; defaults to the current year.
+    mutating func book(_ amount: Int, as category: FinanceCategory, year: Int? = nil) {
+        treasury += amount
+        ledger.book(amount, as: category, year: year ?? clock.year)
     }
 
     mutating func emit(_ event: SimulationEvent) {
