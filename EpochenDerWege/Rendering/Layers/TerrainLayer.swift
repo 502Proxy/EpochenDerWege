@@ -14,6 +14,7 @@ final class TerrainLayer: SceneLayer {
     private var treeChunks: [ChunkKey: ModelEntity] = [:]
     private var occupiedCellsByChunk: [ChunkKey: Set<GridPoint>] = [:]
     private var lastBuildingIDs: [BuildingID] = []
+    private var lastRoads: Set<GridPoint> = []
 
     private static let biomeColors: [Biome: GameColor] = [
         .water: GameColor(red: 0.55, green: 0.50, blue: 0.36),
@@ -52,14 +53,16 @@ final class TerrainLayer: SceneLayer {
     }
 
     func update(with context: RenderContext) {
-        let buildings = context.world.buildings
-        let ids = buildings.map(\.id)
-        guard ids != lastBuildingIDs else { return }
+        let world = context.world
+        let ids = world.buildings.map(\.id)
+        guard ids != lastBuildingIDs || world.roads != lastRoads else { return }
         lastBuildingIDs = ids
+        lastRoads = world.roads
 
+        // Trees give way to buildings and roads.
         var occupied: [ChunkKey: Set<GridPoint>] = [:]
-        for building in buildings {
-            occupied[ChunkKey(building.cell), default: []].insert(building.cell)
+        for cell in world.buildings.map(\.cell) + Array(world.roads) {
+            occupied[ChunkKey(cell), default: []].insert(cell)
         }
         let changed = Set(occupied.keys).union(occupiedCellsByChunk.keys).filter {
             occupied[$0] != occupiedCellsByChunk[$0]

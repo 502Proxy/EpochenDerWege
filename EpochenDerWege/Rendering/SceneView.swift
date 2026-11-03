@@ -48,6 +48,9 @@ final class SceneCoordinator: NSObject {
     private var hoverPoint: CGPoint?
     private var animationTime: TimeInterval = 0
     private var cachedPreview: (point: CGPoint, tick: Int, tool: BuildingTypeID, preview: PlacementPreview?)?
+    /// Start and current end of a road being dragged.
+    private var roadDrag: (start: GridPoint, end: GridPoint)?
+    private var cachedRoadPreview: (start: GridPoint, end: GridPoint, tick: Int, preview: RoadPreview)?
 
     init(viewModel: GameViewModel, engine: SimulationEngine) {
         self.viewModel = viewModel
@@ -114,6 +117,7 @@ final class SceneCoordinator: NSObject {
             fraction: frame.interpolationFraction(at: .now),
             selectedBuildingID: viewModel.selectedBuildingID,
             preview: placementPreview(in: frame.world),
+            roadPreview: roadPreview(in: frame.world),
             animationTime: animationTime
         )
         renderer.update(with: context)
@@ -140,7 +144,7 @@ final class SceneCoordinator: NSObject {
     /// or the world changed, not on every frame.
     private func placementPreview(in world: WorldState) -> PlacementPreview? {
         guard
-            let tool = viewModel.selectedTool,
+            let tool = viewModel.selectedBuildingType,
             let definition = world.catalog.building(tool),
             let point = hoverPoint
         else {
@@ -154,6 +158,31 @@ final class SceneCoordinator: NSObject {
             PlacementPreview(definition: definition, cell: cell, isValid: viewModel.previewValidity(at: cell, in: world) ?? false)
         }
         cachedPreview = (point, world.clock.tick, tool, preview)
+        return preview
+    }
+
+    /// Road under construction: the dragged path, or the hovered cell before dragging.
+    private func roadPreview(in world: WorldState) -> RoadPreview? {
+        guard viewModel.selectedTool == .road else {
+            roadDrag = nil
+            cachedRoadPreview = nil
+            return nil
+        }
+        let ends: (start: GridPoint, end: GridPoint)
+        if let roadDrag {
+            ends = roadDrag
+        } else if let point = hoverPoint, let cell = cell(at: point) {
+            ends = (cell, cell)
+        } else {
+            return nil
+        }
+        if let cached = cachedRoadPreview, cached.start == ends.start, cached.end == ends.end, cached.tick == world.clock.tick {
+            return cached.preview
+        }
+        let path = RoadPlanner.path(from: ends.start, to: ends.end)
+        let buildable = Set(RoadPlanner.buildableCells(path, in: world))
+        let preview = RoadPreview(cells: path, valid: buildable.union(path.filter(world.hasRoad(at:))))
+        cachedRoadPreview = (ends.start, ends.end, world.clock.tick, preview)
         return preview
     }
 
@@ -195,10 +224,38 @@ final class SceneCoordinator: NSObject {
 
     @objc private func handlePan(_ gesture: NSPanGestureRecognizer) {
         guard let view else { return }
+        if viewModel.selectedTool == .road {
+            handleRoadDrag(gesture, in: view)
+            return
+        }
         let translation = gesture.translation(in: view)
         rig.drag(dx: Float(translation.x), dy: upwardDelta(translation, in: view))
         gesture.setTranslation(.zero, in: view)
         applyCamera()
+    }
+
+    /// With the road tool, dragging draws a road from the start cell to the cell under the mouse.
+    private func handleRoadDrag(_ gesture: NSPanGestureRecognizer, in view: NSView) {
+        let location = gesture.location(in: view)
+        switch gesture.state {
+        case .began:
+            let translation = gesture.translation(in: view)
+            let origin = CGPoint(x: location.x - translation.x, y: location.y - translation.y)
+            if let start = cell(at: origin) ?? cell(at: location) {
+                roadDrag = (start, start)
+            }
+        case .changed:
+            if let drag = roadDrag, let end = cell(at: location) {
+                roadDrag = (drag.start, end)
+            }
+        case .ended:
+            if let drag = roadDrag {
+                viewModel.buildRoad(from: drag.start, to: drag.end)
+            }
+            roadDrag = nil
+        default:
+            roadDrag = nil
+        }
     }
 
     @objc private func handleOrbit(_ gesture: NSPanGestureRecognizer) {

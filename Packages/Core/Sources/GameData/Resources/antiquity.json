@@ -12,6 +12,8 @@
     "taxPerResidentPerYear": 1,
     "maxSlopePercent": 35,
     "demolitionRefundPercent": 50,
+    "roadCostPerCell": 16,
+    "maxRoadSlopePercent": 25,
     "foodGoods": ["bread", "fish"],
     "startingHouses": 5,
     "startingResidentsPerHouse": 4,

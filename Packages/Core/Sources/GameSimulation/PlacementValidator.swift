@@ -17,7 +17,7 @@ public enum PlacementValidator {
         guard terrain.isLand(cell) else { return .failure(.water) }
         let slope = terrain.slopePercent(at: cell)
         guard slope <= world.rules.maxSlopePercent else { return .failure(.tooSteep(slopePercent: slope)) }
-        guard !world.isOccupied(cell) else { return .failure(.occupied) }
+        guard !world.isOccupied(cell), !world.hasRoad(at: cell) else { return .failure(.occupied) }
         guard ignoringCost || world.treasury >= definition.cost else {
             return .failure(.insufficientFunds(cost: definition.cost))
         }

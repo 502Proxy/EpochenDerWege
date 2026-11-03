@@ -35,7 +35,7 @@ struct Toast: Equatable, Identifiable {
 @Observable
 final class GameViewModel {
     private(set) var hud = HUDState()
-    private(set) var selectedTool: BuildingTypeID?
+    private(set) var selectedTool: BuildTool?
     private(set) var selectedBuildingID: BuildingID?
     private(set) var inspector: BuildingDetails?
     private(set) var toast: Toast?
@@ -73,12 +73,17 @@ final class GameViewModel {
 
     // MARK: - Intents
 
-    /// Selects a build tool; selecting the active tool again deselects it.
-    func toggleTool(_ type: BuildingTypeID) {
-        selectedTool = selectedTool == type ? nil : type
+    /// Selects a tool; selecting the active tool again deselects it.
+    func toggleTool(_ tool: BuildTool) {
+        selectedTool = selectedTool == tool ? nil : tool
         if selectedTool != nil {
             selectBuilding(nil)
         }
+    }
+
+    /// The building type of the active tool, if it places buildings.
+    var selectedBuildingType: BuildingTypeID? {
+        if case .building(let type) = selectedTool { type } else { nil }
     }
 
     func selectBuilding(_ id: BuildingID?) {
@@ -97,11 +102,26 @@ final class GameViewModel {
 
     func click(on cell: GridPoint?) {
         guard let cell else { return }
-        if let selectedTool {
-            engine.submit(PlaceBuildingCommand(buildingType: selectedTool, cell: cell))
-        } else {
+        switch selectedTool {
+        case .building(let type):
+            engine.submit(PlaceBuildingCommand(buildingType: type, cell: cell))
+        case .road:
+            engine.submit(BuildRoadCommand(cells: [cell]))
+        case .bulldoze:
+            let world = world
+            if let building = world.building(at: cell) {
+                engine.submit(DemolishBuildingCommand(buildingID: building.id))
+            } else if world.hasRoad(at: cell) {
+                engine.submit(DemolishRoadCommand(cells: [cell]))
+            }
+        case nil:
             selectBuilding(world.building(at: cell)?.id)
         }
+    }
+
+    /// Builds road along an L-shaped path between two cells (end of a road drag).
+    func buildRoad(from start: GridPoint, to end: GridPoint) {
+        engine.submit(BuildRoadCommand(cells: RoadPlanner.path(from: start, to: end)))
     }
 
     func demolishSelected() {
@@ -121,7 +141,7 @@ final class GameViewModel {
 
     /// Placement preview for the scene: `nil` without a tool, otherwise whether the cell is valid.
     func previewValidity(at cell: GridPoint, in world: WorldState) -> Bool? {
-        guard let selectedTool, let definition = catalog.building(selectedTool) else { return nil }
+        guard let type = selectedBuildingType, let definition = catalog.building(type) else { return nil }
         if case .success = PlacementValidator.validate(definition, at: cell, in: world) {
             return true
         }

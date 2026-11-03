@@ -11,6 +11,7 @@ struct RenderContext {
     let fraction: Double
     let selectedBuildingID: BuildingID?
     let preview: PlacementPreview?
+    let roadPreview: RoadPreview?
     /// Seconds of animation time; advances with the game speed and stops while paused.
     let animationTime: TimeInterval
 
@@ -22,6 +23,14 @@ struct PlacementPreview: Equatable {
     let definition: BuildingDefinition
     let cell: GridPoint
     let isValid: Bool
+}
+
+/// Road cells shown while the road tool is active.
+struct RoadPreview: Equatable {
+    /// Cells of the planned path, in order.
+    let cells: [GridPoint]
+    /// Cells that will be (or already are) road; the others are shown as blocked.
+    let valid: Set<GridPoint>
 }
 
 /// One part of the scene (composite pattern). Layers own their entities and update
@@ -46,10 +55,12 @@ final class SceneRenderer {
         root = AnchorEntity(world: SIMD3<Float>(-space.halfExtent, 0, -space.halfExtent))
         layers = [
             TerrainLayer(parent: root, space: space),
+            RoadLayer(parent: root, space: space),
             BuildingLayer(parent: root, space: space),
             CarrierLayer(parent: root, space: space),
             SelectionLayer(parent: root, space: space),
             PlacementPreviewLayer(parent: root, space: space),
+            RoadPreviewLayer(parent: root, space: space),
         ]
     }
 
