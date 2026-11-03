@@ -73,6 +73,10 @@ enum GameText {
             String(localized: "A resident left because of hunger.")
         case .yearClosed(let year, let taxes, let upkeep):
             String(localized: "Year \(year): \(taxes) thalers taxes, \(upkeep) thalers upkeep.")
+        case .roadBuilt(let cells, let cost):
+            String(localized: "\(cells) road cells built for \(cost) thalers.")
+        case .roadDemolished(let cells, let refund):
+            String(localized: "\(cells) road cells removed, \(refund) thalers refunded.")
         }
     }
 

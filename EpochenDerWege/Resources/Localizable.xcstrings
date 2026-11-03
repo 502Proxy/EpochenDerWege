@@ -41,6 +41,26 @@
         }
       }
     },
+    "%lld road cells built for %lld thalers.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Straßenfelder für %lld Taler gebaut."
+          }
+        }
+      }
+    },
+    "%lld road cells removed, %lld thalers refunded.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Straßenfelder entfernt, %lld Taler zurückerhalten."
+          }
+        }
+      }
+    },
     "%lld thalers": {
       "localizations": {
         "de": {
@@ -67,6 +87,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld Arbeiter"
+          }
+        }
+      }
+    },
+    "1–4: open a build category": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1–4: Baukategorie öffnen"
           }
         }
       }
@@ -151,6 +181,16 @@
         }
       }
     },
+    "Click a building or road to remove it. Half of the cost is refunded.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klicke auf ein Gebäude oder eine Straße, um es abzureißen. Die Hälfte der Kosten wird erstattet."
+          }
+        }
+      }
+    },
     "Click: build or select": {
       "localizations": {
         "de": {
@@ -171,12 +211,32 @@
         }
       }
     },
+    "Controls": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steuerung"
+          }
+        }
+      }
+    },
     "Demolish": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Abreißen"
+          }
+        }
+      }
+    },
+    "Drag to build. %lld thalers per cell.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziehen zum Bauen. %lld Taler pro Feld."
           }
         }
       }
@@ -301,6 +361,16 @@
         }
       }
     },
+    "Gravel road": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schotterstraße"
+          }
+        }
+      }
+    },
     "Half of the cost is refunded.": {
       "localizations": {
         "de": {
@@ -317,6 +387,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Haus"
+          }
+        }
+      }
+    },
+    "Housing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wohnen"
           }
         }
       }
@@ -461,6 +541,16 @@
         }
       }
     },
+    "Production": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Produktion"
+          }
+        }
+      }
+    },
     "Progress": {
       "localizations": {
         "de": {
@@ -527,6 +617,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Rechts ziehen: drehen"
+          }
+        }
+      }
+    },
+    "Road tool: drag to build a road": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Straßenwerkzeug: ziehen, um eine Straße zu bauen"
+          }
+        }
+      }
+    },
+    "Roads": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Straßen"
           }
         }
       }
@@ -617,6 +727,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Stein"
+          }
+        }
+      }
+    },
+    "Storage": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lager"
           }
         }
       }

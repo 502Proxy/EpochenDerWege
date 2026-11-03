@@ -15,7 +15,6 @@ struct GameScreen: View {
                 TopBarView(viewModel: viewModel)
 
                 HStack(alignment: .top) {
-                    BuildMenuView(viewModel: viewModel)
                     Spacer()
                     if let details = viewModel.inspector {
                         InspectorView(
@@ -34,8 +33,11 @@ struct GameScreen: View {
                     ToastView(text: toast.text)
                         .id(toast.id)
                         .transition(.opacity)
-                        .padding(.bottom, 16)
+                        .padding(.bottom, 8)
                 }
+
+                BuildToolbarView(viewModel: viewModel)
+                    .padding(.bottom, 14)
             }
             .animation(.easeInOut(duration: 0.2), value: viewModel.toast)
             .animation(.easeInOut(duration: 0.2), value: viewModel.inspector?.id)
