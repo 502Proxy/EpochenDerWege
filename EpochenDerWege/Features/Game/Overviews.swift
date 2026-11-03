@@ -39,7 +39,10 @@ struct GoodRow: Equatable, Identifiable {
 }
 
 /// One building in the building list.
-struct BuildingRow: Equatable, Identifiable {
+///
+/// `nonisolated` and `Sendable` because the table sorts it with key-path comparators,
+/// which Swift 6 requires to be sendable.
+nonisolated struct BuildingRow: Equatable, Identifiable, Sendable {
     let id: BuildingID
     let name: String
     let category: BuildingCategory
@@ -54,6 +57,7 @@ struct BuildingRow: Equatable, Identifiable {
     /// Sort key for the efficiency column; buildings without one go last.
     var efficiencySortKey: Double { efficiency ?? -1 }
 
+    @MainActor
     static func make(for world: WorldState) -> [BuildingRow] {
         world.buildings.map { building in
             let status = GameText.status(of: building)
