@@ -1,99 +1,104 @@
 # Epochen der Wege
 
 [![CI](https://github.com/502Proxy/EpochenDerWege/actions/workflows/ci.yml/badge.svg)](https://github.com/502Proxy/EpochenDerWege/actions/workflows/ci.yml)
+![Platform](https://img.shields.io/badge/platform-macOS%2026-blue)
+![Swift](https://img.shields.io/badge/Swift-6-orange)
 
-Ein friedliches 3D-Aufbau- und Logistikspiel für macOS (Swift, SwiftUI, RealityKit).
-Du führst ein Volk von der Antike in die Moderne – Wachstum entsteht nur,
-wenn Waren und Menschen physisch transportiert werden.
+A peaceful 3D city-building and logistics game for macOS, written in Swift with
+SwiftUI and RealityKit.
 
-Inspiriert vom Genre-Mix aus Aufbauspielen, Strategiespielen und Transport-Simulationen.
-Die Spielregeln stehen im [Game Design Document](docs/GameDesign.md).
+You lead a people from antiquity to the modern age. Growth only happens when goods
+and people are physically moved from A to B: every sack of grain and every commuter
+is an object on a path. The genre mix combines settlement building, a civilisation
+spanning several eras, and transport simulation.
 
-## Starten
+The full rules are in the [game design document](docs/GameDesign.md).
 
-Voraussetzungen: macOS 14 oder neuer, Xcode 16 oder neuer.
+## Getting started
 
-1. `EpochenDerWege.xcodeproj` in Xcode öffnen.
-2. Oben links das Schema **EpochenDerWege** und als Ziel **My Mac** wählen.
-3. **⌘R** drücken.
+Requirements: macOS 26 and Xcode 26.
 
-Falls Xcode beim ersten Start nach einer Signierung fragt: Unter
-*Signing & Capabilities* „Sign to Run Locally“ wählen oder dein eigenes Team eintragen.
+```bash
+git clone https://github.com/502Proxy/EpochenDerWege.git
+open EpochenDerWege/EpochenDerWege.xcodeproj
+```
 
-Tests der Simulation:
+Select the **EpochenDerWege** scheme and **My Mac**, then press **⌘R**.
+Press **⌘U** to run all tests, or from the terminal:
 
-- in Xcode: Schema **Simulation** wählen und **⌘U** drücken, oder
-- im Terminal: `cd Packages/Simulation && swift test`
+```bash
+swift test --package-path Packages/Core
+```
 
-## Steuerung
+If Xcode asks for signing, choose *Sign to Run Locally* or your own team under
+*Signing & Capabilities*.
 
-| Eingabe | Wirkung |
+## Controls
+
+| Input | Action |
 | --- | --- |
-| Linksklick | Gebäude bauen (wenn ein Bauwerkzeug gewählt ist) oder auswählen |
-| Linke Maustaste ziehen | Karte verschieben |
-| Rechte Maustaste ziehen | Kamera drehen und neigen |
-| Scrollen / Pinch | Zoomen |
-| W A S D / Pfeiltasten | Kamera bewegen |
-| Q / E | Kamera drehen |
-| Rechtsklick / Esc | Bauwerkzeug ablegen bzw. Auswahl aufheben |
-| Leertaste | Pause |
+| Click | Build (with a building selected) or select a building |
+| Drag | Move the map |
+| Right-drag | Rotate and tilt the camera |
+| Scroll / pinch | Zoom |
+| W A S D / arrow keys | Move the camera |
+| Q / E | Rotate the camera |
+| Right-click / Esc | Drop the build tool or clear the selection |
+| Space | Pause |
 
-Farbige Kugeln über Gebäuden zeigen den Zustand: grün = arbeitet,
-gelb = wartet oder Lager voll, rot = keine Arbeiter, keine Rohstoffe oder Hunger.
-Kleine Kugeln, die über die Karte laufen, sind Träger – ihre Farbe zeigt die Ware.
+Coloured spheres above buildings show their state: green working, yellow waiting or
+full, red without workers, resources or food. Small spheres walking across the map
+are carriers; their colour shows the good they carry.
 
-## Projektstruktur
+## Project structure
 
 ```
-EpochenDerWege.xcodeproj      Xcode-Projekt (Ordner werden automatisch synchronisiert)
-EpochenDerWege/               macOS-App
-  EpochenDerWegeApp.swift     Einstiegspunkt
-  ContentView.swift           Fenster: 3D-Ansicht plus Oberfläche
-  GameController.swift        Verbindet Simulation, Eingaben und Anzeige
-  Rendering/                  RealityKit: Kamera, Gelände, Gebäude, Träger
-  UI/                         SwiftUI: obere Leiste, Baumenü, Gebäudeinfo
-Packages/Simulation/          Spielregeln als eigenes Swift-Paket, ohne Grafik
-  Sources/Simulation/
-    Resources/antike.json     Alle Spielwerte (Gebäude, Waren, Regeln)
-    Simulation.swift          Tick-Schleife: Produktion, Träger, Bewohner, Finanzen
-    Terrain.swift             Prozedurale Karte aus einem Seed
-  Tests/SimulationTests/      Unit-Tests
-docs/GameDesign.md            Game Design Document
+EpochenDerWege.xcodeproj        Xcode project; source folders are synchronised automatically
+EpochenDerWege/                 macOS app
+  App/                          Entry point and composition root (GameSession)
+  Features/Game/                View model, text formatting, SwiftUI views
+  Rendering/                    RealityKit scene: layers, camera, input
+  Resources/                    String catalog (English, German)
+Packages/Core/                  Game logic, no UI frameworks
+  Sources/GameDomain/           Entities and value types
+  Sources/GameData/             Game data loading and validation
+    Resources/antiquity.json    All balancing values for the antiquity era
+  Sources/GameSimulation/       World state, systems, commands, engine, world generation
+  Tests/                        Swift Testing suites per module
+docs/
+  GameDesign.md                 Game design document
+  Architecture.md               Layers, data flow, patterns, decisions
 ```
 
-**Grundsatz:** Die Simulation kennt keine Grafik. Die App liest nur ihren Zustand
-und schickt Befehle (bauen, abreißen). So bleibt die Spiellogik testbar, und
-die Grafik-Technik könnte später ausgetauscht werden.
+See [docs/Architecture.md](docs/Architecture.md) for how the pieces fit together.
 
-**Balancing:** Kosten, Produktionszeiten, Arbeiter, Lagergrößen und Regeln stehen in
-`Packages/Simulation/Sources/Simulation/Resources/antike.json` und lassen sich ohne
-Code-Änderung anpassen.
+## Status
 
-## Stand: Meilenstein 1 (Prototyp Antike)
+The project is in milestone **0.1 Foundation**. See the
+[milestones](https://github.com/502Proxy/EpochenDerWege/milestones) for the roadmap
+and the [issues](https://github.com/502Proxy/EpochenDerWege/issues) for planned work.
 
-Fertig:
+Playable today:
 
-- [x] Prozedurale 3D-Karte (Low-Poly) mit Wasser, Sand, Grasland, Wald, Fels und Schnee
-- [x] Orbit-Kamera mit Maus, Trackpad und Tastatur
-- [x] Startsiedlung mit Lager und fünf Häusern (20 Bauern)
-- [x] Bauen mit Vorschau (grün/rot) und Regeln: Gelände, Steigung, Geld, Rohstoffe in Reichweite
-- [x] Produktionsketten: Getreide → Mehl → Brot, Fisch, Holz, Stein
-- [x] Träger bringen Waren sichtbar von Betrieb zu Betrieb, zu Häusern und ins Lager
-- [x] Arbeiter, Versorgung, Wachstum und Hunger der Häuser
-- [x] Steuern und Unterhalt pro Jahr
-- [x] Pause und Zeitraffer (1×, 2×, 4×)
+- Procedural low-poly 3D map with water, sand, grassland, forest, rock and snow
+- Starting settlement with a storehouse and five houses (20 farmers)
+- Building with live preview and rules for terrain, slope, money and nearby resources
+- Production chains: grain → flour → bread, fish, wood, stone
+- Carriers visibly transport goods between buildings, houses and storehouses
+- Workers, food supply, growth and hunger
+- Yearly taxes and upkeep
+- Pause and 1× / 2× / 4× speed
 
-Bewusste Vereinfachungen für den Prototyp:
+Known simplifications of the prototype: carriers walk in straight lines (roads come in
+0.2), farmers and citizens are not yet distinguished, buildings cost only money, the
+player places houses directly, and there is no save game yet.
 
-- Träger laufen in gerader Linie; Straßen, Wegfindung und Ochsenkarren kommen als Nächstes
-- Bauern und Bürger werden noch nicht unterschieden
-- Gebäude kosten nur Geld, noch kein Baumaterial
-- Häuser setzt der Spieler selbst (später entstehen sie in Wohnzonen)
-- Kein Speichern und Laden
+## Contributing
 
-Nächste Schritte:
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow: issues, branches,
+Conventional Commits and pull requests.
 
-1. Straßen bauen, Wegfindung (A*) und Ochsenkarren auf Linien
-2. Baumaterial muss zur Baustelle transportiert werden
-3. Bürger als zweiter Stand mit Kleidung und Wein
-4. Speichern und Laden
+## Language
+
+Code, comments and documentation are written in English. The game is available in
+English and German.
