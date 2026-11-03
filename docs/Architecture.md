@@ -97,6 +97,7 @@ simulation slightly but can never drop a frame.
 | 3 | `LogisticsSystem` | dispatch every 5 ticks, movement every tick | Sends carriers and moves them |
 | 4 | `PopulationSystem` | every 10 days | Feeds houses, grows or shrinks them |
 | 5 | `EconomySystem` | yearly | Taxes and upkeep |
+| 6 | `TownGrowthSystem` | every 5 days | Builds houses in residential zones next to roads when the town has demand |
 
 The simulation is **deterministic**: the same seed, commands and number of ticks always
 produce the same world. Collections are iterated in a stable order (buildings in
@@ -108,7 +109,7 @@ reproducible and is a prerequisite for save games and replays.
 | Pattern | Where | Why |
 | --- | --- | --- |
 | Repository | `GameCatalogRepository`, `BundledCatalogRepository`, `JSONCatalogRepository` | The app does not care where game data comes from; tests and mods can supply their own |
-| Command | `GameCommand`, `PlaceBuildingCommand`, `DemolishBuildingCommand`, `BuildRoadCommand`, `DemolishRoadCommand` | All player actions are applied in one place between ticks; easy to log, replay or network later |
+| Command | `GameCommand`, `PlaceBuildingCommand`, `DemolishBuildingCommand`, `BuildRoadCommand`, `DemolishRoadCommand`, `ZoneCommand` | All player actions are applied in one place between ticks; easy to log, replay or network later |
 | Strategy | `DeliveryPlanner`, `NearestConsumerPlanner` | How carriers pick targets can change (e.g. road routing) without touching the logistics system |
 | Observer | `SimulationEvent` stream in `WorldState.events` | The simulation reports what happened as data; the UI decides how to phrase it |
 | Factory | `WorldFactory`, `TerrainGenerator` | World creation (terrain, starting settlement) is separate from running a world |

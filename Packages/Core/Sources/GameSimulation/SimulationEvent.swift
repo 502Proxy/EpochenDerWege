@@ -13,6 +13,8 @@ public enum SimulationEvent: Hashable, Sendable {
     case yearClosed(year: Int, taxes: Int, upkeep: Int)
     case roadBuilt(cells: Int, cost: Int)
     case roadDemolished(cells: Int, refund: Int)
+    case zoneChanged(kind: ZoneKind?, cells: Int)
+    case townGrew(BuildingID)
 }
 
 /// An event with its position in the event stream.

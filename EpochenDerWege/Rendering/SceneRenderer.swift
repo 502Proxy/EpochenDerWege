@@ -12,6 +12,7 @@ struct RenderContext {
     let selectedBuildingID: BuildingID?
     let preview: PlacementPreview?
     let roadPreview: RoadPreview?
+    let zonePreview: ZonePreview?
     /// Seconds of animation time; advances with the game speed and stops while paused.
     let animationTime: TimeInterval
 
@@ -31,6 +32,13 @@ struct RoadPreview: Equatable {
     let cells: [GridPoint]
     /// Cells that will be (or already are) road; the others are shown as blocked.
     let valid: Set<GridPoint>
+}
+
+/// Area being zoned (or unzoned) while dragging a zone tool.
+struct ZonePreview: Equatable {
+    let cells: Set<GridPoint>
+    /// `nil` when zoning is being removed.
+    let kind: ZoneKind?
 }
 
 /// One part of the scene (composite pattern). Layers own their entities and update
@@ -55,6 +63,7 @@ final class SceneRenderer {
         root = AnchorEntity(world: SIMD3<Float>(-space.halfExtent, 0, -space.halfExtent))
         layers = [
             TerrainLayer(parent: root, space: space),
+            ZoneLayer(parent: root, space: space),
             RoadLayer(parent: root, space: space),
             BuildingLayer(parent: root, space: space),
             CarrierLayer(parent: root, space: space),

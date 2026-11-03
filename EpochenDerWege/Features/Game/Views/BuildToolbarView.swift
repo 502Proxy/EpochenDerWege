@@ -106,6 +106,18 @@ private struct ToolPresentation {
             costLabel = "\(catalog.rules.roadCostPerCell)"
             symbol = "road.lanes"
             color = Color(red: 0.66, green: 0.60, blue: 0.50)
+        case .zone:
+            name = String(localized: "Residential zone")
+            detail = String(localized: "Drag to zone an area. Houses appear next to roads when the town needs them.")
+            costLabel = nil
+            symbol = "square.dashed.inset.filled"
+            color = .green
+        case .unzone:
+            name = String(localized: "Remove zone")
+            detail = String(localized: "Drag to remove zoning. Existing houses stay.")
+            costLabel = nil
+            symbol = "square.dashed"
+            color = .orange
         case .bulldoze:
             name = String(localized: "Demolish")
             detail = String(localized: "Click a building or road to remove it. Half of the cost is refunded.")
@@ -176,7 +188,7 @@ private struct ControlsHelpButton: View {
                 Text("Controls").font(.headline)
                 Text("Click: build or select")
                 Text("Drag: move the map")
-                Text("Road tool: drag to build a road")
+                Text("Road and zone tools: drag to draw")
                 Text("Right-drag: rotate")
                 Text("Scroll: zoom")
                 Text("Right-click or Esc: cancel")
