@@ -1,15 +1,15 @@
 import SwiftUI
 
-/// Rechte Seitenleiste mit Details zum ausgewählten Gebäude.
-struct InspectorPanel: View {
-    let info: BuildingInfo
+/// Details of the selected building.
+struct InspectorView: View {
+    let details: BuildingDetails
     let onDemolish: () -> Void
     let onClose: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(info.name)
+                Text(details.name)
                     .font(.headline)
                 Spacer()
                 Button(action: onClose) {
@@ -17,16 +17,20 @@ struct InspectorPanel: View {
                         .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(Text("Close"))
             }
 
-            Label(info.status, systemImage: "circle.fill")
-                .font(.callout)
-                .foregroundStyle(statusColor)
-                .labelStyle(StatusLabelStyle(color: statusColor))
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(toneColor)
+                    .frame(width: 8, height: 8)
+                Text(details.status)
+                    .font(.callout)
+            }
 
             Divider()
 
-            ForEach(Array(info.rows.enumerated()), id: \.offset) { _, row in
+            ForEach(details.rows) { row in
                 HStack(alignment: .firstTextBaseline) {
                     Text(row.label)
                         .foregroundStyle(.secondary)
@@ -40,34 +44,34 @@ struct InspectorPanel: View {
             Divider()
 
             Button(role: .destructive, action: onDemolish) {
-                Label("Abreißen (50 % zurück)", systemImage: "trash")
+                Label("Demolish", systemImage: "trash")
             }
+            .help(Text("Half of the cost is refunded."))
         }
         .frame(width: 280)
         .padding(12)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
     }
 
-    private var statusColor: Color {
-        switch info.statusLevel {
-        case .good: return .green
-        case .warning: return .orange
-        case .problem: return .red
-        case .neutral: return .secondary
+    private var toneColor: Color {
+        switch details.tone {
+        case .good: .green
+        case .warning: .orange
+        case .problem: .red
+        case .neutral: .secondary
         }
     }
 }
 
-private struct StatusLabelStyle: LabelStyle {
-    let color: Color
+/// A short message at the bottom of the screen.
+struct ToastView: View {
+    let text: String
 
-    func makeBody(configuration: Configuration) -> some View {
-        HStack(spacing: 6) {
-            configuration.icon
-                .font(.system(size: 8))
-                .foregroundStyle(color)
-            configuration.title
-                .foregroundStyle(.primary)
-        }
+    var body: some View {
+        Text(text)
+            .font(.callout)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(.regularMaterial, in: Capsule())
     }
 }

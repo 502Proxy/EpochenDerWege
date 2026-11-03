@@ -1,0 +1,796 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%@ built for %lld thalers.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ für %lld Taler gebaut."
+          }
+        }
+      }
+    },
+    "%@ demolished, %lld thalers refunded.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ abgerissen, %lld Taler zurückerhalten."
+          }
+        }
+      }
+    },
+    "%lld carriers": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Träger"
+          }
+        }
+      }
+    },
+    "%lld residents": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Einwohner"
+          }
+        }
+      }
+    },
+    "%lld thalers": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Taler"
+          }
+        }
+      }
+    },
+    "%lld unemployed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld ohne Arbeit"
+          }
+        }
+      }
+    },
+    "%lld workers": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Arbeiter"
+          }
+        }
+      }
+    },
+    "A new settlement with %lld residents was founded.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine neue Siedlung mit %lld Bewohnern wurde gegründet."
+          }
+        }
+      }
+    },
+    "A resident left because of hunger.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Bewohner ist wegen Hunger weggezogen."
+          }
+        }
+      }
+    },
+    "Bakery": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bäckerei"
+          }
+        }
+      }
+    },
+    "Barely supplied": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Knapp versorgt"
+          }
+        }
+      }
+    },
+    "Bread": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brot"
+          }
+        }
+      }
+    },
+    "Build": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bauen"
+          }
+        }
+      }
+    },
+    "Cannot build on water.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf Wasser kann nicht gebaut werden."
+          }
+        }
+      }
+    },
+    "Carriers out": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Träger unterwegs"
+          }
+        }
+      }
+    },
+    "Click: build or select": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klick: bauen oder auswählen"
+          }
+        }
+      }
+    },
+    "Close": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließen"
+          }
+        }
+      }
+    },
+    "Demolish": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abreißen"
+          }
+        }
+      }
+    },
+    "Drag: move the map": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziehen: Karte verschieben"
+          }
+        }
+      }
+    },
+    "Efficiency": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leistung"
+          }
+        }
+      }
+    },
+    "Empty": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leer"
+          }
+        }
+      }
+    },
+    "Empty – waiting for food": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leer – wartet auf Essen"
+          }
+        }
+      }
+    },
+    "Fish": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fisch"
+          }
+        }
+      }
+    },
+    "Fisher's Hut": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fischerhütte"
+          }
+        }
+      }
+    },
+    "Flour": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehl"
+          }
+        }
+      }
+    },
+    "Food: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorrat: %@"
+          }
+        }
+      }
+    },
+    "Forest": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wald"
+          }
+        }
+      }
+    },
+    "Grain": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getreide"
+          }
+        }
+      }
+    },
+    "Grain Farm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getreidehof"
+          }
+        }
+      }
+    },
+    "Grassland": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grasland"
+          }
+        }
+      }
+    },
+    "Half of the cost is refunded.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Hälfte der Kosten wird erstattet."
+          }
+        }
+      }
+    },
+    "House": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haus"
+          }
+        }
+      }
+    },
+    "Hungry": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hunger"
+          }
+        }
+      }
+    },
+    "Jobs %lld/%lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arbeitsplätze %lld/%lld"
+          }
+        }
+      }
+    },
+    "Mill": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mühle"
+          }
+        }
+      }
+    },
+    "Needs %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Braucht %@"
+          }
+        }
+      }
+    },
+    "Needs %@ nearby": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Braucht %@ in der Nähe"
+          }
+        }
+      }
+    },
+    "No %@ nearby.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein %@ in der Nähe."
+          }
+        }
+      }
+    },
+    "No resources in reach": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Rohstoffe in Reichweite"
+          }
+        }
+      }
+    },
+    "No workers – build more houses": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Arbeiter – baue mehr Häuser"
+          }
+        }
+      }
+    },
+    "Not enough money: %lld thalers needed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht genug Geld: %lld Taler nötig."
+          }
+        }
+      }
+    },
+    "Output full – carriers cannot keep up": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lager voll – Träger kommen nicht hinterher"
+          }
+        }
+      }
+    },
+    "Outside the map.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Außerhalb der Karte."
+          }
+        }
+      }
+    },
+    "Pause": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        }
+      }
+    },
+    "Produces %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erzeugt %@"
+          }
+        }
+      }
+    },
+    "Produces %@ in %lld days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erzeugt %@ in %lld Tagen"
+          }
+        }
+      }
+    },
+    "Progress": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortschritt"
+          }
+        }
+      }
+    },
+    "Quarry": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steinbruch"
+          }
+        }
+      }
+    },
+    "Ready": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereit"
+          }
+        }
+      }
+    },
+    "Residents": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewohner"
+          }
+        }
+      }
+    },
+    "Resources in reach": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rohstoffe in Reichweite"
+          }
+        }
+      }
+    },
+    "Right-click or Esc: cancel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechtsklick oder Esc: abbrechen"
+          }
+        }
+      }
+    },
+    "Right-drag: rotate": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechts ziehen: drehen"
+          }
+        }
+      }
+    },
+    "Rock": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fels"
+          }
+        }
+      }
+    },
+    "Sand": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sand"
+          }
+        }
+      }
+    },
+    "Scroll: zoom": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scrollen: zoomen"
+          }
+        }
+      }
+    },
+    "Snow": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schnee"
+          }
+        }
+      }
+    },
+    "Space: pause": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leertaste: Pause"
+          }
+        }
+      }
+    },
+    "Speed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geschwindigkeit"
+          }
+        }
+      }
+    },
+    "Stock": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestand"
+          }
+        }
+      }
+    },
+    "Stock in all storehouses": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestand in allen Lagern"
+          }
+        }
+      }
+    },
+    "Stone": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stein"
+          }
+        }
+      }
+    },
+    "Storehouse": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lager"
+          }
+        }
+      }
+    },
+    "Supply": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versorgung"
+          }
+        }
+      }
+    },
+    "The game data could not be loaded.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Spieldaten konnten nicht geladen werden."
+          }
+        }
+      }
+    },
+    "This space is already taken.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hier steht schon etwas."
+          }
+        }
+      }
+    },
+    "Too steep (%@ slope).": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu steil (%@ Steigung)."
+          }
+        }
+      }
+    },
+    "Unknown building %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unbekanntes Gebäude %@."
+          }
+        }
+      }
+    },
+    "Up to %lld residents": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bis zu %lld Bewohner"
+          }
+        }
+      }
+    },
+    "WASD, Q/E, Space": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WASD, Q/E, Leertaste"
+          }
+        }
+      }
+    },
+    "Waiting for inputs": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wartet auf Rohstoffe"
+          }
+        }
+      }
+    },
+    "Water": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wasser"
+          }
+        }
+      }
+    },
+    "Well supplied": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gut versorgt"
+          }
+        }
+      }
+    },
+    "Wood": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Holz"
+          }
+        }
+      }
+    },
+    "Woodcutter": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Holzfäller"
+          }
+        }
+      }
+    },
+    "Workers": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arbeiter"
+          }
+        }
+      }
+    },
+    "Working": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arbeitet"
+          }
+        }
+      }
+    },
+    "Year %lld, day %lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jahr %lld, Tag %lld"
+          }
+        }
+      }
+    },
+    "Year %lld: %lld thalers taxes, %lld thalers upkeep.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jahr %lld: %lld Taler Steuern, %lld Taler Unterhalt."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
