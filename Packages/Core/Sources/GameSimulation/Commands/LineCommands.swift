@@ -63,7 +63,7 @@ public struct BuyVehicleCommand: GameCommand {
             world.emit(.placementRejected(.insufficientFunds(cost: definition.price)))
             return
         }
-        world.book(-definition.price, as: .vehicles)
+        world.book(-definition.price, as: .vehicles, detail: .vehicle(definition.id))
         let vehicle = Vehicle(id: world.makeVehicleID(), definition: definition, lineID: lineID, position: firstStop.center)
         world.vehicles.append(vehicle)
         world.emit(.vehicleBought(vehicleType, cost: definition.price))

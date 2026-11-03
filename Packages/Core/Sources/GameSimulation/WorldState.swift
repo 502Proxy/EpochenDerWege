@@ -162,10 +162,13 @@ public struct WorldState: Sendable {
 
     /// Changes the treasury and records the booking. Positive amounts are income.
     ///
-    /// - Parameter year: The year to book into; defaults to the current year.
-    mutating func book(_ amount: Int, as category: FinanceCategory, year: Int? = nil) {
+    /// - Parameters:
+    ///   - year: The year to book into; defaults to the current year.
+    ///   - month: The month to book into; defaults to the current month.
+    ///   - detail: What the booking was about, for breakdowns.
+    mutating func book(_ amount: Int, as category: FinanceCategory, year: Int? = nil, month: Int? = nil, detail: LedgerDetail? = nil) {
         treasury += amount
-        ledger.book(amount, as: category, year: year ?? clock.year)
+        ledger.book(amount, as: category, year: year ?? clock.year, month: month ?? clock.month, detail: detail)
     }
 
     mutating func emit(_ event: SimulationEvent) {

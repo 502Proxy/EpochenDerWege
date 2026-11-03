@@ -188,7 +188,7 @@ public struct LogisticsSystem: SimulationSystem {
             // Markets and workshops pay the base price for every delivered unit.
             let accepted = world.buildings[index].input.add(good, amount: carrier.cargo.amount)
             let price = world.catalog.good(good)?.basePrice ?? 0
-            world.book(accepted * price, as: .sales)
+            world.book(accepted * price, as: .sales, detail: .good(good))
         }
     }
 }

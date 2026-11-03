@@ -21,6 +21,12 @@ public struct GameClock: Hashable, Sendable, Codable {
     /// Day within the current year, starting at 0.
     public var dayOfYear: Int { day % daysPerYear }
 
+    /// Months per in-game year, used for finance figures.
+    public static let monthsPerYear = 12
+
+    /// Month within the current year, starting at 0.
+    public var month: Int { dayOfYear * Self.monthsPerYear / daysPerYear }
+
     /// `true` on the first tick of every `days`-day period.
     public func isStartOfPeriod(days: Int) -> Bool {
         isMultiple(ofTicks: ticksPerDay * max(1, days))
