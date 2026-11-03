@@ -5,6 +5,8 @@ struct TopBarView: View {
     let viewModel: GameViewModel
     @State private var showsFinances = false
     @State private var showsLines = false
+    @State private var showsGoods = false
+    @State private var showsBuildings = false
 
     var body: some View {
         let hud = viewModel.hud
@@ -39,6 +41,28 @@ struct TopBarView: View {
             .help(Text("Show transport lines and vehicles"))
             .popover(isPresented: $showsLines, arrowEdge: .bottom) {
                 LinesView(viewModel: viewModel)
+            }
+            Button {
+                showsGoods.toggle()
+            } label: {
+                Image(systemName: "shippingbox")
+            }
+            .buttonStyle(.plain)
+            .keyboardShortcut("g", modifiers: [])
+            .help(Text("Goods overview (G)"))
+            .sheet(isPresented: $showsGoods) {
+                GoodsView(goods: viewModel.goods) { showsGoods = false }
+            }
+            Button {
+                showsBuildings.toggle()
+            } label: {
+                Image(systemName: "building.2")
+            }
+            .buttonStyle(.plain)
+            .keyboardShortcut("b", modifiers: [])
+            .help(Text("Building list (B)"))
+            .sheet(isPresented: $showsBuildings) {
+                BuildingListView(viewModel: viewModel) { showsBuildings = false }
             }
 
             Divider().frame(height: 18)

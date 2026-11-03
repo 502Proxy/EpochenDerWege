@@ -47,6 +47,7 @@ final class SceneCoordinator: NSObject {
 
     private var hoverPoint: CGPoint?
     private var animationTime: TimeInterval = 0
+    private var handledFocus = 0
     private var cachedPreview: (point: CGPoint, tick: Int, tool: BuildingTypeID, preview: PlacementPreview?)?
     /// Start and current end of a drag with an area tool (road, zone).
     private var areaDrag: (start: GridPoint, end: GridPoint)?
@@ -122,6 +123,12 @@ final class SceneCoordinator: NSObject {
             animationTime: animationTime
         )
         renderer.update(with: context)
+
+        if let focus = viewModel.cameraFocus, focus.id != handledFocus {
+            handledFocus = focus.id
+            rig.target = renderer.space.scene(frame.world.terrain.center(of: focus.cell))
+            rig.distance = min(rig.distance, 160)
+        }
 
         // The camera follows the terrain height below its target, smoothed.
         let ground = Float(frame.world.terrain.surfaceHeight(at: renderer.space.worldPoint(fromScene: rig.target)))
