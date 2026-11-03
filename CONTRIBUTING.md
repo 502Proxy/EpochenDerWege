@@ -58,8 +58,8 @@ into several issues and pull requests.
 ## Code guidelines
 
 - Follow the layering in [docs/Architecture.md](docs/Architecture.md). The
-  Simulation package never imports SwiftUI, AppKit or RealityKit.
-- Game rules belong in the Simulation package and are covered by unit tests.
+  Core package never imports SwiftUI, AppKit or RealityKit.
+- Game rules belong in the Core package and are covered by unit tests.
 - Balancing values belong in the game data JSON, not in code.
 - Public types and functions have documentation comments (`///`).
 - Prefer value types and immutable snapshots; mutable state lives in one owner.
@@ -68,8 +68,8 @@ into several issues and pull requests.
 ## Running locally
 
 ```bash
-# Simulation tests
-swift test --package-path Packages/Simulation
+# Core package tests
+swift test --package-path Packages/Core
 
 # Build the app (or open EpochenDerWege.xcodeproj and press ⌘R)
 xcodebuild build -project EpochenDerWege.xcodeproj -scheme EpochenDerWege -destination 'platform=macOS'

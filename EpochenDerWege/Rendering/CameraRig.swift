@@ -1,31 +1,27 @@
-import Foundation
 import simd
 
-/// Orbit-Kamera wie in Aufbauspielen: schaut auf einen Punkt am Boden,
-/// lässt sich drehen, neigen, zoomen und über die Karte schieben.
+/// Orbit camera as known from city builders: looks at a point on the ground and can be
+/// rotated, tilted, zoomed and moved across the map. Pure math, no RealityKit.
 struct CameraRig {
-    /// Punkt, auf den die Kamera schaut (Szenen-Koordinaten).
+    /// Point the camera looks at, in scene coordinates.
     var target = SIMD3<Float>(0, 0, 0)
-    /// Drehung um die Hochachse (Bogenmaß).
+    /// Rotation around the vertical axis, in radians.
     var yaw: Float = .pi * 0.25
-    /// Neigung über dem Horizont (Bogenmaß).
+    /// Elevation above the horizon, in radians.
     var pitch: Float = 0.75
     var distance: Float = 220
-
-    /// Halbe Kartenbreite – so weit darf das Ziel vom Mittelpunkt weg.
+    /// The target stays within ±bounds on x and z.
     var bounds: Float = 512
 
-    static let minDistance: Float = 25
-    static let maxDistance: Float = 1400
-    static let minPitch: Float = 0.2
-    static let maxPitch: Float = 1.45
+    static let distanceRange: ClosedRange<Float> = 25...1400
+    static let pitchRange: ClosedRange<Float> = 0.2...1.45
 
     var position: SIMD3<Float> {
         let horizontal = cos(pitch) * distance
         return target + SIMD3<Float>(sin(yaw) * horizontal, sin(pitch) * distance, cos(yaw) * horizontal)
     }
 
-    /// Blickrichtung am Boden (ohne Höhe).
+    /// Viewing direction projected onto the ground.
     var forward: SIMD3<Float> {
         SIMD3<Float>(-sin(yaw), 0, -cos(yaw))
     }
@@ -34,31 +30,35 @@ struct CameraRig {
         SIMD3<Float>(cos(yaw), 0, -sin(yaw))
     }
 
-    /// Verschiebt die Karte wie beim Ziehen mit der Maus. `dy` ist positiv, wenn nach oben gezogen wird.
+    /// Moves the map like dragging it with the mouse. `dy` is positive for upward drags.
     mutating func drag(dx: Float, dy: Float) {
-        let scale = distance * 0.0018
-        target += (-right * dx - forward * dy) * scale
-        clamp()
+        target += (-right * dx - forward * dy) * (distance * 0.0018)
+        clampTarget()
     }
 
-    /// Bewegt die Kamera in Blickrichtung (Tastatur).
-    mutating func move(forwardAmount: Float, rightAmount: Float) {
-        let scale = distance * 0.06
-        target += (forward * forwardAmount + right * rightAmount) * scale
-        clamp()
+    /// Moves the camera relative to the viewing direction (keyboard).
+    mutating func move(forward forwardAmount: Float, right rightAmount: Float) {
+        target += (forward * forwardAmount + right * rightAmount) * (distance * 0.06)
+        clampTarget()
     }
 
     mutating func rotate(dx: Float, dy: Float) {
         yaw -= dx * 0.006
-        pitch = min(max(pitch + dy * 0.004, CameraRig.minPitch), CameraRig.maxPitch)
+        pitch = (pitch + dy * 0.004).clamped(to: Self.pitchRange)
     }
 
-    mutating func zoom(factor: Float) {
-        distance = min(max(distance * factor, CameraRig.minDistance), CameraRig.maxDistance)
+    mutating func zoom(by factor: Float) {
+        distance = (distance * factor).clamped(to: Self.distanceRange)
     }
 
-    private mutating func clamp() {
-        target.x = min(max(target.x, -bounds), bounds)
-        target.z = min(max(target.z, -bounds), bounds)
+    private mutating func clampTarget() {
+        target.x = target.x.clamped(to: -bounds...bounds)
+        target.z = target.z.clamped(to: -bounds...bounds)
+    }
+}
+
+extension Comparable {
+    func clamped(to range: ClosedRange<Self>) -> Self {
+        min(max(self, range.lowerBound), range.upperBound)
     }
 }

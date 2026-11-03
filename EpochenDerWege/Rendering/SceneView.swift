@@ -1,0 +1,276 @@
+import AppKit
+import Combine
+import GameDomain
+import GameSimulation
+import RealityKit
+import SwiftUI
+
+/// Hosts the RealityKit scene inside SwiftUI.
+///
+/// `ARView` is used instead of `RealityView` because the game needs low-level mouse
+/// input (right-drag, scroll wheel, hover) and screen-to-world ray casts. See
+/// `docs/Architecture.md` for the reasoning.
+struct SceneView: NSViewRepresentable {
+    let viewModel: GameViewModel
+    let engine: SimulationEngine
+
+    func makeCoordinator() -> SceneCoordinator {
+        SceneCoordinator(viewModel: viewModel, engine: engine)
+    }
+
+    func makeNSView(context: Context) -> ARView {
+        context.coordinator.makeView()
+    }
+
+    func updateNSView(_ nsView: ARView, context: Context) {}
+
+    static func dismantleNSView(_ nsView: ARView, coordinator: SceneCoordinator) {
+        coordinator.tearDown()
+    }
+}
+
+/// Drives the scene every frame and translates mouse and keyboard input.
+///
+/// Controls:
+/// - Click: build or select · Drag: move the map · Right-drag: rotate and tilt
+/// - Scroll or pinch: zoom · WASD or arrows: move · Q/E: rotate
+/// - Right-click or Esc: cancel · Space: pause
+final class SceneCoordinator: NSObject {
+    private let viewModel: GameViewModel
+    private let engine: SimulationEngine
+    private let camera = PerspectiveCamera()
+    private var rig = CameraRig()
+    private weak var view: ARView?
+    private var renderer: SceneRenderer?
+    private var frameSubscription: (any Cancellable)?
+    private var eventMonitors: [Any] = []
+
+    private var hoverPoint: CGPoint?
+    private var cachedPreview: (point: CGPoint, tick: Int, tool: BuildingTypeID, preview: PlacementPreview?)?
+
+    init(viewModel: GameViewModel, engine: SimulationEngine) {
+        self.viewModel = viewModel
+        self.engine = engine
+        super.init()
+    }
+
+    func makeView() -> ARView {
+        let view = ARView(frame: .zero)
+        view.environment.background = .color(NSColor(srgbRed: 0.63, green: 0.78, blue: 0.92, alpha: 1))
+
+        let world = engine.snapshots.value.world
+        let renderer = SceneRenderer(world: world)
+        renderer.install(in: view)
+        self.renderer = renderer
+
+        camera.camera.fieldOfViewInDegrees = 45
+        camera.camera.near = 1
+        camera.camera.far = 8000
+        let cameraAnchor = AnchorEntity(world: .zero)
+        cameraAnchor.addChild(camera)
+        view.scene.addAnchor(cameraAnchor)
+
+        rig.bounds = renderer.space.halfExtent
+        if let start = world.startCell {
+            rig.target = renderer.space.scene(world.terrain.center(of: start))
+        }
+        applyCamera()
+
+        installGestures(on: view)
+        installEventMonitors()
+        frameSubscription = view.scene.subscribe(to: SceneEvents.Update.self) { [weak self] event in
+            let deltaTime = event.deltaTime
+            MainActor.assumeIsolated {
+                self?.renderFrame(deltaTime: deltaTime)
+            }
+        }
+
+        self.view = view
+        return view
+    }
+
+    func tearDown() {
+        frameSubscription?.cancel()
+        frameSubscription = nil
+        for monitor in eventMonitors {
+            NSEvent.removeMonitor(monitor)
+        }
+        eventMonitors.removeAll()
+    }
+
+    // MARK: - Frame
+
+    private func renderFrame(deltaTime: TimeInterval) {
+        guard let renderer else { return }
+        if let window = view?.window, !window.acceptsMouseMovedEvents {
+            window.acceptsMouseMovedEvents = true
+        }
+
+        let frame = engine.snapshots.value
+        let context = RenderContext(
+            frame: frame,
+            fraction: frame.interpolationFraction(at: .now),
+            selectedBuildingID: viewModel.selectedBuildingID,
+            preview: placementPreview(in: frame.world)
+        )
+        renderer.update(with: context)
+
+        // The camera follows the terrain height below its target, smoothed.
+        let ground = Float(frame.world.terrain.surfaceHeight(at: renderer.space.worldPoint(fromScene: rig.target)))
+        rig.target.y += (ground - rig.target.y) * min(1, Float(deltaTime) * 8)
+        applyCamera()
+    }
+
+    private func applyCamera() {
+        camera.look(at: rig.target, from: rig.position, relativeTo: nil)
+    }
+
+    // MARK: - Picking
+
+    private func cell(at point: CGPoint) -> GridPoint? {
+        guard let view, let renderer, let ray = view.ray(through: point) else { return nil }
+        guard let hit = renderer.space.groundPoint(origin: ray.origin, direction: ray.direction) else { return nil }
+        return renderer.space.terrain.cell(containing: hit)
+    }
+
+    /// The ghost building under the mouse. Ray casts only when the mouse, the tool
+    /// or the world changed, not on every frame.
+    private func placementPreview(in world: WorldState) -> PlacementPreview? {
+        guard
+            let tool = viewModel.selectedTool,
+            let definition = world.catalog.building(tool),
+            let point = hoverPoint
+        else {
+            cachedPreview = nil
+            return nil
+        }
+        if let cached = cachedPreview, cached.point == point, cached.tick == world.clock.tick, cached.tool == tool {
+            return cached.preview
+        }
+        let preview = cell(at: point).map { cell in
+            PlacementPreview(definition: definition, cell: cell, isValid: viewModel.previewValidity(at: cell, in: world) ?? false)
+        }
+        cachedPreview = (point, world.clock.tick, tool, preview)
+        return preview
+    }
+
+    // MARK: - Gestures
+
+    private func installGestures(on view: ARView) {
+        let click = NSClickGestureRecognizer(target: self, action: #selector(handleClick(_:)))
+        click.buttonMask = 0x1
+        view.addGestureRecognizer(click)
+
+        let rightClick = NSClickGestureRecognizer(target: self, action: #selector(handleRightClick(_:)))
+        rightClick.buttonMask = 0x2
+        view.addGestureRecognizer(rightClick)
+
+        let pan = NSPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
+        pan.buttonMask = 0x1
+        view.addGestureRecognizer(pan)
+
+        let orbit = NSPanGestureRecognizer(target: self, action: #selector(handleOrbit(_:)))
+        orbit.buttonMask = 0x2
+        view.addGestureRecognizer(orbit)
+
+        view.addGestureRecognizer(NSMagnificationGestureRecognizer(target: self, action: #selector(handlePinch(_:))))
+    }
+
+    /// Vertical movement, positive upwards regardless of the view's coordinate system.
+    private func upwardDelta(_ translation: CGPoint, in view: NSView) -> Float {
+        Float(view.isFlipped ? -translation.y : translation.y)
+    }
+
+    @objc private func handleClick(_ gesture: NSClickGestureRecognizer) {
+        guard let view else { return }
+        viewModel.click(on: cell(at: gesture.location(in: view)))
+    }
+
+    @objc private func handleRightClick(_ gesture: NSClickGestureRecognizer) {
+        viewModel.cancel()
+    }
+
+    @objc private func handlePan(_ gesture: NSPanGestureRecognizer) {
+        guard let view else { return }
+        let translation = gesture.translation(in: view)
+        rig.drag(dx: Float(translation.x), dy: upwardDelta(translation, in: view))
+        gesture.setTranslation(.zero, in: view)
+        applyCamera()
+    }
+
+    @objc private func handleOrbit(_ gesture: NSPanGestureRecognizer) {
+        guard let view else { return }
+        let translation = gesture.translation(in: view)
+        rig.rotate(dx: Float(translation.x), dy: upwardDelta(translation, in: view))
+        gesture.setTranslation(.zero, in: view)
+        applyCamera()
+    }
+
+    @objc private func handlePinch(_ gesture: NSMagnificationGestureRecognizer) {
+        rig.zoom(by: Float(1 - gesture.magnification))
+        gesture.magnification = 0
+        applyCamera()
+    }
+
+    // MARK: - Scroll wheel, mouse movement, keyboard
+
+    private func locationInView(_ event: NSEvent) -> CGPoint? {
+        guard let view, event.window === view.window else { return nil }
+        let point = view.convert(event.locationInWindow, from: nil)
+        return view.bounds.contains(point) ? point : nil
+    }
+
+    private func installEventMonitors() {
+        // Local monitors are always called on the main thread.
+        let scroll = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
+            let handled = MainActor.assumeIsolated { () -> Bool in
+                guard let self, self.locationInView(event) != nil else { return false }
+                let sensitivity: Float = event.hasPreciseScrollingDeltas ? 0.01 : 0.1
+                self.rig.zoom(by: exp(-Float(event.scrollingDeltaY) * sensitivity))
+                self.applyCamera()
+                return true
+            }
+            return handled ? nil : event
+        }
+
+        let movement = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged]) { [weak self] event in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.hoverPoint = self.locationInView(event)
+            }
+            return event
+        }
+
+        let keys = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            let handled = MainActor.assumeIsolated { () -> Bool in
+                guard let self, let view = self.view, event.window === view.window else { return false }
+                return self.handleKey(code: event.keyCode)
+            }
+            return handled ? nil : event
+        }
+
+        eventMonitors = [scroll, movement, keys].compactMap { $0 }
+    }
+
+    private enum KeyCode {
+        static let a: UInt16 = 0, s: UInt16 = 1, d: UInt16 = 2, q: UInt16 = 12, w: UInt16 = 13, e: UInt16 = 14
+        static let space: UInt16 = 49, escape: UInt16 = 53
+        static let left: UInt16 = 123, right: UInt16 = 124, down: UInt16 = 125, up: UInt16 = 126
+    }
+
+    private func handleKey(code: UInt16) -> Bool {
+        switch code {
+        case KeyCode.w, KeyCode.up: rig.move(forward: 1, right: 0)
+        case KeyCode.s, KeyCode.down: rig.move(forward: -1, right: 0)
+        case KeyCode.a, KeyCode.left: rig.move(forward: 0, right: -1)
+        case KeyCode.d, KeyCode.right: rig.move(forward: 0, right: 1)
+        case KeyCode.q: rig.rotate(dx: -40, dy: 0)
+        case KeyCode.e: rig.rotate(dx: 40, dy: 0)
+        case KeyCode.space: viewModel.togglePause()
+        case KeyCode.escape: viewModel.cancel()
+        default: return false
+        }
+        applyCamera()
+        return true
+    }
+}
