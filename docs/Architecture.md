@@ -111,6 +111,7 @@ reproducible and is a prerequisite for save games and replays.
 | Repository | `GameCatalogRepository`, `BundledCatalogRepository`, `JSONCatalogRepository` | The app does not care where game data comes from; tests and mods can supply their own |
 | Command | `GameCommand`, `PlaceBuildingCommand`, `DemolishBuildingCommand`, `BuildRoadCommand`, `DemolishRoadCommand`, `ZoneCommand` | All player actions are applied in one place between ticks; easy to log, replay or network later |
 | Strategy | `DeliveryPlanner`, `NearestConsumerPlanner` | How carriers pick targets can change (e.g. road routing) without touching the logistics system |
+| Single point of change | `WorldState.book(_:as:year:)` and `Ledger` | Every change of the treasury goes through one method that also records it, so the finance overview can never miss a booking |
 | Observer | `SimulationEvent` stream in `WorldState.events` | The simulation reports what happened as data; the UI decides how to phrase it |
 | Factory | `WorldFactory`, `TerrainGenerator` | World creation (terrain, starting settlement) is separate from running a world |
 | Factory + prototype | `BuildingModelFactory` | Each building model is assembled once from primitives; placed buildings are clones that share meshes and materials |

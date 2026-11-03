@@ -28,7 +28,7 @@ public struct PlaceBuildingCommand: GameCommand {
         case .failure(let error):
             world.emit(.placementRejected(error))
         case .success(let resourceFactor):
-            world.treasury -= definition.cost
+            world.book(-definition.cost, as: .construction)
             world.addBuilding(definition, at: cell, resourceFactor: resourceFactor)
             WorkforceSystem.assignWorkers(in: &world)
             world.emit(.buildingPlaced(buildingType, cost: definition.cost))
@@ -47,7 +47,7 @@ public struct DemolishBuildingCommand: GameCommand {
     public func execute(in world: inout WorldState) {
         guard let removed = world.removeBuilding(buildingID) else { return }
         let refund = removed.definition.cost * world.rules.demolitionRefundPercent / 100
-        world.treasury += refund
+        world.book(refund, as: .refunds)
 
         // Carriers heading to the demolished building turn back; their cargo is lost.
         for index in world.carriers.indices where world.carriers[index].targetID == buildingID {
