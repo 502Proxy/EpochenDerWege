@@ -9,6 +9,7 @@ import GameDomain
 /// 3. ``LogisticsSystem`` – dispatch and move carriers
 /// 4. ``PopulationSystem`` – feed houses, grow or shrink them
 /// 5. ``EconomySystem`` – once per year, taxes and upkeep
+/// 6. ``TownGrowthSystem`` – every few days, towns build houses in residential zones
 ///
 /// `Simulation` is deterministic: the same world, commands and tick count always
 /// produce the same result. It does no timing of its own; see ``SimulationEngine``.
@@ -28,6 +29,7 @@ public struct Simulation: Sendable {
             LogisticsSystem(),
             PopulationSystem(),
             EconomySystem(),
+            TownGrowthSystem(),
         ]
     }
 

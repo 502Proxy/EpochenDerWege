@@ -21,6 +21,8 @@ public struct WorldState: Sendable {
     public internal(set) var startCell: GridPoint?
     /// Cells covered by roads.
     public internal(set) var roads: Set<GridPoint> = []
+    /// Zoned cells. A zone stays when a building is placed on it.
+    public internal(set) var zones: [GridPoint: ZoneKind] = [:]
     /// Recent events, oldest first. Capped to `maximumEventCount`.
     public internal(set) var events: [EventRecord] = []
 

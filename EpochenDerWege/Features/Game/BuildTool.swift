@@ -8,6 +8,18 @@ enum BuildTool: Hashable {
     case road
     /// Remove buildings and roads.
     case bulldoze
+    /// Drag a rectangle to zone cells; the town builds there on its own.
+    case zone(ZoneKind)
+    /// Drag a rectangle to remove zoning.
+    case unzone
+
+    /// Whether dragging with this tool marks an area instead of moving the map.
+    var drawsArea: Bool {
+        switch self {
+        case .road, .zone, .unzone: true
+        case .building, .bulldoze: false
+        }
+    }
 }
 
 /// Groups of tools in the build toolbar.
@@ -53,7 +65,8 @@ enum ToolCategory: String, CaseIterable, Identifiable {
         case .roads:
             [.road, .bulldoze]
         case .housing:
-            catalog.buildings.filter { $0.category == .housing }.map { .building($0.id) }
+            // Houses are built by the towns themselves inside residential zones.
+            [.zone(.residential), .unzone]
         case .production:
             catalog.buildings.filter { $0.category == .production }.map { .building($0.id) }
         case .storage:
@@ -66,6 +79,8 @@ enum ToolCategory: String, CaseIterable, Identifiable {
         switch tool {
         case .road, .bulldoze:
             return .roads
+        case .zone, .unzone:
+            return .housing
         case .building(let type):
             switch catalog.building(type)?.category {
             case .housing: return .housing

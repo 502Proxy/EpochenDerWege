@@ -36,6 +36,20 @@ struct RoadMeshBuilder {
         return try? mesh.makeMesh(named: name)
     }
 
+    /// One inset square per cell, e.g. for zone overlays.
+    func makeTileMesh(cells: Set<GridPoint>, inset: Float = 0.4, material: (GridPoint) -> UInt32 = { _ in 0 }, name: String) -> MeshResource? {
+        let terrain = space.terrain
+        var mesh = TriangleMeshBuilder(estimatedTriangles: cells.count * 8)
+        let half = Float(terrain.cellSize) / 2 - inset
+        for cell in cells {
+            let center = terrain.center(of: cell)
+            let cx = Float(center.x)
+            let cz = Float(center.z)
+            addDrapedQuad(to: &mesh, x0: cx - half, z0: cz - half, x1: cx + half, z1: cz + half, material: material(cell))
+        }
+        return try? mesh.makeMesh(named: name)
+    }
+
     /// A horizontal rectangle subdivided into a 2 × 2 grid that follows the terrain.
     private func addDrapedQuad(to mesh: inout TriangleMeshBuilder, x0: Float, z0: Float, x1: Float, z1: Float, material: UInt32) {
         let steps = 2

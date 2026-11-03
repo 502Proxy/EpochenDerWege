@@ -107,6 +107,10 @@ final class GameViewModel {
             engine.submit(PlaceBuildingCommand(buildingType: type, cell: cell))
         case .road:
             engine.submit(BuildRoadCommand(cells: [cell]))
+        case .zone(let kind):
+            engine.submit(ZoneCommand(cells: [cell], kind: kind))
+        case .unzone:
+            engine.submit(ZoneCommand(cells: [cell], kind: nil))
         case .bulldoze:
             let world = world
             if let building = world.building(at: cell) {
@@ -119,9 +123,18 @@ final class GameViewModel {
         }
     }
 
-    /// Builds road along an L-shaped path between two cells (end of a road drag).
-    func buildRoad(from start: GridPoint, to end: GridPoint) {
-        engine.submit(BuildRoadCommand(cells: RoadPlanner.path(from: start, to: end)))
+    /// Finishes a drag with an area tool: road along an L-shaped path, zoning on a rectangle.
+    func applyDrag(from start: GridPoint, to end: GridPoint) {
+        switch selectedTool {
+        case .road:
+            engine.submit(BuildRoadCommand(cells: RoadPlanner.path(from: start, to: end)))
+        case .zone(let kind):
+            engine.submit(ZoneCommand(cells: ZonePlanner.rectangle(from: start, to: end), kind: kind))
+        case .unzone:
+            engine.submit(ZoneCommand(cells: ZonePlanner.rectangle(from: start, to: end), kind: nil))
+        case .building, .bulldoze, nil:
+            break
+        }
     }
 
     func demolishSelected() {

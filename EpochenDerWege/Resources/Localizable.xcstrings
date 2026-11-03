@@ -241,6 +241,26 @@
         }
       }
     },
+    "Drag to remove zoning. Existing houses stay.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziehen, um Zonen zu entfernen. Bestehende Häuser bleiben."
+          }
+        }
+      }
+    },
+    "Drag to zone an area. Houses appear next to roads when the town needs them.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziehen, um ein Gebiet auszuweisen. Häuser entstehen an Straßen, sobald die Stadt sie braucht."
+          }
+        }
+      }
+    },
     "Drag: move the map": {
       "localizations": {
         "de": {
@@ -581,6 +601,26 @@
         }
       }
     },
+    "Remove zone": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zone entfernen"
+          }
+        }
+      }
+    },
+    "Residential zone": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wohngebiet"
+          }
+        }
+      }
+    },
     "Residents": {
       "localizations": {
         "de": {
@@ -621,12 +661,12 @@
         }
       }
     },
-    "Road tool: drag to build a road": {
+    "Road and zone tools: drag to draw": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Straßenwerkzeug: ziehen, um eine Straße zu bauen"
+            "value": "Straßen- und Zonenwerkzeug: ziehen zum Zeichnen"
           }
         }
       }
@@ -767,6 +807,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Die Spieldaten konnten nicht geladen werden."
+          }
+        }
+      }
+    },
+    "The town built a new house.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Stadt hat ein neues Haus gebaut."
           }
         }
       }

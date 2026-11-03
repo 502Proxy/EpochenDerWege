@@ -39,7 +39,7 @@ If Xcode asks for signing, choose *Sign to Run Locally* or your own team under
 | --- | --- |
 | 1 – 4 | Open a category of the build toolbar (roads, housing, production, storage) |
 | Click | Build (with a building selected) or select a building |
-| Drag | Move the map; with the road tool, build a road |
+| Drag | Move the map; with the road or zone tool, draw a road or zone an area |
 | Right-drag | Rotate and tilt the camera |
 | Scroll / pinch | Zoom |
 | W A S D / arrow keys | Move the camera |
@@ -84,6 +84,7 @@ Playable today:
 - Procedural low-poly 3D map with water, sand, grassland, forest, rock and snow
 - Starting settlement with a storehouse and five houses (20 farmers)
 - Build toolbar with categories; gravel roads drawn by dragging, demolish tool
+- Residential zones: towns build houses next to roads on their own when they need workers or have food to spare
 - Building with live preview and rules for terrain, slope, money and nearby resources
 - Production chains: grain → flour → bread, fish, wood, stone
 - Carriers visibly transport goods between buildings, houses and storehouses
@@ -92,8 +93,7 @@ Playable today:
 - Pause and 1× / 2× / 4× speed
 
 Known simplifications of the prototype: carriers walk in straight lines and do not use
-roads yet (pathfinding comes in 0.2), farmers and citizens are not yet distinguished, buildings cost only money, the
-player places houses directly, and there is no save game yet.
+roads yet (pathfinding comes in 0.2), farmers and citizens are not yet distinguished, buildings cost only money, and there is no save game yet.
 
 ## Contributing
 

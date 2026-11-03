@@ -77,6 +77,10 @@ enum GameText {
             String(localized: "\(cells) road cells built for \(cost) thalers.")
         case .roadDemolished(let cells, let refund):
             String(localized: "\(cells) road cells removed, \(refund) thalers refunded.")
+        case .zoneChanged:
+            nil
+        case .townGrew:
+            String(localized: "The town built a new house.")
         }
     }
 

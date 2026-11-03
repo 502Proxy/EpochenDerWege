@@ -48,8 +48,8 @@ final class SceneCoordinator: NSObject {
     private var hoverPoint: CGPoint?
     private var animationTime: TimeInterval = 0
     private var cachedPreview: (point: CGPoint, tick: Int, tool: BuildingTypeID, preview: PlacementPreview?)?
-    /// Start and current end of a road being dragged.
-    private var roadDrag: (start: GridPoint, end: GridPoint)?
+    /// Start and current end of a drag with an area tool (road, zone).
+    private var areaDrag: (start: GridPoint, end: GridPoint)?
     private var cachedRoadPreview: (start: GridPoint, end: GridPoint, tick: Int, preview: RoadPreview)?
 
     init(viewModel: GameViewModel, engine: SimulationEngine) {
@@ -118,6 +118,7 @@ final class SceneCoordinator: NSObject {
             selectedBuildingID: viewModel.selectedBuildingID,
             preview: placementPreview(in: frame.world),
             roadPreview: roadPreview(in: frame.world),
+            zonePreview: zonePreview(),
             animationTime: animationTime
         )
         renderer.update(with: context)
@@ -164,13 +165,12 @@ final class SceneCoordinator: NSObject {
     /// Road under construction: the dragged path, or the hovered cell before dragging.
     private func roadPreview(in world: WorldState) -> RoadPreview? {
         guard viewModel.selectedTool == .road else {
-            roadDrag = nil
             cachedRoadPreview = nil
             return nil
         }
         let ends: (start: GridPoint, end: GridPoint)
-        if let roadDrag {
-            ends = roadDrag
+        if let areaDrag {
+            ends = areaDrag
         } else if let point = hoverPoint, let cell = cell(at: point) {
             ends = (cell, cell)
         } else {
@@ -184,6 +184,19 @@ final class SceneCoordinator: NSObject {
         let preview = RoadPreview(cells: path, valid: buildable.union(path.filter(world.hasRoad(at:))))
         cachedRoadPreview = (ends.start, ends.end, world.clock.tick, preview)
         return preview
+    }
+
+    /// Rectangle being zoned while a zone tool is dragged.
+    private func zonePreview() -> ZonePreview? {
+        guard let areaDrag else { return nil }
+        switch viewModel.selectedTool {
+        case .zone(let kind):
+            return ZonePreview(cells: Set(ZonePlanner.rectangle(from: areaDrag.start, to: areaDrag.end)), kind: kind)
+        case .unzone:
+            return ZonePreview(cells: Set(ZonePlanner.rectangle(from: areaDrag.start, to: areaDrag.end)), kind: nil)
+        default:
+            return nil
+        }
     }
 
     // MARK: - Gestures
@@ -224,8 +237,8 @@ final class SceneCoordinator: NSObject {
 
     @objc private func handlePan(_ gesture: NSPanGestureRecognizer) {
         guard let view else { return }
-        if viewModel.selectedTool == .road {
-            handleRoadDrag(gesture, in: view)
+        if viewModel.selectedTool?.drawsArea == true {
+            handleAreaDrag(gesture, in: view)
             return
         }
         let translation = gesture.translation(in: view)
@@ -234,27 +247,27 @@ final class SceneCoordinator: NSObject {
         applyCamera()
     }
 
-    /// With the road tool, dragging draws a road from the start cell to the cell under the mouse.
-    private func handleRoadDrag(_ gesture: NSPanGestureRecognizer, in view: NSView) {
+    /// With an area tool, dragging marks cells from the start cell to the cell under the mouse.
+    private func handleAreaDrag(_ gesture: NSPanGestureRecognizer, in view: NSView) {
         let location = gesture.location(in: view)
         switch gesture.state {
         case .began:
             let translation = gesture.translation(in: view)
             let origin = CGPoint(x: location.x - translation.x, y: location.y - translation.y)
             if let start = cell(at: origin) ?? cell(at: location) {
-                roadDrag = (start, start)
+                areaDrag = (start, start)
             }
         case .changed:
-            if let drag = roadDrag, let end = cell(at: location) {
-                roadDrag = (drag.start, end)
+            if let drag = areaDrag, let end = cell(at: location) {
+                areaDrag = (drag.start, end)
             }
         case .ended:
-            if let drag = roadDrag {
-                viewModel.buildRoad(from: drag.start, to: drag.end)
+            if let drag = areaDrag {
+                viewModel.applyDrag(from: drag.start, to: drag.end)
             }
-            roadDrag = nil
+            areaDrag = nil
         default:
-            roadDrag = nil
+            areaDrag = nil
         }
     }
 
