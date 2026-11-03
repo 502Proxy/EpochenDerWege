@@ -11,7 +11,7 @@ import RealityKit
 final class MaterialLibrary {
     static let shared = MaterialLibrary()
 
-    private var matteMaterials: [RGBColor: SimpleMaterial] = [:]
+    private var matteMaterials: [GameColor: SimpleMaterial] = [:]
     private var unlitMaterials: [UnlitKey: UnlitMaterial] = [:]
     private var boxes: [BoxKey: MeshResource] = [:]
     private var spheres: [Float: MeshResource] = [:]
@@ -19,7 +19,7 @@ final class MaterialLibrary {
     private init() {}
 
     /// A rough, non-metallic material, the base look of the low-poly world.
-    func matte(_ color: RGBColor) -> SimpleMaterial {
+    func matte(_ color: GameColor) -> SimpleMaterial {
         if let cached = matteMaterials[color] { return cached }
         let material = SimpleMaterial(color: NSColor(color), roughness: 0.9, isMetallic: false)
         matteMaterials[color] = material
@@ -27,7 +27,7 @@ final class MaterialLibrary {
     }
 
     /// A material that ignores lighting, for markers and previews.
-    func unlit(_ color: RGBColor, opacity: Float = 1) -> UnlitMaterial {
+    func unlit(_ color: GameColor, opacity: Float = 1) -> UnlitMaterial {
         let key = UnlitKey(color: color, opacity: opacity)
         if let cached = unlitMaterials[key] { return cached }
         var material = UnlitMaterial(color: NSColor(color))
@@ -54,7 +54,7 @@ final class MaterialLibrary {
     }
 
     private struct UnlitKey: Hashable {
-        let color: RGBColor
+        let color: GameColor
         let opacity: Float
     }
 
@@ -65,20 +65,20 @@ final class MaterialLibrary {
 }
 
 extension NSColor {
-    convenience init(_ color: RGBColor) {
+    convenience init(_ color: GameColor) {
         self.init(srgbRed: color.red, green: color.green, blue: color.blue, alpha: 1)
     }
 }
 
-extension RGBColor {
+extension GameColor {
     /// Mixes towards black by `fraction` (`0...1`).
-    func darkened(by fraction: Double) -> RGBColor {
-        RGBColor(red: red * (1 - fraction), green: green * (1 - fraction), blue: blue * (1 - fraction))
+    func darkened(by fraction: Double) -> GameColor {
+        GameColor(red: red * (1 - fraction), green: green * (1 - fraction), blue: blue * (1 - fraction))
     }
 
-    static let markerGood = RGBColor(red: 0.30, green: 0.85, blue: 0.35)
-    static let markerWarning = RGBColor(red: 1.00, green: 0.80, blue: 0.20)
-    static let markerProblem = RGBColor(red: 0.95, green: 0.25, blue: 0.20)
-    static let carrierEmpty = RGBColor(red: 0.35, green: 0.35, blue: 0.35)
-    static let selection = RGBColor(red: 1, green: 1, blue: 1)
+    static let markerGood = GameColor(red: 0.30, green: 0.85, blue: 0.35)
+    static let markerWarning = GameColor(red: 1.00, green: 0.80, blue: 0.20)
+    static let markerProblem = GameColor(red: 0.95, green: 0.25, blue: 0.20)
+    static let carrierEmpty = GameColor(red: 0.35, green: 0.35, blue: 0.35)
+    static let selection = GameColor(red: 1, green: 1, blue: 1)
 }

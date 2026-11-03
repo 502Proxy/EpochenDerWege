@@ -10,7 +10,7 @@ public struct GoodAmount: Hashable, Sendable, Codable {
 }
 
 /// An sRGB colour with components in `0...1`. Used by the prototype renderer.
-public struct RGBColor: Hashable, Sendable, Codable {
+public struct GameColor: Hashable, Sendable, Codable {
     public var red: Double
     public var green: Double
     public var blue: Double
@@ -95,9 +95,9 @@ public struct GoodDefinition: Identifiable, Hashable, Sendable, Codable {
     /// English display name. The app localizes it through its string catalog.
     public var name: String
     public var basePrice: Int
-    public var color: RGBColor
+    public var color: GameColor
 
-    public init(id: GoodID, name: String, basePrice: Int, color: RGBColor) {
+    public init(id: GoodID, name: String, basePrice: Int, color: GameColor) {
         self.id = id
         self.name = name
         self.basePrice = basePrice
@@ -149,7 +149,7 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
     /// Maximum number of residents (housing only).
     public var maxResidents: Int
     public var resource: ResourceRequirement?
-    public var color: RGBColor
+    public var color: GameColor
 
     public init(
         id: BuildingTypeID,
@@ -165,7 +165,7 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         maxCarriers: Int,
         maxResidents: Int,
         resource: ResourceRequirement?,
-        color: RGBColor
+        color: GameColor
     ) {
         self.id = id
         self.name = name

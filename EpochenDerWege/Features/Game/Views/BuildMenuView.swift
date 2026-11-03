@@ -73,7 +73,7 @@ private struct BuildMenuRow: View {
 }
 
 extension Color {
-    init(_ color: RGBColor) {
+    init(_ color: GameColor) {
         self.init(.sRGB, red: color.red, green: color.green, blue: color.blue)
     }
 }

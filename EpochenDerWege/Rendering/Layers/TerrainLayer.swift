@@ -15,19 +15,19 @@ final class TerrainLayer: SceneLayer {
     private var occupiedCellsByChunk: [ChunkKey: Set<GridPoint>] = [:]
     private var lastBuildingIDs: [BuildingID] = []
 
-    private static let biomeColors: [Biome: RGBColor] = [
-        .water: RGBColor(red: 0.55, green: 0.50, blue: 0.36),
-        .sand: RGBColor(red: 0.87, green: 0.80, blue: 0.56),
-        .grass: RGBColor(red: 0.47, green: 0.66, blue: 0.30),
-        .forest: RGBColor(red: 0.27, green: 0.47, blue: 0.20),
-        .rock: RGBColor(red: 0.52, green: 0.50, blue: 0.47),
-        .snow: RGBColor(red: 0.95, green: 0.95, blue: 0.97),
+    private static let biomeColors: [Biome: GameColor] = [
+        .water: GameColor(red: 0.55, green: 0.50, blue: 0.36),
+        .sand: GameColor(red: 0.87, green: 0.80, blue: 0.56),
+        .grass: GameColor(red: 0.47, green: 0.66, blue: 0.30),
+        .forest: GameColor(red: 0.27, green: 0.47, blue: 0.20),
+        .rock: GameColor(red: 0.52, green: 0.50, blue: 0.47),
+        .snow: GameColor(red: 0.95, green: 0.95, blue: 0.97),
     ]
     private static let treeColors = [
-        RGBColor(red: 0.16, green: 0.38, blue: 0.16),
-        RGBColor(red: 0.22, green: 0.45, blue: 0.18),
+        GameColor(red: 0.16, green: 0.38, blue: 0.16),
+        GameColor(red: 0.22, green: 0.45, blue: 0.18),
     ]
-    private static let waterColor = RGBColor(red: 0.20, green: 0.45, blue: 0.70)
+    private static let waterColor = GameColor(red: 0.20, green: 0.45, blue: 0.70)
 
     init(parent: Entity, space: SceneSpace) {
         self.parent = parent

@@ -28,8 +28,8 @@ final class SelectionLayer: SceneLayer {
 
 /// Translucent ghost of the building about to be placed: green if allowed, red if not.
 final class PlacementPreviewLayer: SceneLayer {
-    private static let validColor = RGBColor(red: 0.35, green: 0.90, blue: 0.40)
-    private static let invalidColor = RGBColor(red: 0.95, green: 0.30, blue: 0.25)
+    private static let validColor = GameColor(red: 0.35, green: 0.90, blue: 0.40)
+    private static let invalidColor = GameColor(red: 0.95, green: 0.30, blue: 0.25)
 
     private let space: SceneSpace
     private let ghost = ModelEntity()

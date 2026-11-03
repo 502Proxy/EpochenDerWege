@@ -90,7 +90,7 @@ final class BuildingLayer: SceneLayer {
             }
         }
 
-        var color: RGBColor? {
+        var color: GameColor? {
             switch self {
             case .hidden: nil
             case .good: .markerGood
