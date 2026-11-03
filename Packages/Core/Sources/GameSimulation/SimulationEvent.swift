@@ -11,6 +11,8 @@ public enum SimulationEvent: Hashable, Sendable {
     case placementRejected(PlacementError)
     case residentLeft(BuildingID)
     case yearClosed(year: Int, taxes: Int, upkeep: Int)
+    case roadBuilt(cells: Int, cost: Int)
+    case roadDemolished(cells: Int, refund: Int)
 }
 
 /// An event with its position in the event stream.

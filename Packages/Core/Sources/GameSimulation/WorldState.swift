@@ -19,6 +19,8 @@ public struct WorldState: Sendable {
     public internal(set) var unemployed = 0
     /// Centre of the starting settlement, if one was founded.
     public internal(set) var startCell: GridPoint?
+    /// Cells covered by roads.
+    public internal(set) var roads: Set<GridPoint> = []
     /// Recent events, oldest first. Capped to `maximumEventCount`.
     public internal(set) var events: [EventRecord] = []
 
@@ -50,8 +52,13 @@ public struct WorldState: Sendable {
         occupancy[cell].flatMap { building($0) }
     }
 
+    /// Whether a building stands on the cell.
     public func isOccupied(_ cell: GridPoint) -> Bool {
         occupancy[cell] != nil
+    }
+
+    public func hasRoad(at cell: GridPoint) -> Bool {
+        roads.contains(cell)
     }
 
     public var population: Int {

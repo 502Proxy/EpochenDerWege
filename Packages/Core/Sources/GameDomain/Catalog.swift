@@ -45,6 +45,10 @@ public struct GameRules: Hashable, Sendable, Codable {
     public var maxSlopePercent: Double
     /// Share of the construction cost refunded on demolition.
     public var demolitionRefundPercent: Int
+    /// Cost of one cell of gravel road.
+    public var roadCostPerCell: Int
+    /// Roads cannot be built on steeper cells.
+    public var maxRoadSlopePercent: Double
     /// Goods houses accept as food, in order of preference.
     public var foodGoods: [GoodID]
     public var startingHouses: Int
@@ -65,6 +69,8 @@ public struct GameRules: Hashable, Sendable, Codable {
         taxPerResidentPerYear: Int,
         maxSlopePercent: Double,
         demolitionRefundPercent: Int,
+        roadCostPerCell: Int,
+        maxRoadSlopePercent: Double,
         foodGoods: [GoodID],
         startingHouses: Int,
         startingResidentsPerHouse: Int,
@@ -82,6 +88,8 @@ public struct GameRules: Hashable, Sendable, Codable {
         self.taxPerResidentPerYear = taxPerResidentPerYear
         self.maxSlopePercent = maxSlopePercent
         self.demolitionRefundPercent = demolitionRefundPercent
+        self.roadCostPerCell = roadCostPerCell
+        self.maxRoadSlopePercent = maxRoadSlopePercent
         self.foodGoods = foodGoods
         self.startingHouses = startingHouses
         self.startingResidentsPerHouse = startingResidentsPerHouse
