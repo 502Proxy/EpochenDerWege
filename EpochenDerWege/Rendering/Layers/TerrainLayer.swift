@@ -23,10 +23,20 @@ final class TerrainLayer: SceneLayer {
         .rock: GameColor(red: 0.52, green: 0.50, blue: 0.47),
         .snow: GameColor(red: 0.95, green: 0.95, blue: 0.97),
     ]
+    /// Materials of the tree meshes, indexed by `TreePart`.
     private static let treeColors = [
-        GameColor(red: 0.16, green: 0.38, blue: 0.16),
-        GameColor(red: 0.22, green: 0.45, blue: 0.18),
+        GameColor(red: 0.40, green: 0.28, blue: 0.17),
+        GameColor(red: 0.15, green: 0.35, blue: 0.17),
+        GameColor(red: 0.30, green: 0.52, blue: 0.20),
+        GameColor(red: 0.38, green: 0.58, blue: 0.22),
     ]
+
+    private enum TreePart: UInt32 {
+        case trunk = 0, needles, leaves, lightLeaves
+    }
+
+    /// Shades per biome; neighbouring cells pick different shades so the ground looks less uniform.
+    private static let shadeSteps: [Double] = [0, 0.05, 0.10]
     private static let waterColor = GameColor(red: 0.20, green: 0.45, blue: 0.70)
 
     init(parent: Entity, space: SceneSpace) {
@@ -65,7 +75,8 @@ final class TerrainLayer: SceneLayer {
     private func makeGround() -> Entity? {
         let terrain = space.terrain
         let biomes = Biome.allCases
-        let materialIndex = Dictionary(uniqueKeysWithValues: biomes.enumerated().map { ($1, UInt32($0)) })
+        let biomeIndex = Dictionary(uniqueKeysWithValues: biomes.enumerated().map { ($1, $0) })
+        let shades = Self.shadeSteps.count
         let cellSize = Float(terrain.cellSize)
 
         func corner(_ x: Int, _ z: Int) -> SIMD3<Float> {
@@ -76,14 +87,17 @@ final class TerrainLayer: SceneLayer {
         let up = SIMD3<Float>(0, 1, 0)
         for z in 0..<terrain.size {
             for x in 0..<terrain.size {
-                let material = materialIndex[terrain.biome(at: GridPoint(x: x, z: z))] ?? 0
+                let biome = biomeIndex[terrain.biome(at: GridPoint(x: x, z: z))] ?? 0
+                let material = UInt32(biome * shades + Self.hash(x, z, 7) % shades)
                 mesh.addTriangle(corner(x, z), corner(x, z + 1), corner(x + 1, z), material: material, outward: up)
                 mesh.addTriangle(corner(x + 1, z), corner(x, z + 1), corner(x + 1, z + 1), material: material, outward: up)
             }
         }
 
         guard let resource = try? mesh.makeMesh(named: "terrain") else { return nil }
-        let materials = biomes.map { MaterialLibrary.shared.matte(Self.biomeColors[$0] ?? .selection) }
+        let materials = biomes.flatMap { biome in
+            Self.shadeSteps.map { MaterialLibrary.shared.matte((Self.biomeColors[biome] ?? .selection).darkened(by: $0)) }
+        }
         return ModelEntity(mesh: resource, materials: materials)
     }
 
@@ -127,7 +141,7 @@ final class TerrainLayer: SceneLayer {
 
         let terrain = space.terrain
         let occupied = occupiedCellsByChunk[key] ?? []
-        var mesh = TriangleMeshBuilder(estimatedTriangles: Self.chunkSize * Self.chunkSize * 8)
+        var mesh = TriangleMeshBuilder(estimatedTriangles: Self.chunkSize * Self.chunkSize * 40)
         let startX = key.x * Self.chunkSize
         let startZ = key.z * Self.chunkSize
 
@@ -141,7 +155,12 @@ final class TerrainLayer: SceneLayer {
                     let jitterZ = Double((seed / 1000) % 1000) / 1000 * 0.7 + 0.15
                     let point = WorldPoint(x: (Double(x) + jitterX) * terrain.cellSize, z: (Double(z) + jitterZ) * terrain.cellSize)
                     let base = SIMD3<Float>(Float(point.x), Float(terrain.height(at: point)), Float(point.z))
-                    Self.addTree(to: &mesh, base: base, radius: 2.4, height: 7 + Float(seed % 5), material: UInt32(seed % 2))
+                    let size = 0.8 + Float(seed % 5) * 0.1
+                    if seed % 5 < 3 {
+                        Self.addConifer(to: &mesh, base: base, size: size)
+                    } else {
+                        Self.addDeciduous(to: &mesh, base: base, size: size, light: seed % 2 == 0)
+                    }
                 }
             }
         }
@@ -152,20 +171,61 @@ final class TerrainLayer: SceneLayer {
         treeChunks[key] = entity
     }
 
-    /// A tree is a four-sided pyramid.
-    private static func addTree(to mesh: inout TriangleMeshBuilder, base: SIMD3<Float>, radius: Float, height: Float, material: UInt32) {
-        let bottom = base + SIMD3<Float>(0, 1.2, 0)
+    /// A conifer: short trunk and two stacked six-sided cones.
+    private static func addConifer(to mesh: inout TriangleMeshBuilder, base: SIMD3<Float>, size: Float) {
+        addPrism(to: &mesh, base: base, radius: 0.35 * size, height: 1.6 * size, sides: 4, material: TreePart.trunk.rawValue)
+        addCone(to: &mesh, base: base + SIMD3<Float>(0, 1.2 * size, 0), radius: 2.4 * size, height: 4.2 * size, sides: 6, material: TreePart.needles.rawValue)
+        addCone(to: &mesh, base: base + SIMD3<Float>(0, 3.6 * size, 0), radius: 1.7 * size, height: 3.6 * size, sides: 6, material: TreePart.needles.rawValue)
+    }
+
+    /// A broadleaf tree: trunk and a faceted, roughly round crown.
+    private static func addDeciduous(to mesh: inout TriangleMeshBuilder, base: SIMD3<Float>, size: Float, light: Bool) {
+        addPrism(to: &mesh, base: base, radius: 0.35 * size, height: 3 * size, sides: 4, material: TreePart.trunk.rawValue)
+        let center = base + SIMD3<Float>(0, 4.6 * size, 0)
+        let material = (light ? TreePart.lightLeaves : TreePart.leaves).rawValue
+        addCrown(to: &mesh, center: center, radius: 2.4 * size, height: 2.2 * size, sides: 6, material: material)
+    }
+
+    private static func ring(center: SIMD3<Float>, radius: Float, sides: Int, rotation: Float = 0) -> [SIMD3<Float>] {
+        (0..<sides).map { index in
+            let angle = rotation + Float(index) / Float(sides) * 2 * .pi
+            return center + SIMD3<Float>(cos(angle) * radius, 0, sin(angle) * radius)
+        }
+    }
+
+    private static func addCone(to mesh: inout TriangleMeshBuilder, base: SIMD3<Float>, radius: Float, height: Float, sides: Int, material: UInt32) {
         let apex = base + SIMD3<Float>(0, height, 0)
-        let corners = [
-            bottom + SIMD3<Float>(-radius, 0, -radius),
-            bottom + SIMD3<Float>(radius, 0, -radius),
-            bottom + SIMD3<Float>(radius, 0, radius),
-            bottom + SIMD3<Float>(-radius, 0, radius),
-        ]
-        for i in 0..<4 {
-            let a = corners[i]
-            let b = corners[(i + 1) % 4]
-            mesh.addTriangle(a, b, apex, material: material, outward: (a + b) / 2 - bottom)
+        let corners = ring(center: base, radius: radius, sides: sides)
+        for index in 0..<sides {
+            let a = corners[index]
+            let b = corners[(index + 1) % sides]
+            mesh.addTriangle(a, b, apex, material: material, outward: (a + b) / 2 - base)
+            mesh.addTriangle(a, b, base, material: material, outward: SIMD3<Float>(0, -1, 0))
+        }
+    }
+
+    private static func addPrism(to mesh: inout TriangleMeshBuilder, base: SIMD3<Float>, radius: Float, height: Float, sides: Int, material: UInt32) {
+        let bottom = ring(center: base, radius: radius, sides: sides, rotation: .pi / 4)
+        let top = bottom.map { $0 + SIMD3<Float>(0, height, 0) }
+        for index in 0..<sides {
+            let next = (index + 1) % sides
+            let outward = (bottom[index] + bottom[next]) / 2 - base
+            mesh.addTriangle(bottom[index], bottom[next], top[next], material: material, outward: outward)
+            mesh.addTriangle(bottom[index], top[next], top[index], material: material, outward: outward)
+        }
+    }
+
+    /// Two cones joined at their bases: a cheap low-poly sphere.
+    private static func addCrown(to mesh: inout TriangleMeshBuilder, center: SIMD3<Float>, radius: Float, height: Float, sides: Int, material: UInt32) {
+        let top = center + SIMD3<Float>(0, height, 0)
+        let bottom = center - SIMD3<Float>(0, height * 0.8, 0)
+        let corners = ring(center: center, radius: radius, sides: sides)
+        for index in 0..<sides {
+            let a = corners[index]
+            let b = corners[(index + 1) % sides]
+            let side = (a + b) / 2 - center
+            mesh.addTriangle(a, b, top, material: material, outward: side + SIMD3<Float>(0, 1, 0))
+            mesh.addTriangle(a, b, bottom, material: material, outward: side - SIMD3<Float>(0, 1, 0))
         }
     }
 

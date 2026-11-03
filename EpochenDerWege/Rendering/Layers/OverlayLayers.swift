@@ -51,7 +51,7 @@ final class PlacementPreviewLayer: SceneLayer {
             ghost.isEnabled = false
             return
         }
-        let size = BuildingLayer.size(of: preview.definition.category)
+        let size = BuildingLayer.previewSize(of: preview.definition.category)
         let key = Key(category: preview.definition.category, isValid: preview.isValid)
         if key != shownKey {
             shownKey = key

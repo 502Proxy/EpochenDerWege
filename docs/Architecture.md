@@ -112,6 +112,7 @@ reproducible and is a prerequisite for save games and replays.
 | Strategy | `DeliveryPlanner`, `NearestConsumerPlanner` | How carriers pick targets can change (e.g. road routing) without touching the logistics system |
 | Observer | `SimulationEvent` stream in `WorldState.events` | The simulation reports what happened as data; the UI decides how to phrase it |
 | Factory | `WorldFactory`, `TerrainGenerator` | World creation (terrain, starting settlement) is separate from running a world |
+| Factory + prototype | `BuildingModelFactory` | Each building model is assembled once from primitives; placed buildings are clones that share meshes and materials |
 | Composite | `SceneRenderer` with `SceneLayer`s | Each visual concern (terrain, buildings, carriers, overlays) is an independent layer |
 | Object pool | `CarrierLayer` | Carriers appear and disappear constantly; entities are recycled instead of reallocated |
 | Singleton + flyweight | `MaterialLibrary.shared` | One shared cache of materials and meshes for all layers. It holds no game state, only rendering resources, which is why a singleton is acceptable here |
@@ -141,6 +142,8 @@ replaced in tests.
 | Trees merged into one mesh per 16 × 16 chunk; only touched chunks rebuild | `TerrainLayer` |
 | Shared materials and meshes | `MaterialLibrary` |
 | Entity pooling | `CarrierLayer` |
+| Building models cloned from per-type templates | `BuildingModelFactory` |
+| Animation time advances with game speed; only working buildings animate | `BuildingLayer` |
 | Diff-based updates; markers change material only on status change | `BuildingLayer` |
 | Placement preview ray cast only when mouse, tool or world changes | `SceneCoordinator` |
 | HUD refreshed 5× per second, not every frame; observation only fires on change | `GameViewModel` |

@@ -46,6 +46,7 @@ final class SceneCoordinator: NSObject {
     private var eventMonitors: [Any] = []
 
     private var hoverPoint: CGPoint?
+    private var animationTime: TimeInterval = 0
     private var cachedPreview: (point: CGPoint, tick: Int, tool: BuildingTypeID, preview: PlacementPreview?)?
 
     init(viewModel: GameViewModel, engine: SimulationEngine) {
@@ -107,11 +108,13 @@ final class SceneCoordinator: NSObject {
         }
 
         let frame = engine.snapshots.value
+        animationTime += deltaTime * Double(engine.speed)
         let context = RenderContext(
             frame: frame,
             fraction: frame.interpolationFraction(at: .now),
             selectedBuildingID: viewModel.selectedBuildingID,
-            preview: placementPreview(in: frame.world)
+            preview: placementPreview(in: frame.world),
+            animationTime: animationTime
         )
         renderer.update(with: context)
 
