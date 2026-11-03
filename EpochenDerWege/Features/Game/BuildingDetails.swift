@@ -2,7 +2,7 @@ import GameDomain
 import GameSimulation
 
 /// How a status should be presented.
-enum StatusTone: Equatable {
+nonisolated enum StatusTone: Equatable, Sendable {
     case good, warning, problem, neutral
 }
 
