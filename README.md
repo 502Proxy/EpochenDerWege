@@ -46,6 +46,8 @@ If Xcode asks for signing, choose *Sign to Run Locally* or your own team under
 | Q / E | Rotate the camera |
 | Right-click / Esc | Drop the build tool or clear the selection |
 | F | Finance window |
+| G | Goods overview |
+| B | Building list |
 | Space | Pause |
 
 Coloured spheres above buildings show their state: green working, yellow waiting or
@@ -92,6 +94,7 @@ Playable today:
 - Production chains: grain → flour → bread, fish, wood, stone
 - Carriers visibly transport goods within 150 m; for longer distances the player builds stops, creates lines and buys ox carts that drive on the road network (A* pathfinding)
 - Workers, food supply, growth and hunger
+- Goods overview (key G): production, consumption, stock and sales per good; building list (key B) with status and efficiency, click to jump there
 - Finance window (key F or click the money): income and expenses per month and year, sales per good, costs per building and vehicle type, balance chart
 - Pause and 1× / 2× / 4× speed
 

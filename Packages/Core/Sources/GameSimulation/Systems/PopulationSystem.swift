@@ -7,11 +7,12 @@ public struct PopulationSystem: SimulationSystem {
     public func update(_ world: inout WorldState) {
         guard world.clock.isStartOfPeriod(days: world.rules.supplyCheckIntervalDays) else { return }
         let rules = world.rules
+        let year = world.clock.year
         var departures: [BuildingID] = []
 
         for index in world.buildings.indices where world.buildings[index].category == .housing {
             var house = world.buildings[index]
-            if Self.checkSupply(of: &house, rules: rules) == .shrank {
+            if Self.checkSupply(of: &house, rules: rules, statistics: &world.goodsStatistics, year: year) == .shrank {
                 departures.append(house.id)
             }
             world.buildings[index] = house
@@ -27,7 +28,7 @@ public struct PopulationSystem: SimulationSystem {
         case grew, stable, shrank
     }
 
-    static func checkSupply(of house: inout Building, rules: GameRules) -> Outcome {
+    static func checkSupply(of house: inout Building, rules: GameRules, statistics: inout GoodsStatistics, year: Int) -> Outcome {
         let hasFood = rules.foodGoods.contains { house.input.count(of: $0) > 0 }
 
         // Empty houses are moved into again as soon as food arrives.
@@ -45,6 +46,7 @@ public struct PopulationSystem: SimulationSystem {
         var eaten = 0.0
         while house.unpaidFood >= 1, let good = rules.foodGoods.first(where: { house.input.count(of: $0) > 0 }) {
             house.input.remove(good, amount: 1)
+            statistics.recordConsumed(good, amount: 1, year: year)
             house.unpaidFood -= 1
             eaten += 1
         }

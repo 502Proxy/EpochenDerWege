@@ -15,6 +15,8 @@ public struct WorldState: Sendable {
     public private(set) var treasury: Int
     /// Income and expenses by year and category, plus the balance history.
     public internal(set) var ledger = Ledger()
+    /// Production and consumption per good and year.
+    public internal(set) var goodsStatistics = GoodsStatistics()
     /// Buildings in placement order. The order is stable, which keeps the simulation deterministic.
     public internal(set) var buildings: [Building] = []
     public internal(set) var carriers: [Carrier] = []
@@ -84,6 +86,13 @@ public struct WorldState: Sendable {
 
     public var workersEmployed: Int {
         buildings.reduce(0) { $0 + $1.assignedWorkers }
+    }
+
+    /// Everything of a good that exists: in buildings, on carriers and on vehicles.
+    public func totalAmount(of good: GoodID) -> Int {
+        buildings.reduce(0) { $0 + $1.input.count(of: good) + $1.output.count(of: good) }
+            + carriers.reduce(0) { $0 + ($1.isLoaded && $1.cargo.good == good ? $1.cargo.amount : 0) }
+            + vehicles.reduce(0) { $0 + $1.cargo[good, default: 0] }
     }
 
     /// Total stock of all storehouses, sorted by good.

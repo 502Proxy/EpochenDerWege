@@ -42,6 +42,10 @@ final class GameViewModel {
     private(set) var speed: Int
     private(set) var finances = FinanceSummary()
     private(set) var lines: [LineSummary] = []
+    private(set) var goods: [GoodRow] = []
+    private(set) var buildingRows: [BuildingRow] = []
+    /// Latest request to move the camera; the scene follows it once.
+    private(set) var cameraFocus: CameraFocus?
     /// Stops picked so far with the line tool, in order.
     private(set) var pendingLineStops: [BuildingID] = []
 
@@ -148,6 +152,13 @@ final class GameViewModel {
         }
     }
 
+    /// Selects a building and moves the camera to it, e.g. from the building list.
+    func focus(on id: BuildingID) {
+        guard let building = world.building(id) else { return }
+        selectBuilding(id)
+        cameraFocus = CameraFocus(id: (cameraFocus?.id ?? 0) + 1, cell: building.cell)
+    }
+
     // MARK: - Lines
 
     /// Creates a line from the stops picked with the line tool.
@@ -215,6 +226,14 @@ final class GameViewModel {
         }
         if next != hud {
             hud = next
+        }
+        let goodRows = GoodRow.make(for: world)
+        if goodRows != goods {
+            goods = goodRows
+        }
+        let rows = BuildingRow.make(for: world)
+        if rows != buildingRows {
+            buildingRows = rows
         }
         let lineSummaries = LineSummary.make(for: world)
         if lineSummaries != lines {

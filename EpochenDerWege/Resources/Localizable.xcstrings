@@ -171,6 +171,16 @@
         }
       }
     },
+    "All": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle"
+          }
+        }
+      }
+    },
     "Bakery": {
       "localizations": {
         "de": {
@@ -217,6 +227,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bauen"
+          }
+        }
+      }
+    },
+    "Building": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gebäude"
+          }
+        }
+      }
+    },
+    "Building list (B)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gebäudeliste (B)"
+          }
+        }
+      }
+    },
+    "Buildings": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gebäude"
           }
         }
       }
@@ -337,6 +377,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bau"
+          }
+        }
+      }
+    },
+    "Consumed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbraucht"
           }
         }
       }
@@ -501,6 +551,16 @@
         }
       }
     },
+    "Figures for the current year. Net = produced − consumed; a negative value means the economy uses more than it makes.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Werte für das laufende Jahr. Bilanz = produziert − verbraucht; ein negativer Wert heißt, es wird mehr verbraucht als hergestellt."
+          }
+        }
+      }
+    },
     "Finances": {
       "localizations": {
         "de": {
@@ -557,6 +617,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wald"
+          }
+        }
+      }
+    },
+    "Good": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ware"
+          }
+        }
+      }
+    },
+    "Goods": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waren"
+          }
+        }
+      }
+    },
+    "Goods overview (G)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warenübersicht (G)"
           }
         }
       }
@@ -621,12 +711,32 @@
         }
       }
     },
+    "Houses": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Häuser"
+          }
+        }
+      }
+    },
     "Hungry": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Hunger"
+          }
+        }
+      }
+    },
+    "In stock": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestand"
           }
         }
       }
@@ -657,6 +767,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Arbeitsplätze %lld/%lld"
+          }
+        }
+      }
+    },
+    "Last year": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letztes Jahr"
           }
         }
       }
@@ -697,6 +817,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Markt"
+          }
+        }
+      }
+    },
+    "Markets and workshops": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Märkte und Werkstätten"
           }
         }
       }
@@ -747,6 +877,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Braucht %@ in der Nähe"
+          }
+        }
+      }
+    },
+    "Net": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilanz"
           }
         }
       }
@@ -937,6 +1077,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vormonat"
+          }
+        }
+      }
+    },
+    "Produced": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Produziert"
           }
         }
       }
@@ -1151,12 +1301,32 @@
         }
       }
     },
+    "Select a building to jump to it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle ein Gebäude aus, um dorthin zu springen."
+          }
+        }
+      }
+    },
     "Sell a vehicle": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Fahrzeug verkaufen"
+          }
+        }
+      }
+    },
+    "Show": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anzeigen"
           }
         }
       }
@@ -1207,6 +1377,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geschwindigkeit"
+          }
+        }
+      }
+    },
+    "Status": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status"
           }
         }
       }
@@ -1277,6 +1457,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lager"
+          }
+        }
+      }
+    },
+    "Storehouses and stops": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lager und Haltestellen"
           }
         }
       }
