@@ -151,6 +151,16 @@
         }
       }
     },
+    "A paused building does no work, releases its workers and receives no deliveries.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein pausiertes Gebäude arbeitet nicht, gibt seine Arbeiter frei und erhält keine Lieferungen."
+          }
+        }
+      }
+    },
     "A resident left because of hunger.": {
       "localizations": {
         "de": {
@@ -311,6 +321,16 @@
         }
       }
     },
+    "Carriers serve buildings with high priority first.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Träger beliefern Gebäude mit hoher Priorität zuerst."
+          }
+        }
+      }
+    },
     "Click a building or road to remove it. Half of the cost is refunded.": {
       "localizations": {
         "de": {
@@ -427,6 +447,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Linie löschen"
+          }
+        }
+      }
+    },
+    "Delivery priority": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lieferpriorität"
           }
         }
       }
@@ -701,6 +731,16 @@
         }
       }
     },
+    "High": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoch"
+          }
+        }
+      }
+    },
     "House": {
       "localizations": {
         "de": {
@@ -807,6 +847,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Linien"
+          }
+        }
+      }
+    },
+    "Low": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niedrig"
           }
         }
       }
@@ -981,6 +1031,16 @@
         }
       }
     },
+    "Normal": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normal"
+          }
+        }
+      }
+    },
     "Not enough money: %lld thalers needed.": {
       "localizations": {
         "de": {
@@ -1067,6 +1127,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pause"
+          }
+        }
+      }
+    },
+    "Paused": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausiert"
           }
         }
       }

@@ -12,6 +12,19 @@ public enum BuildingStatus: Hashable, Sendable, Codable {
     case trading
     /// A commerce building waits for deliveries.
     case awaitingGoods
+    /// Switched off by the player.
+    case paused
+}
+
+/// How eagerly carriers deliver to a building.
+public enum DeliveryPriority: Int, CaseIterable, Comparable, Hashable, Sendable, Codable {
+    case low = -1
+    case normal = 0
+    case high = 1
+
+    public static func < (lhs: DeliveryPriority, rhs: DeliveryPriority) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
 }
 
 /// A placed building.
@@ -46,6 +59,15 @@ public struct Building: Identifiable, Hashable, Sendable, Codable {
     public var incoming: [GoodID: Int] = [:]
     /// Food owed from the last supply check (fractions of a unit).
     public var unpaidFood: Double = 0
+    /// Switched off by the player: no work, no workers, no deliveries.
+    public var isPaused = false
+    /// How eagerly carriers deliver here.
+    public var priority: DeliveryPriority = .normal
+
+    /// Whether the player may pause the building and set its priority.
+    public var isConfigurable: Bool {
+        category == .production || category == .commerce || category == .storage
+    }
 
     public init(id: BuildingID, definition: BuildingDefinition, cell: GridPoint, center: WorldPoint) {
         self.id = id

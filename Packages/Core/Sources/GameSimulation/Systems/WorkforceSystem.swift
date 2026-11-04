@@ -14,6 +14,10 @@ public struct WorkforceSystem: SimulationSystem {
     public static func assignWorkers(in world: inout WorldState) {
         var available = world.population
         for index in world.buildings.indices where world.buildings[index].category == .production {
+            guard !world.buildings[index].isPaused else {
+                world.buildings[index].assignedWorkers = 0
+                continue
+            }
             let assigned = min(world.buildings[index].definition.workers, available)
             world.buildings[index].assignedWorkers = assigned
             available -= assigned

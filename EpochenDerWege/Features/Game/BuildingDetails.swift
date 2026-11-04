@@ -19,6 +19,10 @@ struct BuildingDetails: Equatable {
     let status: String
     let tone: StatusTone
     let rows: [Row]
+    /// Whether the player may pause the building and set its priority.
+    let isConfigurable: Bool
+    let isPaused: Bool
+    let priority: DeliveryPriority
 
     init(building: Building, world: WorldState) {
         let catalog = world.catalog
@@ -87,5 +91,8 @@ struct BuildingDetails: Equatable {
         self.status = status.text
         tone = status.tone
         self.rows = rows
+        isConfigurable = building.isConfigurable
+        isPaused = building.isPaused
+        priority = building.priority
     }
 }

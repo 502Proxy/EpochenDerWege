@@ -55,7 +55,8 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
             let distance = source.center.distance(to: candidate.center)
             guard distance <= rules.carrierRangeMeters else { continue }
 
-            var score = distance
+            // Priority acts like a shorter or longer way: half the carrier range per step.
+            var score = distance - Double(candidate.priority.rawValue) * rules.carrierRangeMeters / 2
             switch candidate.category {
             case .storage:
                 score += rules.carrierRangeMeters * 2
@@ -79,6 +80,7 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
 
     /// Units of `good` a building still accepts, minus what is already on its way.
     static func demand(of building: Building, for good: GoodID, rules: GameRules) -> Int {
+        guard !building.isPaused else { return 0 }
         let incoming = building.incomingAmount(of: good)
         switch building.category {
         case .production:

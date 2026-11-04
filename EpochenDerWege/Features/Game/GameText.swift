@@ -61,6 +61,14 @@ enum GameText {
         }
     }
 
+    static func name(of priority: DeliveryPriority) -> String {
+        switch priority {
+        case .low: String(localized: "Low")
+        case .normal: String(localized: "Normal")
+        case .high: String(localized: "High")
+        }
+    }
+
     static func percent(_ fraction: Double) -> String {
         fraction.formatted(.percent.precision(.fractionLength(0)))
     }
@@ -150,6 +158,8 @@ enum GameText {
             housingStatus(of: building)
         case .trading:
             (String(localized: "Trading"), .good)
+        case .paused:
+            (String(localized: "Paused"), .warning)
         case .awaitingGoods:
             (String(localized: "Waiting for goods"), .warning)
         }

@@ -9,6 +9,11 @@ public struct ProductionSystem: SimulationSystem {
         let year = world.clock.year
         for index in world.buildings.indices {
             var building = world.buildings[index]
+            if building.isPaused {
+                building.status = .paused
+                world.buildings[index] = building
+                continue
+            }
             switch building.category {
             case .housing:
                 building.status = .housing
