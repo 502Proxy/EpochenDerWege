@@ -271,12 +271,12 @@
         }
       }
     },
-    "Drag to build. %lld thalers per cell.": {
+    "Drag to build. %lld thalers per cell; steep cells become tunnels for %lld thalers.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ziehen zum Bauen. %lld Taler pro Feld."
+            "value": "Ziehen zum Bauen. %lld Taler pro Feld; steile Felder werden zu Tunneln für %lld Taler."
           }
         }
       }

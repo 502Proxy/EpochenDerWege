@@ -47,8 +47,10 @@ public struct GameRules: Hashable, Sendable, Codable {
     public var demolitionRefundPercent: Int
     /// Cost of one cell of gravel road.
     public var roadCostPerCell: Int
-    /// Roads cannot be built on steeper cells.
+    /// Steeper road cells are built as tunnels.
     public var maxRoadSlopePercent: Double
+    /// Cost of one cell of road tunnel.
+    public var tunnelCostPerCell: Int
     /// Towns try to build a new house in a residential zone every this many days.
     public var zoneGrowthIntervalDays: Int
     /// Stored food (all storehouses) above which towns grow even without open jobs.
@@ -75,6 +77,7 @@ public struct GameRules: Hashable, Sendable, Codable {
         demolitionRefundPercent: Int,
         roadCostPerCell: Int,
         maxRoadSlopePercent: Double,
+        tunnelCostPerCell: Int,
         zoneGrowthIntervalDays: Int,
         zoneGrowthFoodThreshold: Int,
         foodGoods: [GoodID],
@@ -96,6 +99,7 @@ public struct GameRules: Hashable, Sendable, Codable {
         self.demolitionRefundPercent = demolitionRefundPercent
         self.roadCostPerCell = roadCostPerCell
         self.maxRoadSlopePercent = maxRoadSlopePercent
+        self.tunnelCostPerCell = tunnelCostPerCell
         self.zoneGrowthIntervalDays = zoneGrowthIntervalDays
         self.zoneGrowthFoodThreshold = zoneGrowthFoodThreshold
         self.foodGoods = foodGoods

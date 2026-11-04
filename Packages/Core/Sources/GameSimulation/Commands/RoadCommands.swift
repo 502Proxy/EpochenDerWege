@@ -1,16 +1,31 @@
 import GameDomain
 
+/// How a road cell is built.
+public enum RoadKind: Hashable, Sendable {
+    /// On the surface.
+    case surface
+    /// Through the hill, for cells too steep for a surface road.
+    case tunnel
+}
+
 /// Rules for road cells and helpers to plan road paths.
 public enum RoadPlanner {
-    /// Whether a road may be built on a cell (ignoring cost).
-    public static func validate(_ cell: GridPoint, in world: WorldState) -> Result<Void, PlacementError> {
+    /// Whether and how a road may be built on a cell (ignoring cost).
+    /// Cells steeper than `maxRoadSlopePercent` become tunnels; water blocks roads.
+    public static func validate(_ cell: GridPoint, in world: WorldState) -> Result<RoadKind, PlacementError> {
         let terrain = world.terrain
         guard terrain.contains(cell) else { return .failure(.outOfBounds) }
         guard terrain.isLand(cell) else { return .failure(.water) }
-        let slope = terrain.slopePercent(at: cell)
-        guard slope <= world.rules.maxRoadSlopePercent else { return .failure(.tooSteep(slopePercent: slope)) }
         guard !world.isOccupied(cell) else { return .failure(.occupied) }
-        return .success(())
+        return .success(terrain.slopePercent(at: cell) > world.rules.maxRoadSlopePercent ? .tunnel : .surface)
+    }
+
+    /// Cost of building one cell of the given kind.
+    public static func cost(of kind: RoadKind, rules: GameRules) -> Int {
+        switch kind {
+        case .surface: rules.roadCostPerCell
+        case .tunnel: rules.tunnelCostPerCell
+        }
     }
 
     /// An L-shaped path from `start` to `end`: first along the longer axis, then the shorter one.
@@ -37,18 +52,26 @@ public enum RoadPlanner {
         return cells
     }
 
-    /// The cells of `cells` that would actually be built: new, valid, in order, without duplicates.
-    public static func buildableCells(_ cells: [GridPoint], in world: WorldState) -> [GridPoint] {
+    /// The cells of `cells` that would actually be built, with their kind: new, valid,
+    /// in order, without duplicates.
+    public static func plan(_ cells: [GridPoint], in world: WorldState) -> [(cell: GridPoint, kind: RoadKind)] {
         var seen = Set<GridPoint>()
-        return cells.filter { cell in
-            guard seen.insert(cell).inserted, !world.hasRoad(at: cell) else { return false }
-            if case .success = validate(cell, in: world) { return true }
-            return false
+        var result: [(cell: GridPoint, kind: RoadKind)] = []
+        for cell in cells where seen.insert(cell).inserted && !world.hasRoad(at: cell) {
+            if case .success(let kind) = validate(cell, in: world) {
+                result.append((cell, kind))
+            }
         }
+        return result
+    }
+
+    /// The cells of `cells` that would actually be built.
+    public static func buildableCells(_ cells: [GridPoint], in world: WorldState) -> [GridPoint] {
+        plan(cells, in: world).map(\.cell)
     }
 }
 
-/// Builds gravel road on the given cells. Invalid cells and cells that already have a road
+/// Builds gravel road on the given cells; cells too steep for a surface road become tunnels. Invalid cells and cells that already have a road
 /// are skipped; the whole command is rejected if the valid cells cannot be paid for.
 public struct BuildRoadCommand: GameCommand {
     public let cells: [GridPoint]
@@ -58,20 +81,26 @@ public struct BuildRoadCommand: GameCommand {
     }
 
     public func execute(in world: inout WorldState) {
-        let buildable = RoadPlanner.buildableCells(cells, in: world)
+        let buildable = RoadPlanner.plan(cells, in: world)
         guard !buildable.isEmpty else {
             if let error = firstError(in: world) {
                 world.emit(.placementRejected(error))
             }
             return
         }
-        let cost = buildable.count * world.rules.roadCostPerCell
+        let rules = world.rules
+        let cost = buildable.reduce(0) { $0 + RoadPlanner.cost(of: $1.kind, rules: rules) }
         guard world.treasury >= cost else {
             world.emit(.placementRejected(.insufficientFunds(cost: cost)))
             return
         }
         world.book(-cost, as: .roads)
-        world.roads.formUnion(buildable)
+        for (cell, kind) in buildable {
+            world.roads.insert(cell)
+            if kind == .tunnel {
+                world.tunnels.insert(cell)
+            }
+        }
         world.emit(.roadBuilt(cells: buildable.count, cost: cost))
     }
 
@@ -96,8 +125,13 @@ public struct DemolishRoadCommand: GameCommand {
     public func execute(in world: inout WorldState) {
         let removed = Set(cells).intersection(world.roads)
         guard !removed.isEmpty else { return }
+        let rules = world.rules
+        let value = removed.reduce(0) { total, cell in
+            total + RoadPlanner.cost(of: world.tunnels.contains(cell) ? .tunnel : .surface, rules: rules)
+        }
         world.roads.subtract(removed)
-        let refund = removed.count * world.rules.roadCostPerCell * world.rules.demolitionRefundPercent / 100
+        world.tunnels.subtract(removed)
+        let refund = value * rules.demolitionRefundPercent / 100
         world.book(refund, as: .refunds)
         world.emit(.roadDemolished(cells: removed.count, refund: refund))
     }

@@ -102,7 +102,7 @@ private struct ToolPresentation {
             color = definition.map { Color($0.color) } ?? .gray
         case .road:
             name = String(localized: "Gravel road")
-            detail = String(localized: "Drag to build. \(catalog.rules.roadCostPerCell) thalers per cell.")
+            detail = String(localized: "Drag to build. \(catalog.rules.roadCostPerCell) thalers per cell; steep cells become tunnels for \(catalog.rules.tunnelCostPerCell) thalers.")
             costLabel = "\(catalog.rules.roadCostPerCell)"
             symbol = "road.lanes"
             color = Color(red: 0.66, green: 0.60, blue: 0.50)

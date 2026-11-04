@@ -83,7 +83,7 @@ Playable today:
 
 - Procedural low-poly 3D map with water, sand, grassland, forest, rock and snow
 - Starting settlement with a storehouse and five houses (20 farmers)
-- Build toolbar with categories; gravel roads drawn by dragging, demolish tool
+- Build toolbar with categories; gravel roads drawn by dragging (steep hills are crossed by tunnels), demolish tool
 - Residential, commercial and industrial zones: towns build houses, markets and workshops next to roads on their own
 - Markets buy food and workshops buy raw materials; every delivery earns its base price as sales income
 - Processing businesses (mill, bakery) may only be built in commercial or industrial zones; raw material producers sit at their resources
