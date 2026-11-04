@@ -44,6 +44,8 @@ final class GameViewModel {
     private(set) var lines: [LineSummary] = []
     private(set) var goods: [GoodRow] = []
     private(set) var buildingRows: [BuildingRow] = []
+    /// What the map overlay shows.
+    var overlay = MapOverlay.none
     /// Latest request to move the camera; the scene follows it once.
     private(set) var cameraFocus: CameraFocus?
     /// Stops picked so far with the line tool, in order.
@@ -202,6 +204,10 @@ final class GameViewModel {
     func setSpeed(_ multiplier: Int) {
         engine.setSpeed(multiplier)
         speed = engine.speed
+    }
+
+    func cycleOverlay() {
+        overlay = overlay.next
     }
 
     func togglePause() {

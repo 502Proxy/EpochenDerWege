@@ -61,6 +61,14 @@ enum GameText {
         }
     }
 
+    static func name(of overlay: MapOverlay) -> String {
+        switch overlay {
+        case .none: String(localized: "No overlay")
+        case .supply: String(localized: "Supply")
+        case .coverage: String(localized: "Carrier range")
+        }
+    }
+
     static func name(of priority: DeliveryPriority) -> String {
         switch priority {
         case .low: String(localized: "Low")

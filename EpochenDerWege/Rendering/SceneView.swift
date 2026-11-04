@@ -120,7 +120,8 @@ final class SceneCoordinator: NSObject {
             preview: placementPreview(in: frame.world),
             roadPreview: roadPreview(in: frame.world),
             zonePreview: zonePreview(),
-            animationTime: animationTime
+            animationTime: animationTime,
+            overlay: viewModel.overlay
         )
         renderer.update(with: context)
 
@@ -336,7 +337,7 @@ final class SceneCoordinator: NSObject {
 
     private enum KeyCode {
         static let a: UInt16 = 0, s: UInt16 = 1, d: UInt16 = 2, q: UInt16 = 12, w: UInt16 = 13, e: UInt16 = 14
-        static let space: UInt16 = 49, escape: UInt16 = 53
+        static let space: UInt16 = 49, escape: UInt16 = 53, o: UInt16 = 31
         static let left: UInt16 = 123, right: UInt16 = 124, down: UInt16 = 125, up: UInt16 = 126
     }
 
@@ -349,6 +350,7 @@ final class SceneCoordinator: NSObject {
         case KeyCode.q: rig.rotate(dx: -40, dy: 0)
         case KeyCode.e: rig.rotate(dx: 40, dy: 0)
         case KeyCode.space: viewModel.togglePause()
+        case KeyCode.o: viewModel.cycleOverlay()
         case KeyCode.escape: viewModel.cancel()
         default: return false
         }

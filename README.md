@@ -45,6 +45,7 @@ If Xcode asks for signing, choose *Sign to Run Locally* or your own team under
 | W A S D / arrow keys | Move the camera |
 | Q / E | Rotate the camera |
 | Right-click / Esc | Drop the build tool or clear the selection |
+| O | Map overlay: supply, carrier range, off |
 | F | Finance window |
 | G | Goods overview |
 | B | Building list |
@@ -94,6 +95,7 @@ Playable today:
 - Production chains: grain → flour → bread, fish, wood, stone
 - Carriers visibly transport goods within 150 m; for longer distances the player builds stops, creates lines and buys ox carts that drive on the road network (A* pathfinding)
 - Workers, food supply, growth and hunger
+- Map overlays (key O): supply of houses and efficiency of businesses, carrier range of storehouses and stops
 - Per-building settings in the inspector: pause a business and set its delivery priority
 - Goods overview (key G): production, consumption, stock and sales per good; building list (key B) with status and efficiency, click to jump there
 - Finance window (key F or click the money): income and expenses per month and year, sales per good, costs per building and vehicle type, balance chart
