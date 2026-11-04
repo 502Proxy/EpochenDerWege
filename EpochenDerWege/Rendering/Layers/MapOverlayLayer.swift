@@ -1,4 +1,5 @@
 import GameDomain
+import GameSimulation
 import RealityKit
 
 /// What the map overlay shows.
