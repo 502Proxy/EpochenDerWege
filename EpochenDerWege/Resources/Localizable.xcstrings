@@ -21,12 +21,32 @@
         }
       }
     },
+    "%@: %lld units, %lld thalers, %lld thalers upkeep per year": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@: %lld Einheiten, %lld Taler, %lld Taler Unterhalt pro Jahr"
+          }
+        }
+      }
+    },
     "%lld carriers": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "%lld Träger"
+          }
+        }
+      }
+    },
+    "%lld lines": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Linien"
           }
         }
       }
@@ -81,6 +101,16 @@
         }
       }
     },
+    "%lld vehicles, %lld/%lld loaded": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Fahrzeuge, %lld/%lld beladen"
+          }
+        }
+      }
+    },
     "%lld workers": {
       "localizations": {
         "de": {
@@ -101,6 +131,16 @@
         }
       }
     },
+    "A line needs at least two different stops.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Linie braucht mindestens zwei verschiedene Haltestellen."
+          }
+        }
+      }
+    },
     "A new settlement with %lld residents was founded.": {
       "localizations": {
         "de": {
@@ -117,6 +157,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ein Bewohner ist wegen Hunger weggezogen."
+          }
+        }
+      }
+    },
+    "A vehicle cannot reach its next stop. Check the roads.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Fahrzeug erreicht die nächste Haltestelle nicht. Prüfe die Straßen."
           }
         }
       }
@@ -171,12 +221,32 @@
         }
       }
     },
+    "Buy a vehicle": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fahrzeug kaufen"
+          }
+        }
+      }
+    },
     "Buys %@": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Kauft %@"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbrechen"
           }
         }
       }
@@ -207,6 +277,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Klicke auf ein Gebäude oder eine Straße, um es abzureißen. Die Hälfte der Kosten wird erstattet."
+          }
+        }
+      }
+    },
+    "Click stops one after another, then press Return or Create line. Buy ox carts for the line in the lines window.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klicke nacheinander auf Haltestellen und drücke dann Return oder „Linie erstellen“. Ochsenkarren kaufst du im Linienfenster."
+          }
+        }
+      }
+    },
+    "Click the stops of the new line one after another.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klicke nacheinander auf die Haltestellen der neuen Linie."
           }
         }
       }
@@ -257,6 +347,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Steuerung"
+          }
+        }
+      }
+    },
+    "Create line": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linie erstellen"
+          }
+        }
+      }
+    },
+    "Delete line": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linie löschen"
           }
         }
       }
@@ -531,6 +641,36 @@
         }
       }
     },
+    "Line %lld created. Buy ox carts for it in the lines window.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linie %lld erstellt. Kaufe Ochsenkarren dafür im Linienfenster."
+          }
+        }
+      }
+    },
+    "Line %lld deleted.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linie %lld gelöscht."
+          }
+        }
+      }
+    },
+    "Lines": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linien"
+          }
+        }
+      }
+    },
     "Market": {
       "localizations": {
         "de": {
@@ -547,6 +687,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mühle"
+          }
+        }
+      }
+    },
+    "Must be built next to a road.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muss direkt an einer Straße stehen."
           }
         }
       }
@@ -571,12 +721,42 @@
         }
       }
     },
+    "New line": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Linie"
+          }
+        }
+      }
+    },
+    "New line: %lld stops": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Linie: %lld Haltestellen"
+          }
+        }
+      }
+    },
     "No %@ nearby.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Kein %@ in der Nähe."
+          }
+        }
+      }
+    },
+    "No lines yet. Build stops next to roads, then use the line tool (key 1) to click them one after another.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Linien. Baue Haltestellen an Straßen und klicke sie dann mit dem Linienwerkzeug (Taste 1) nacheinander an."
           }
         }
       }
@@ -597,6 +777,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Keine Arbeiter – baue mehr Häuser"
+          }
+        }
+      }
+    },
+    "None": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine"
           }
         }
       }
@@ -637,6 +827,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Außerhalb der Karte."
+          }
+        }
+      }
+    },
+    "Ox Cart": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ochsenkarren"
+          }
+        }
+      }
+    },
+    "Ox cart bought for %lld thalers.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ochsenkarren für %lld Taler gekauft."
+          }
+        }
+      }
+    },
+    "Ox cart sold for %lld thalers.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ochsenkarren für %lld Taler verkauft."
           }
         }
       }
@@ -851,12 +1071,32 @@
         }
       }
     },
+    "Sell a vehicle": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fahrzeug verkaufen"
+          }
+        }
+      }
+    },
     "Show income and expenses": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Einnahmen und Ausgaben anzeigen"
+          }
+        }
+      }
+    },
+    "Show transport lines and vehicles": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transportlinien und Fahrzeuge anzeigen"
           }
         }
       }
@@ -917,6 +1157,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Stein"
+          }
+        }
+      }
+    },
+    "Stop": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haltestelle"
+          }
+        }
+      }
+    },
+    "Stop %lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haltestelle %lld"
           }
         }
       }
@@ -1011,6 +1271,16 @@
         }
       }
     },
+    "Transport": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transport"
+          }
+        }
+      }
+    },
     "Unknown building %@.": {
       "localizations": {
         "de": {
@@ -1041,6 +1311,16 @@
         }
       }
     },
+    "Vehicles": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fahrzeuge"
+          }
+        }
+      }
+    },
     "WASD, Q/E, Space": {
       "localizations": {
         "de": {
@@ -1067,6 +1347,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wartet auf Rohstoffe"
+          }
+        }
+      }
+    },
+    "Waiting goods": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wartende Waren"
           }
         }
       }

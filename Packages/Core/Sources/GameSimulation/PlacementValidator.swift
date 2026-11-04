@@ -21,6 +21,12 @@ public enum PlacementValidator {
         if let zones = definition.allowedZones, !zones.isEmpty {
             guard let zone = world.zones[cell], zones.contains(zone) else { return .failure(.requiresZone(zones)) }
         }
+        if definition.requiresRoadAccess == true {
+            let neighbours = [cell.offset(dx: 1, dz: 0), cell.offset(dx: -1, dz: 0), cell.offset(dx: 0, dz: 1), cell.offset(dx: 0, dz: -1)]
+            guard neighbours.contains(where: { world.hasRoad(at: $0) && !world.tunnels.contains($0) }) else {
+                return .failure(.noRoadAccess)
+            }
+        }
         guard ignoringCost || world.treasury >= definition.cost else {
             return .failure(.insufficientFunds(cost: definition.cost))
         }

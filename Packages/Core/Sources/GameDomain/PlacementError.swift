@@ -9,4 +9,6 @@ public enum PlacementError: Error, Hashable, Sendable, Codable {
     case missingResource(Biome)
     /// The building may only be placed in one of these zones.
     case requiresZone([ZoneKind])
+    /// The building must stand next to a road.
+    case noRoadAccess
 }

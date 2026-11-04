@@ -95,9 +95,10 @@ simulation slightly but can never drop a frame.
 | 1 | `WorkforceSystem` | daily | Assigns residents to production buildings |
 | 2 | `ProductionSystem` | every tick | Consumes inputs, advances cycles, produces outputs |
 | 3 | `LogisticsSystem` | dispatch every 5 ticks, movement every tick | Sends carriers and moves them |
-| 4 | `PopulationSystem` | every 10 days | Feeds houses, grows or shrinks them |
-| 5 | `EconomySystem` | yearly | Taxes and upkeep |
-| 6 | `TownGrowthSystem` | every 5 days | Builds houses, markets and workshops in their zones next to roads when the town has demand |
+| 4 | `TransportSystem` | every tick | Drives vehicles along their lines; unloads goods wanted at a stop and loads goods wanted further down the line |
+| 5 | `PopulationSystem` | every 10 days | Feeds houses, grows or shrinks them |
+| 6 | `EconomySystem` | yearly | Taxes and upkeep |
+| 7 | `TownGrowthSystem` | every 5 days | Builds houses, markets and workshops in their zones next to roads when the town has demand |
 
 The simulation is **deterministic**: the same seed, commands and number of ticks always
 produce the same world. Collections are iterated in a stable order (buildings in
@@ -109,7 +110,7 @@ reproducible and is a prerequisite for save games and replays.
 | Pattern | Where | Why |
 | --- | --- | --- |
 | Repository | `GameCatalogRepository`, `BundledCatalogRepository`, `JSONCatalogRepository` | The app does not care where game data comes from; tests and mods can supply their own |
-| Command | `GameCommand`, `PlaceBuildingCommand`, `DemolishBuildingCommand`, `BuildRoadCommand`, `DemolishRoadCommand`, `ZoneCommand` | All player actions are applied in one place between ticks; easy to log, replay or network later |
+| Command | `GameCommand`, `PlaceBuildingCommand`, `DemolishBuildingCommand`, `BuildRoadCommand`, `DemolishRoadCommand`, `ZoneCommand`, `CreateLineCommand`, `BuyVehicleCommand` | All player actions are applied in one place between ticks; easy to log, replay or network later |
 | Strategy | `DeliveryPlanner`, `NearestConsumerPlanner` | How carriers pick targets can change (e.g. road routing) without touching the logistics system |
 | Single point of change | `WorldState.book(_:as:year:)` and `Ledger` | Every change of the treasury goes through one method that also records it, so the finance overview can never miss a booking |
 | Observer | `SimulationEvent` stream in `WorldState.events` | The simulation reports what happened as data; the UI decides how to phrase it |
@@ -174,8 +175,10 @@ The simulation emits `SimulationEvent` values instead of strings. Text is create
 `GameText` and localized through `Localizable.xcstrings`, so the Core package stays
 free of presentation concerns and the game can be translated without touching rules.
 
-### Straight-line carriers in the prototype
+### Hybrid logistics: carriers locally, lines for distance
 
-Carriers currently walk in straight lines within a fixed range. Roads and A* routing
-are planned in milestone 0.2 and will plug in as a new `DeliveryPlanner` plus a
-movement component; the rest of the logistics system stays as it is.
+Carriers handle the neighbourhood (150 m) and walk in straight lines. Everything
+further is the player's job: stops collect goods that one of their lines takes to a
+stop where a consumer needs them (`StopDemand`), and vehicles find their way on the
+road network with A* (`RoadNetwork`). Storehouses do not count as demand for lines,
+so goods never shuttle between storehouses.

@@ -15,6 +15,12 @@ public enum SimulationEvent: Hashable, Sendable {
     case roadDemolished(cells: Int, refund: Int)
     case zoneChanged(kind: ZoneKind?, cells: Int)
     case townGrew(BuildingID)
+    case lineCreated(LineID)
+    case lineDeleted(LineID)
+    /// A line needs at least two different stops.
+    case lineRejected
+    case vehicleBought(VehicleTypeID, cost: Int)
+    case vehicleSold(VehicleTypeID, refund: Int)
 }
 
 /// An event with its position in the event stream.

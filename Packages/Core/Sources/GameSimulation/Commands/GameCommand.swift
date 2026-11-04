@@ -49,6 +49,17 @@ public struct DemolishBuildingCommand: GameCommand {
         let refund = removed.definition.cost * world.rules.demolitionRefundPercent / 100
         world.book(refund, as: .refunds)
 
+        // Lines no longer call at a demolished stop.
+        if removed.category == .stop {
+            for index in world.lines.indices {
+                world.lines[index].stops.removeAll { $0 == buildingID }
+            }
+            for index in world.vehicles.indices {
+                world.vehicles[index].route = []
+                world.vehicles[index].stopIndex = 0
+            }
+        }
+
         // Carriers heading to the demolished building turn back; their cargo is lost.
         for index in world.carriers.indices where world.carriers[index].targetID == buildingID {
             world.carriers[index].turnBack()

@@ -5,7 +5,7 @@
     "startingTreasury": 10000,
     "carrierSpeedMetersPerDay": 600,
     "carrierCapacity": 2,
-    "carrierRangeMeters": 400,
+    "carrierRangeMeters": 150,
     "dispatchIntervalTicks": 5,
     "supplyCheckIntervalDays": 10,
     "foodPerResidentPerCheck": 0.5,
@@ -383,6 +383,41 @@
         "red": 0.85,
         "green": 0.55,
         "blue": 0.25
+      }
+    },
+    {
+      "id": "stop",
+      "name": "Stop",
+      "category": "stop",
+      "cost": 120,
+      "upkeepPerYear": 5,
+      "workers": 0,
+      "inputs": [],
+      "outputs": [],
+      "cycleDays": 0,
+      "storagePerGood": 40,
+      "maxCarriers": 3,
+      "maxResidents": 0,
+      "requiresRoadAccess": true,
+      "color": {
+        "red": 0.75,
+        "green": 0.62,
+        "blue": 0.4
+      }
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "oxCart",
+      "name": "Ox Cart",
+      "capacity": 4,
+      "speedMetersPerDay": 900,
+      "price": 400,
+      "upkeepPerYear": 80,
+      "color": {
+        "red": 0.55,
+        "green": 0.38,
+        "blue": 0.22
       }
     }
   ]

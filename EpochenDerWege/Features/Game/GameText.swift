@@ -22,6 +22,10 @@ enum GameText {
         return String(localized: String.LocalizationValue(good.name))
     }
 
+    static func name(of vehicle: VehicleDefinition) -> String {
+        String(localized: String.LocalizationValue(vehicle.name))
+    }
+
     static func name(of zone: ZoneKind) -> String {
         switch zone {
         case .residential: String(localized: "Residential zone")
@@ -77,6 +81,8 @@ enum GameText {
             String(localized: "This space is already taken.")
         case .insufficientFunds(let cost):
             String(localized: "Not enough money: \(cost) thalers needed.")
+        case .noRoadAccess:
+            String(localized: "Must be built next to a road.")
         case .requiresZone(let zones):
             String(localized: "Only allowed in: \(zoneList(zones)).")
         case .missingResource(let biome):
@@ -107,6 +113,16 @@ enum GameText {
             nil
         case .townGrew:
             String(localized: "The town built a new house.")
+        case .lineCreated(let id):
+            String(localized: "Line \(id.rawValue) created. Buy ox carts for it in the lines window.")
+        case .lineDeleted(let id):
+            String(localized: "Line \(id.rawValue) deleted.")
+        case .lineRejected:
+            String(localized: "A line needs at least two different stops.")
+        case .vehicleBought(_, let cost):
+            String(localized: "Ox cart bought for \(cost) thalers.")
+        case .vehicleSold(_, let refund):
+            String(localized: "Ox cart sold for \(refund) thalers.")
         }
     }
 
@@ -127,7 +143,9 @@ enum GameText {
         case .noResources:
             (String(localized: "No resources in reach"), .problem)
         case .storing:
-            (String(localized: "Storehouse"), .neutral)
+            building.category == .stop
+                ? (String(localized: "Stop"), .neutral)
+                : (String(localized: "Storehouse"), .neutral)
         case .housing:
             housingStatus(of: building)
         case .trading:
