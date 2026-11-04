@@ -30,6 +30,12 @@ extension Simulation {
         try #require(world.buildings.count == before + 1, "Placing \(type) at \(x), \(z) was rejected")
     }
 
+    /// Zones the cell as industrial first, so zone-restricted buildings like the mill can be placed.
+    mutating func placeZoned(_ type: BuildingTypeID, x: Int, z: Int) throws {
+        execute(ZoneCommand(cells: [GridPoint(x: x, z: z)], kind: .industrial))
+        try place(type, x: x, z: z)
+    }
+
     var lastEvent: SimulationEvent? {
         world.events.last?.event
     }
@@ -101,7 +107,7 @@ struct PlacementTests {
     @Test func costsMoneyAndRefundsHalfOnDemolition() throws {
         var simulation = try Fixtures.flatSimulation(settlement: false)
         let start = simulation.world.treasury
-        try simulation.place("mill", x: 4, z: 4)
+        try simulation.placeZoned("mill", x: 4, z: 4)
         #expect(simulation.world.treasury == start - 600)
 
         let mill = try #require(simulation.world.building(at: GridPoint(x: 4, z: 4)))
@@ -122,10 +128,11 @@ struct PlacementTests {
     }
 
     @Test func validatorIsUsableOnSnapshots() throws {
-        let simulation = try Fixtures.flatSimulation()
+        var simulation = try Fixtures.flatSimulation()
+        let start = try #require(simulation.world.startCell)
+        simulation.execute(ZoneCommand(cells: [start.offset(dx: 1, dz: 0)], kind: .commercial))
         let world = simulation.world
         let mill = try #require(world.catalog.building("mill"))
-        let start = try #require(world.startCell)
         #expect((try? PlacementValidator.validate(mill, at: start, in: world).get()) == nil)
         #expect((try? PlacementValidator.validate(mill, at: start.offset(dx: 1, dz: 0), in: world).get()) == 1)
     }
@@ -136,8 +143,8 @@ struct EconomyLoopTests {
     @Test func oneFarmFeedsTheStartingSettlementFairly() throws {
         var simulation = try Fixtures.flatSimulation()
         try simulation.place("grainFarm", x: 15, z: 16)
-        try simulation.place("mill", x: 17, z: 16)
-        try simulation.place("bakery", x: 16, z: 17)
+        try simulation.placeZoned("mill", x: 17, z: 16)
+        try simulation.placeZoned("bakery", x: 16, z: 17)
 
         simulation.advance(days: 60)
 
@@ -150,8 +157,8 @@ struct EconomyLoopTests {
         var simulation = try Fixtures.flatSimulation()
         try simulation.place("grainFarm", x: 15, z: 16)
         try simulation.place("grainFarm", x: 15, z: 15)
-        try simulation.place("mill", x: 17, z: 16)
-        try simulation.place("bakery", x: 16, z: 17)
+        try simulation.placeZoned("mill", x: 17, z: 16)
+        try simulation.placeZoned("bakery", x: 16, z: 17)
 
         simulation.advance(days: 60)
 
@@ -202,6 +209,7 @@ struct EconomyLoopTests {
             var simulation = Simulation(world: WorldFactory.makeWorld(catalog: try Fixtures.catalog(), seed: 7))
             let start = try #require(simulation.world.startCell)
             simulation.execute(PlaceBuildingCommand(buildingType: "grainFarm", cell: start.offset(dx: 1, dz: 0)))
+            simulation.execute(ZoneCommand(cells: [start.offset(dx: -1, dz: 0)], kind: .industrial))
             simulation.execute(PlaceBuildingCommand(buildingType: "mill", cell: start.offset(dx: -1, dz: 0)))
             simulation.advance(days: 90)
             return (simulation.world.treasury, simulation.world.population, simulation.world.storedGoods)
@@ -221,6 +229,7 @@ struct EngineTests {
         let engine = SimulationEngine(simulation: simulation)
         engine.setSpeed(4)
         engine.start()
+        engine.submit(ZoneCommand(cells: [GridPoint(x: 17, z: 16)], kind: .industrial))
         engine.submit(PlaceBuildingCommand(buildingType: "mill", cell: GridPoint(x: 17, z: 16)))
 
         try await Task.sleep(for: .milliseconds(400))
@@ -235,6 +244,7 @@ struct EngineTests {
         let engine = SimulationEngine(simulation: try Fixtures.flatSimulation())
         engine.setSpeed(0)
         engine.start()
+        engine.submit(ZoneCommand(cells: [GridPoint(x: 17, z: 16)], kind: .industrial))
         engine.submit(PlaceBuildingCommand(buildingType: "mill", cell: GridPoint(x: 17, z: 16)))
 
         try await Task.sleep(for: .milliseconds(300))

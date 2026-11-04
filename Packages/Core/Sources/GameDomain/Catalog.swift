@@ -172,6 +172,8 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
     public var zone: ZoneKind?
     /// Towns build one of these per this many residents (commerce only).
     public var residentsPerBuilding: Int?
+    /// Zones the player may place this building in; `nil` means anywhere.
+    public var allowedZones: [ZoneKind]?
 
     public init(
         id: BuildingTypeID,
@@ -189,7 +191,8 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         resource: ResourceRequirement?,
         color: GameColor,
         zone: ZoneKind? = nil,
-        residentsPerBuilding: Int? = nil
+        residentsPerBuilding: Int? = nil,
+        allowedZones: [ZoneKind]? = nil
     ) {
         self.id = id
         self.name = name
@@ -207,6 +210,7 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         self.color = color
         self.zone = zone
         self.residentsPerBuilding = residentsPerBuilding
+        self.allowedZones = allowedZones
     }
 
     /// Whether this building consumes the given good as a production input.

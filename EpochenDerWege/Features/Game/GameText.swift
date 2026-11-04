@@ -30,6 +30,11 @@ enum GameText {
         }
     }
 
+    /// "commercial zone or industrial zone", localized.
+    static func zoneList(_ zones: [ZoneKind]) -> String {
+        zones.map(name(of:)).formatted(.list(type: .or))
+    }
+
     static func zoneDescription(_ zone: ZoneKind) -> String {
         switch zone {
         case .residential:
@@ -72,6 +77,8 @@ enum GameText {
             String(localized: "This space is already taken.")
         case .insufficientFunds(let cost):
             String(localized: "Not enough money: \(cost) thalers needed.")
+        case .requiresZone(let zones):
+            String(localized: "Only allowed in: \(zoneList(zones)).")
         case .missingResource(let biome):
             String(localized: "No \(name(of: biome)) nearby.")
         }
@@ -158,6 +165,9 @@ enum GameText {
         }
         if definition.workers > 0 {
             parts.append(String(localized: "\(definition.workers) workers"))
+        }
+        if let zones = definition.allowedZones, !zones.isEmpty {
+            parts.append(String(localized: "Only allowed in: \(zoneList(zones))."))
         }
         if let resource = definition.resource {
             parts.append(String(localized: "Needs \(name(of: resource.biome)) nearby"))

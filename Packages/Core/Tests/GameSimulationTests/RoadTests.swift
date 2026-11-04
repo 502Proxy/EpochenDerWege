@@ -38,7 +38,7 @@ struct RoadTests {
 
     @Test func roadsAndBuildingsExcludeEachOther() throws {
         var simulation = try Fixtures.flatSimulation(settlement: false)
-        try simulation.place("mill", x: 4, z: 4)
+        try simulation.placeZoned("mill", x: 4, z: 4)
         simulation.execute(BuildRoadCommand(cells: [GridPoint(x: 4, z: 4)]))
         #expect(simulation.lastEvent == .placementRejected(.occupied))
         #expect(simulation.world.roads.isEmpty)

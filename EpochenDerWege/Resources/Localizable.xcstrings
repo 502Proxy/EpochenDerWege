@@ -611,6 +611,16 @@
         }
       }
     },
+    "Only allowed in: %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur erlaubt in: %@."
+          }
+        }
+      }
+    },
     "Output full – carriers cannot keep up": {
       "localizations": {
         "de": {
