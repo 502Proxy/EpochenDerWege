@@ -351,6 +351,16 @@
         }
       }
     },
+    "Costs by type": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kosten nach Typ"
+          }
+        }
+      }
+    },
     "Create line": {
       "localizations": {
         "de": {
@@ -377,6 +387,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Abreißen"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fertig"
           }
         }
       }
@@ -691,6 +711,16 @@
         }
       }
     },
+    "Month %lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monat %lld"
+          }
+        }
+      }
+    },
     "Must be built next to a road.": {
       "localizations": {
         "de": {
@@ -751,6 +781,16 @@
         }
       }
     },
+    "No costs yet.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Kosten."
+          }
+        }
+      }
+    },
     "No lines yet. Build stops next to roads, then use the line tool (key 1) to click them one after another.": {
       "localizations": {
         "de": {
@@ -767,6 +807,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Keine Rohstoffe in Reichweite"
+          }
+        }
+      }
+    },
+    "No sales yet. Draw commercial or industrial zones so towns build markets and workshops.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Verkäufe. Zeichne Gewerbe- oder Industriegebiete, damit die Städte Märkte und Werkstätten bauen."
           }
         }
       }
@@ -831,6 +881,16 @@
         }
       }
     },
+    "Overview": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übersicht"
+          }
+        }
+      }
+    },
     "Ox Cart": {
       "localizations": {
         "de": {
@@ -867,6 +927,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pause"
+          }
+        }
+      }
+    },
+    "Previous month": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vormonat"
           }
         }
       }
@@ -1051,6 +1121,16 @@
         }
       }
     },
+    "Sales by good": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verkäufe nach Ware"
+          }
+        }
+      }
+    },
     "Sand": {
       "localizations": {
         "de": {
@@ -1081,12 +1161,12 @@
         }
       }
     },
-    "Show income and expenses": {
+    "Show income and expenses (F)": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Einnahmen und Ausgaben anzeigen"
+            "value": "Einnahmen und Ausgaben anzeigen (F)"
           }
         }
       }
@@ -1221,6 +1301,26 @@
         }
       }
     },
+    "Thalers": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taler"
+          }
+        }
+      }
+    },
+    "The balance chart fills up as days pass.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Diagramm füllt sich mit jedem Spieltag."
+          }
+        }
+      }
+    },
     "The game data could not be loaded.": {
       "localizations": {
         "de": {
@@ -1317,6 +1417,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fahrzeuge"
+          }
+        }
+      }
+    },
+    "View": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ansicht"
           }
         }
       }

@@ -21,9 +21,10 @@ struct TopBarView: View {
                 stat("banknote", Text("\(hud.treasury) thalers"))
             }
             .buttonStyle(.plain)
-            .help(Text("Show income and expenses"))
-            .popover(isPresented: $showsFinances, arrowEdge: .bottom) {
-                FinanceView(summary: viewModel.finances)
+            .keyboardShortcut("f", modifiers: [])
+            .help(Text("Show income and expenses (F)"))
+            .sheet(isPresented: $showsFinances) {
+                FinanceView(summary: viewModel.finances) { showsFinances = false }
             }
             stat("person.3.fill", Text("\(hud.population) residents"))
             stat("hammer.fill", Text("Jobs \(hud.workersEmployed)/\(hud.workersNeeded)"))

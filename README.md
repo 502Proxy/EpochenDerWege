@@ -45,6 +45,7 @@ If Xcode asks for signing, choose *Sign to Run Locally* or your own team under
 | W A S D / arrow keys | Move the camera |
 | Q / E | Rotate the camera |
 | Right-click / Esc | Drop the build tool or clear the selection |
+| F | Finance window |
 | Space | Pause |
 
 Coloured spheres above buildings show their state: green working, yellow waiting or
@@ -91,7 +92,7 @@ Playable today:
 - Production chains: grain → flour → bread, fish, wood, stone
 - Carriers visibly transport goods within 150 m; for longer distances the player builds stops, creates lines and buys ox carts that drive on the road network (A* pathfinding)
 - Workers, food supply, growth and hunger
-- Yearly taxes and upkeep; finance overview with income and expenses per category and a balance chart (click the money in the top bar)
+- Finance window (key F or click the money): income and expenses per month and year, sales per good, costs per building and vehicle type, balance chart
 - Pause and 1× / 2× / 4× speed
 
 Known simplifications of the prototype: carriers walk in straight lines within their short range, farmers and citizens are not yet distinguished, buildings cost only money, and there is no save game yet.

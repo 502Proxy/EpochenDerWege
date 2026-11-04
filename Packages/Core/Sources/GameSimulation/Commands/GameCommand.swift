@@ -28,7 +28,7 @@ public struct PlaceBuildingCommand: GameCommand {
         case .failure(let error):
             world.emit(.placementRejected(error))
         case .success(let resourceFactor):
-            world.book(-definition.cost, as: .construction)
+            world.book(-definition.cost, as: .construction, detail: .building(definition.id))
             world.addBuilding(definition, at: cell, resourceFactor: resourceFactor)
             WorkforceSystem.assignWorkers(in: &world)
             world.emit(.buildingPlaced(buildingType, cost: definition.cost))
@@ -47,7 +47,7 @@ public struct DemolishBuildingCommand: GameCommand {
     public func execute(in world: inout WorldState) {
         guard let removed = world.removeBuilding(buildingID) else { return }
         let refund = removed.definition.cost * world.rules.demolitionRefundPercent / 100
-        world.book(refund, as: .refunds)
+        world.book(refund, as: .refunds, detail: .building(removed.definition.id))
 
         // Lines no longer call at a demolished stop.
         if removed.category == .stop {

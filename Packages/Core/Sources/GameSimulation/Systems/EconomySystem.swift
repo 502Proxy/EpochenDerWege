@@ -11,19 +11,29 @@ public struct EconomySystem: SimulationSystem {
         guard world.clock.isStartOfPeriod(days: world.rules.daysPerYear) else { return }
 
         var taxes = 0
-        var upkeep = 0
+        var upkeepByType: [BuildingTypeID: Int] = [:]
         for building in world.buildings {
-            upkeep += building.definition.upkeepPerYear
+            upkeepByType[building.definition.id, default: 0] += building.definition.upkeepPerYear
             if building.supplyRatio >= 0.5 {
                 taxes += building.residents * world.rules.taxPerResidentPerYear
             }
         }
-        // The year that just ended is settled; the clock already shows the new year.
+        var vehicleUpkeepByType: [VehicleTypeID: Int] = [:]
+        for vehicle in world.vehicles {
+            vehicleUpkeepByType[vehicle.definition.id, default: 0] += vehicle.definition.upkeepPerYear
+        }
+
+        // The year that just ended is settled in its last month; the clock already shows the new year.
         let closedYear = world.clock.year - 1
-        world.book(taxes, as: .taxes, year: closedYear)
-        world.book(-upkeep, as: .upkeep, year: closedYear)
-        let vehicleUpkeep = world.vehicles.reduce(0) { $0 + $1.definition.upkeepPerYear }
-        world.book(-vehicleUpkeep, as: .vehicles, year: closedYear)
+        let lastMonth = GameClock.monthsPerYear - 1
+        world.book(taxes, as: .taxes, year: closedYear, month: lastMonth)
+        for type in upkeepByType.keys.sorted() {
+            world.book(-upkeepByType[type, default: 0], as: .upkeep, year: closedYear, month: lastMonth, detail: .building(type))
+        }
+        for type in vehicleUpkeepByType.keys.sorted() {
+            world.book(-vehicleUpkeepByType[type, default: 0], as: .vehicles, year: closedYear, month: lastMonth, detail: .vehicle(type))
+        }
+        let upkeep = upkeepByType.values.reduce(0, +)
         world.emit(.yearClosed(year: world.clock.year, taxes: taxes, upkeep: upkeep))
     }
 }
