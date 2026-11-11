@@ -94,6 +94,28 @@ public enum CatalogValidator {
             }
         }
 
+        for building in catalog.buildings {
+            for good in building.needs ?? [] where !goods.contains(good) {
+                throw GameDataError.unknownGood(good, referencedBy: building.id.rawValue)
+            }
+            if let next = building.upgradesTo {
+                guard let tier = catalog.building(next), tier.category == .housing, building.category == .housing else {
+                    throw GameDataError.invalidValue("'\(building.id)' upgrades to '\(next)', which is not a house")
+                }
+            }
+        }
+        // Tier chains must end: following upgrades may never come back to a house.
+        for building in catalog.buildings where building.category == .housing {
+            var seen: Set<BuildingTypeID> = [building.id]
+            var current = building
+            while let next = catalog.nextTier(of: current) {
+                guard seen.insert(next.id).inserted else {
+                    throw GameDataError.invalidValue("house tiers of '\(building.id)' form a loop")
+                }
+                current = next
+            }
+        }
+
         let levels = catalog.settlementLevels
         if levels.first?.minimumPopulation != 0 {
             throw GameDataError.invalidValue("the first settlement level must start at 0 residents")

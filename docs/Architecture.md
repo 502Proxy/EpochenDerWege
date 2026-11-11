@@ -96,7 +96,7 @@ simulation slightly but can never drop a frame.
 | 2 | `ProductionSystem` | every tick | Consumes inputs, advances cycles, produces outputs |
 | 3 | `LogisticsSystem` | dispatch every 5 ticks, movement every tick | Sends carriers and moves them |
 | 4 | `TransportSystem` | every tick | Drives vehicles along their lines; unloads goods wanted at a stop and loads goods wanted further down the line |
-| 5 | `PopulationSystem` | every 10 days | Feeds houses, grows or shrinks them |
+| 5 | `PopulationSystem` | every 10 days | Feeds houses, grows or shrinks them; `HouseTiers` uses up clothing and wine and moves houses up or down a tier |
 | 6 | `EconomySystem` | yearly | Taxes and upkeep |
 | 7 | `SettlementSystem` | daily | Raises the settlement level (hamlet, village, …) when the population reaches the next threshold; levels are never lost |
 | 8 | `TownGrowthSystem` | every 5 days | Builds houses, markets and workshops in their zones next to roads when their `ZoneDemand` reaches the growth threshold |

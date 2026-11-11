@@ -61,6 +61,12 @@ public struct GameRules: Hashable, Sendable, Codable {
     public var startingResidentsPerHouse: Int
     /// Goods in the starting storehouse.
     public var startingStock: [GoodAmount]
+    /// Units of each extra need (clothing, wine) a resident uses per supply check.
+    public var needPerResidentPerCheck: Double
+    /// Supply checks in a row with all needs of the next tier met before a house upgrades.
+    public var upgradeChecks: Int
+    /// Supply checks in a row with a need missing before a house drops a tier.
+    public var downgradeChecks: Int
 
     public init(
         ticksPerDay: Int,
@@ -83,7 +89,10 @@ public struct GameRules: Hashable, Sendable, Codable {
         foodGoods: [GoodID],
         startingHouses: Int,
         startingResidentsPerHouse: Int,
-        startingStock: [GoodAmount]
+        startingStock: [GoodAmount],
+        needPerResidentPerCheck: Double = 0.25,
+        upgradeChecks: Int = 3,
+        downgradeChecks: Int = 3
     ) {
         self.ticksPerDay = ticksPerDay
         self.daysPerYear = daysPerYear
@@ -106,6 +115,9 @@ public struct GameRules: Hashable, Sendable, Codable {
         self.startingHouses = startingHouses
         self.startingResidentsPerHouse = startingResidentsPerHouse
         self.startingStock = startingStock
+        self.needPerResidentPerCheck = needPerResidentPerCheck
+        self.upgradeChecks = upgradeChecks
+        self.downgradeChecks = downgradeChecks
     }
 }
 
@@ -184,6 +196,12 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
     public var requiresRoadAccess: Bool?
     /// Index into ``GameCatalog/settlementLevels`` the settlement must have reached; `nil` means from the start.
     public var requiredLevel: Int?
+    /// Goods residents need besides food (housing only), e.g. clothing.
+    public var needs: [GoodID]?
+    /// The next house tier (housing only).
+    public var upgradesTo: BuildingTypeID?
+    /// Taxes per resident and year; `nil` uses the global rule (housing only).
+    public var taxPerResidentPerYear: Int?
 
     public init(
         id: BuildingTypeID,
@@ -204,7 +222,10 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         residentsPerBuilding: Int? = nil,
         allowedZones: [ZoneKind]? = nil,
         requiresRoadAccess: Bool? = nil,
-        requiredLevel: Int? = nil
+        requiredLevel: Int? = nil,
+        needs: [GoodID]? = nil,
+        upgradesTo: BuildingTypeID? = nil,
+        taxPerResidentPerYear: Int? = nil
     ) {
         self.id = id
         self.name = name
@@ -225,6 +246,9 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         self.allowedZones = allowedZones
         self.requiresRoadAccess = requiresRoadAccess
         self.requiredLevel = requiredLevel
+        self.needs = needs
+        self.upgradesTo = upgradesTo
+        self.taxPerResidentPerYear = taxPerResidentPerYear
     }
 
     /// Whether this building consumes the given good as a production input.
@@ -305,6 +329,16 @@ public struct GameCatalog: Sendable, Codable {
     /// Buildings that towns build on their own in a zone.
     public func buildings(forZone zone: ZoneKind) -> [BuildingDefinition] {
         buildings.filter { $0.zone == zone }
+    }
+
+    /// The house tier a house upgrades to, if any.
+    public func nextTier(of definition: BuildingDefinition) -> BuildingDefinition? {
+        definition.upgradesTo.flatMap(building)
+    }
+
+    /// The house tier a house drops to when its needs are not met, if any.
+    public func previousTier(of definition: BuildingDefinition) -> BuildingDefinition? {
+        buildings.first { $0.upgradesTo == definition.id }
     }
 
     /// The highest level whose population threshold is met.

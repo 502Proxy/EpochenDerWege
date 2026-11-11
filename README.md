@@ -93,10 +93,12 @@ Playable today:
 - Residential, commercial and industrial zones: towns build houses, markets and workshops next to roads on their own
 - Demand bars for every zone kind show what the town needs and warn when there is no free zoned space next to a road; click a bar to pick that zone tool
 - Settlement levels from hamlet to city by population; levels unlock buildings, locked tools show the level they need
+- House tiers: hut (4 farmers) → house (6 citizens, needs clothing, from village) → townhouse (8, also needs wine, from small town); houses move up when full, fed and stocked, and fall back when goods run out; higher tiers pay more taxes
+- New chains: sheep farm → wool → weaver → clothing, vineyard → grapes → wine press → wine
 - Markets buy food and workshops buy raw materials; every delivery earns its base price as sales income
 - Processing businesses (mill, bakery) may only be built in commercial or industrial zones; raw material producers sit at their resources
 - Building with live preview and rules for terrain, slope, money and nearby resources
-- Production chains: grain → flour → bread, fish, wood, stone
+- Production chains: grain → flour → bread, fish, wood, stone, wool → clothing, grapes → wine
 - Carriers visibly transport goods within 150 m; for longer distances the player builds stops, creates lines and buys ox carts that drive on the road network (A* pathfinding)
 - Workers, food supply, growth and hunger
 - Map overlays (key O): supply of houses and efficiency of businesses, carrier range of storehouses and stops

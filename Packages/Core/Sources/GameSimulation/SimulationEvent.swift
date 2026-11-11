@@ -23,6 +23,10 @@ public enum SimulationEvent: Hashable, Sendable {
     case vehicleSold(VehicleTypeID, refund: Int)
     /// The settlement grew into a new size class (index into the catalog's levels).
     case settlementLevelReached(Int)
+    /// A house moved up to the next tier.
+    case houseUpgraded(BuildingID, to: BuildingTypeID)
+    /// A house dropped to the previous tier because a need was missing.
+    case houseDowngraded(BuildingID, to: BuildingTypeID)
 }
 
 /// An event with its position in the event stream.

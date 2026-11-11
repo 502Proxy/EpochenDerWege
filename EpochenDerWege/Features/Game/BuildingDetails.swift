@@ -83,6 +83,21 @@ struct BuildingDetails: Equatable {
             for good in world.rules.foodGoods {
                 row(String(localized: "Food: \(goodName(good))"), "\(building.input.count(of: good)) / \(building.input.capacityPerGood)")
             }
+            for good in definition.needs ?? [] {
+                row(String(localized: "Needs: \(goodName(good))"), "\(building.input.count(of: good)) / \(building.input.capacityPerGood)")
+            }
+            if let next = world.catalog.nextTier(of: definition) {
+                row(String(localized: "Next tier"), GameText.name(of: next))
+                if let level = next.requiredLevel, level > world.settlementLevel {
+                    row(String(localized: "Unlocked at"), GameText.levelName(level, in: world.catalog))
+                } else {
+                    let missing = (next.needs ?? []).filter { !(definition.needs ?? []).contains($0) }
+                    if !missing.isEmpty {
+                        row(String(localized: "Also needs"), missing.map(goodName).formatted(.list(type: .and)))
+                    }
+                    row(String(localized: "Upgrade"), "\(building.upgradeProgress) / \(world.rules.upgradeChecks)")
+                }
+            }
         }
 
         let status = GameText.status(of: building)

@@ -50,7 +50,7 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
             if source.category == .stop && candidate.category == .storage && StopDemand.canExport(good, from: source.id, in: world) {
                 continue
             }
-            let capacity = Self.demand(of: candidate, for: good, rules: rules)
+            let capacity = Self.demand(of: candidate, for: good, in: world)
             guard capacity > 0 else { continue }
             let distance = source.center.distance(to: candidate.center)
             guard distance <= rules.carrierRangeMeters else { continue }
@@ -65,7 +65,9 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
             case .stop:
                 score += rules.carrierRangeMeters * 1.5
             case .housing:
-                let stock = rules.foodGoods.reduce(0) { $0 + candidate.input.count(of: $1) + candidate.incomingAmount(of: $1) }
+                // Houses with little of the good come first, so shortages are shared fairly.
+                let goods = rules.foodGoods.contains(good) ? rules.foodGoods : [good]
+                let stock = goods.reduce(0) { $0 + candidate.input.count(of: $1) + candidate.incomingAmount(of: $1) }
                 score += Double(stock) * houseStockPenaltyMeters
             case .production:
                 break
@@ -79,7 +81,8 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
     }
 
     /// Units of `good` a building still accepts, minus what is already on its way.
-    static func demand(of building: Building, for good: GoodID, rules: GameRules) -> Int {
+    static func demand(of building: Building, for good: GoodID, in world: WorldState) -> Int {
+        let rules = world.rules
         guard !building.isPaused else { return 0 }
         let incoming = building.incomingAmount(of: good)
         switch building.category {
@@ -87,7 +90,7 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
             guard building.definition.consumes(good) else { return 0 }
             return building.input.space(for: good) - incoming
         case .housing:
-            guard rules.foodGoods.contains(good) else { return 0 }
+            guard rules.foodGoods.contains(good) || HouseTiers.wants(good, house: building, in: world) else { return 0 }
             return building.input.space(for: good) - incoming
         case .commerce:
             guard building.definition.consumes(good) else { return 0 }

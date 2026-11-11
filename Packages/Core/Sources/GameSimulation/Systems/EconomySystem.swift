@@ -15,7 +15,7 @@ public struct EconomySystem: SimulationSystem {
         for building in world.buildings {
             upkeepByType[building.definition.id, default: 0] += building.definition.upkeepPerYear
             if building.supplyRatio >= 0.5 {
-                taxes += building.residents * world.rules.taxPerResidentPerYear
+                taxes += building.residents * (building.definition.taxPerResidentPerYear ?? world.rules.taxPerResidentPerYear)
             }
         }
         var vehicleUpkeepByType: [VehicleTypeID: Int] = [:]
