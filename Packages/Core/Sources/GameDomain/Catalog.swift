@@ -67,6 +67,10 @@ public struct GameRules: Hashable, Sendable, Codable {
     public var upgradeChecks: Int
     /// Supply checks in a row with a need missing before a house drops a tier.
     public var downgradeChecks: Int
+    /// Neighbouring towns pay this multiple of the base price.
+    public var townPriceFactor: Double
+    /// Towns produce goods and renew their wishes every this many days.
+    public var tradeIntervalDays: Int
 
     public init(
         ticksPerDay: Int,
@@ -92,7 +96,9 @@ public struct GameRules: Hashable, Sendable, Codable {
         startingStock: [GoodAmount],
         needPerResidentPerCheck: Double = 0.25,
         upgradeChecks: Int = 3,
-        downgradeChecks: Int = 3
+        downgradeChecks: Int = 3,
+        townPriceFactor: Double = 1.5,
+        tradeIntervalDays: Int = 10
     ) {
         self.ticksPerDay = ticksPerDay
         self.daysPerYear = daysPerYear
@@ -118,6 +124,8 @@ public struct GameRules: Hashable, Sendable, Codable {
         self.needPerResidentPerCheck = needPerResidentPerCheck
         self.upgradeChecks = upgradeChecks
         self.downgradeChecks = downgradeChecks
+        self.townPriceFactor = townPriceFactor
+        self.tradeIntervalDays = tradeIntervalDays
     }
 }
 
@@ -150,16 +158,20 @@ public enum BuildingCategory: String, Hashable, Sendable, Codable {
     case stop
 }
 
-/// Terrain a building needs nearby, such as forest for a woodcutter.
+/// Terrain a building needs nearby, such as forest for a woodcutter or a stone deposit for a quarry.
 public struct ResourceRequirement: Hashable, Sendable, Codable {
-    public var biome: Biome
+    /// Biome the cells must have; `nil` accepts any.
+    public var biome: Biome?
+    /// Deposit the cells must have; `nil` accepts any.
+    public var deposit: Deposit?
     /// Search radius in cells.
     public var radius: Int
     /// With this many matching cells the building works at full efficiency.
     public var idealCount: Int
 
-    public init(biome: Biome, radius: Int, idealCount: Int) {
+    public init(biome: Biome? = nil, deposit: Deposit? = nil, radius: Int, idealCount: Int) {
         self.biome = biome
+        self.deposit = deposit
         self.radius = radius
         self.idealCount = idealCount
     }
@@ -265,6 +277,8 @@ public struct GameCatalog: Sendable, Codable {
     public let vehicles: [VehicleDefinition]
     /// Size classes of the settlement, ordered by population. Never empty.
     public let settlementLevels: [SettlementLevel]
+    /// Kinds of neighbouring towns the world generator can place.
+    public let townTemplates: [TownTemplate]
 
     private let goodsByID: [GoodID: GoodDefinition]
     private let buildingsByID: [BuildingTypeID: BuildingDefinition]
@@ -274,19 +288,21 @@ public struct GameCatalog: Sendable, Codable {
         goods: [GoodDefinition],
         buildings: [BuildingDefinition],
         vehicles: [VehicleDefinition] = [],
-        settlementLevels: [SettlementLevel] = []
+        settlementLevels: [SettlementLevel] = [],
+        townTemplates: [TownTemplate] = []
     ) {
         self.rules = rules
         self.goods = goods
         self.buildings = buildings
         self.vehicles = vehicles
         self.settlementLevels = settlementLevels.isEmpty ? [.single] : settlementLevels
+        self.townTemplates = townTemplates
         goodsByID = Dictionary(goods.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         buildingsByID = Dictionary(buildings.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
     private enum CodingKeys: String, CodingKey {
-        case rules, goods, buildings, vehicles, settlementLevels
+        case rules, goods, buildings, vehicles, settlementLevels, townTemplates
     }
 
     public init(from decoder: any Decoder) throws {
@@ -296,7 +312,8 @@ public struct GameCatalog: Sendable, Codable {
             goods: try container.decode([GoodDefinition].self, forKey: .goods),
             buildings: try container.decode([BuildingDefinition].self, forKey: .buildings),
             vehicles: try container.decodeIfPresent([VehicleDefinition].self, forKey: .vehicles) ?? [],
-            settlementLevels: try container.decodeIfPresent([SettlementLevel].self, forKey: .settlementLevels) ?? []
+            settlementLevels: try container.decodeIfPresent([SettlementLevel].self, forKey: .settlementLevels) ?? [],
+            townTemplates: try container.decodeIfPresent([TownTemplate].self, forKey: .townTemplates) ?? []
         )
     }
 
@@ -307,6 +324,7 @@ public struct GameCatalog: Sendable, Codable {
         try container.encode(buildings, forKey: .buildings)
         try container.encode(vehicles, forKey: .vehicles)
         try container.encode(settlementLevels, forKey: .settlementLevels)
+        try container.encode(townTemplates, forKey: .townTemplates)
     }
 
     public func good(_ id: GoodID) -> GoodDefinition? {
@@ -323,7 +341,7 @@ public struct GameCatalog: Sendable, Codable {
 
     /// Returns a copy with different rules. Handy for tests and scenarios.
     public func replacingRules(_ rules: GameRules) -> GameCatalog {
-        GameCatalog(rules: rules, goods: goods, buildings: buildings, vehicles: vehicles, settlementLevels: settlementLevels)
+        GameCatalog(rules: rules, goods: goods, buildings: buildings, vehicles: vehicles, settlementLevels: settlementLevels, townTemplates: townTemplates)
     }
 
     /// Buildings that towns build on their own in a zone.

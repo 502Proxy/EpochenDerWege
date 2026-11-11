@@ -23,21 +23,26 @@ public struct Terrain: Sendable {
 
     private let heights: [Double]
     private let biomes: [Biome]
+    /// Natural resources per cell, row-major; empty when the map has none.
+    private let deposits: [Deposit?]
 
     /// Creates terrain from raw data.
     ///
     /// - Parameters:
     ///   - heights: `(size + 1)²` corner heights in row-major order (z outer, x inner).
     ///   - biomes: `size²` cell biomes in row-major order.
-    public init(size: Int, cellSize: Double, seaLevel: Double, heights: [Double], biomes: [Biome]) {
+    ///   - deposits: `size²` deposits in row-major order, or empty for none.
+    public init(size: Int, cellSize: Double, seaLevel: Double, heights: [Double], biomes: [Biome], deposits: [Deposit?] = []) {
         precondition(size > 0, "Terrain needs at least one cell")
         precondition(heights.count == (size + 1) * (size + 1), "Expected one height per cell corner")
         precondition(biomes.count == size * size, "Expected one biome per cell")
+        precondition(deposits.isEmpty || deposits.count == size * size, "Expected one deposit entry per cell")
         self.size = size
         self.cellSize = cellSize
         self.seaLevel = seaLevel
         self.heights = heights
         self.biomes = biomes
+        self.deposits = deposits
     }
 
     /// Flat terrain with a single biome. Useful for tests and sandboxes.
@@ -56,7 +61,16 @@ public struct Terrain: Sendable {
         guard contains(cell) else { return self }
         var newBiomes = biomes
         newBiomes[cell.z * size + cell.x] = biome
-        return Terrain(size: size, cellSize: cellSize, seaLevel: seaLevel, heights: heights, biomes: newBiomes)
+        return Terrain(size: size, cellSize: cellSize, seaLevel: seaLevel, heights: heights, biomes: newBiomes, deposits: deposits)
+    }
+
+    /// Returns a copy with deposits on the given cells.
+    public func addingDeposits(_ added: [GridPoint: Deposit]) -> Terrain {
+        var newDeposits = deposits.isEmpty ? [Deposit?](repeating: nil, count: size * size) : deposits
+        for (cell, deposit) in added where contains(cell) {
+            newDeposits[cell.z * size + cell.x] = deposit
+        }
+        return Terrain(size: size, cellSize: cellSize, seaLevel: seaLevel, heights: heights, biomes: biomes, deposits: newDeposits)
     }
 
     // MARK: - Queries
@@ -79,6 +93,12 @@ public struct Terrain: Sendable {
     public func biome(at cell: GridPoint) -> Biome {
         guard contains(cell) else { return .water }
         return biomes[cell.z * size + cell.x]
+    }
+
+    /// Natural resource on a cell, if any.
+    public func deposit(at cell: GridPoint) -> Deposit? {
+        guard !deposits.isEmpty, contains(cell) else { return nil }
+        return deposits[cell.z * size + cell.x]
     }
 
     public func isLand(_ cell: GridPoint) -> Bool {

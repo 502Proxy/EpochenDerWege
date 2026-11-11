@@ -59,13 +59,14 @@ nonisolated struct BuildingRow: Equatable, Identifiable, Sendable {
 
     @MainActor
     static func make(for world: WorldState) -> [BuildingRow] {
-        world.buildings.map { building in
+        // Towns' stops are not the player's buildings.
+        world.buildings.filter { $0.townID == nil }.map { building in
             let status = GameText.status(of: building)
             let isProduction = building.category == .production
             return BuildingRow(
                 id: building.id,
                 name: building.category == .stop
-                    ? String(localized: "Stop \(building.id.rawValue)")
+                    ? GameText.stopName(building.id, in: world)
                     : GameText.name(of: building.definition),
                 category: building.category,
                 status: status.text,

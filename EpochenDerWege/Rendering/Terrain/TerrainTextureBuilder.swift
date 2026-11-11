@@ -29,6 +29,8 @@ nonisolated struct TerrainTextureBuilder: Sendable {
     private static let beach = RGB(0.88, 0.82, 0.62)
     private static let surf = RGB(0.86, 0.88, 0.86)
     private static let snow = RGB(0.94, 0.95, 0.97)
+    fileprivate static let stoneDeposit = RGB(0.60, 0.58, 0.54)
+    fileprivate static let vineSlope = RGB(0.36, 0.46, 0.20)
 
     /// RGBA bytes, row by row.
     ///
@@ -100,7 +102,13 @@ nonisolated struct TerrainTextureBuilder: Sendable {
             var colors = [RGB](repeating: RGB(), count: size * size)
             for z in 0..<size {
                 for x in 0..<size {
-                    colors[z * size + x] = TerrainTextureBuilder.palette[terrain.biome(at: GridPoint(x: x, z: z))] ?? RGB(1, 0, 1)
+                    let cell = GridPoint(x: x, z: z)
+                    // Deposits show through: gravel for stone, dark green rows for vines.
+                    colors[z * size + x] = switch terrain.deposit(at: cell) {
+                    case .stone: TerrainTextureBuilder.stoneDeposit
+                    case .vines: TerrainTextureBuilder.vineSlope
+                    case nil: TerrainTextureBuilder.palette[terrain.biome(at: cell)] ?? RGB(1, 0, 1)
+                    }
                 }
             }
             self.heights = heights

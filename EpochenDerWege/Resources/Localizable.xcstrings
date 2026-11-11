@@ -2320,6 +2320,126 @@
           }
         }
       }
+    },
+    "Purchases from towns": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einkäufe aus Nachbarorten"
+          }
+        }
+      }
+    },
+    "Sells %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verkauft %@"
+          }
+        }
+      }
+    },
+    "%lld per %lld days, %lld thalers each": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld alle %lld Tage, je %lld Taler"
+          }
+        }
+      }
+    },
+    "%lld of %lld wanted, %lld thalers each": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld von %lld gesucht, je %lld Taler"
+          }
+        }
+      }
+    },
+    "Stone deposit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steinvorkommen"
+          }
+        }
+      }
+    },
+    "Vine slope": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weinhang"
+          }
+        }
+      }
+    },
+    "No %@ nearby. Look for it away from your village.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein %@ in der Nähe. Such es abseits deines Dorfes."
+          }
+        }
+      }
+    },
+    "Fishing village": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fischerdorf"
+          }
+        }
+      }
+    },
+    "Mining town": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bergbaustadt"
+          }
+        }
+      }
+    },
+    "Wine village": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Winzerdorf"
+          }
+        }
+      }
+    },
+    "Farming village": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bauerndorf"
+          }
+        }
+      }
+    },
+    "Neighbouring town": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachbarort"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -20,7 +20,7 @@ public enum PlacementValidator {
         guard terrain.isLand(cell) else { return .failure(.water) }
         let slope = terrain.slopePercent(at: cell)
         guard slope <= world.rules.maxSlopePercent else { return .failure(.tooSteep(slopePercent: slope)) }
-        guard !world.isOccupied(cell), !world.hasRoad(at: cell) else { return .failure(.occupied) }
+        guard !world.isOccupied(cell), !world.hasRoad(at: cell), !world.isTownCell(cell) else { return .failure(.occupied) }
         if let zones = definition.allowedZones, !zones.isEmpty {
             guard let zone = world.zones[cell], zones.contains(zone) else { return .failure(.requiresZone(zones)) }
         }
@@ -35,7 +35,10 @@ public enum PlacementValidator {
         }
         let factor = resourceFactor(for: definition, at: cell, on: terrain)
         if let resource = definition.resource, factor <= 0 {
-            return .failure(.missingResource(resource.biome))
+            if let deposit = resource.deposit {
+                return .failure(.missingDeposit(deposit))
+            }
+            return .failure(.missingResource(resource.biome ?? .grass))
         }
         return .success(factor)
     }
@@ -47,7 +50,10 @@ public enum PlacementValidator {
         for dz in -resource.radius...resource.radius {
             for dx in -resource.radius...resource.radius where dx != 0 || dz != 0 {
                 let neighbour = cell.offset(dx: dx, dz: dz)
-                if terrain.contains(neighbour) && terrain.biome(at: neighbour) == resource.biome {
+                guard terrain.contains(neighbour) else { continue }
+                let biomeMatches = resource.biome.map { terrain.biome(at: neighbour) == $0 } ?? true
+                let depositMatches = resource.deposit.map { terrain.deposit(at: neighbour) == $0 } ?? true
+                if biomeMatches && depositMatches {
                     count += 1
                 }
             }

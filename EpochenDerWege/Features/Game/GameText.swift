@@ -22,6 +22,25 @@ enum GameText {
         return String(localized: String.LocalizationValue(catalog.settlementLevels[level].name))
     }
 
+    /// A town's stop is named after the town; the player's stops are numbered.
+    static func stopName(_ id: BuildingID, in world: WorldState) -> String {
+        if let town = world.town(owningStop: id) {
+            return town.name
+        }
+        return String(localized: "Stop \(id.rawValue)")
+    }
+
+    static func townKind(_ town: NeighbourTown) -> String {
+        String(localized: String.LocalizationValue(town.template.name))
+    }
+
+    static func name(of deposit: Deposit) -> String {
+        switch deposit {
+        case .stone: String(localized: "Stone deposit")
+        case .vines: String(localized: "Vine slope")
+        }
+    }
+
     static func goodName(_ id: GoodID, in catalog: GameCatalog) -> String {
         guard let good = catalog.good(id) else { return id.rawValue }
         return String(localized: String.LocalizationValue(good.name))
@@ -117,6 +136,8 @@ enum GameText {
             String(localized: "Only allowed in: \(zoneList(zones)).")
         case .missingResource(let biome):
             String(localized: "No \(name(of: biome)) nearby.")
+        case .missingDeposit(let deposit):
+            String(localized: "No \(name(of: deposit)) nearby. Look for it away from your village.")
         case .requiresLevel(let level):
             String(localized: "Unlocked when your settlement becomes a \(levelName(level, in: catalog)).")
         }
@@ -280,7 +301,11 @@ enum GameText {
             parts.append(String(localized: "Only allowed in: \(zoneList(zones))."))
         }
         if let resource = definition.resource {
-            parts.append(String(localized: "Needs \(name(of: resource.biome)) nearby"))
+            if let deposit = resource.deposit {
+                parts.append(String(localized: "Needs \(name(of: deposit)) nearby"))
+            } else if let biome = resource.biome {
+                parts.append(String(localized: "Needs \(name(of: biome)) nearby"))
+            }
         }
         if definition.maxResidents > 0 {
             parts.append(String(localized: "Up to \(definition.maxResidents) residents"))

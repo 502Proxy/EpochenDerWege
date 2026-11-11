@@ -84,6 +84,18 @@ struct MiniMapView: View {
             context.stroke(Path(rect), with: .color(.black.opacity(0.5)), lineWidth: 0.5)
         }
 
+        for town in content.towns {
+            let point = CGPoint(x: (CGFloat(town.cell.x) + 0.5) * cell, y: (CGFloat(town.cell.z) + 0.5) * cell)
+            let radius: CGFloat = 4
+            let dot = Path(ellipseIn: CGRect(x: point.x - radius, y: point.y - radius, width: radius * 2, height: radius * 2))
+            context.fill(dot, with: .color(GameTheme.accent))
+            context.stroke(dot, with: .color(.black.opacity(0.6)), lineWidth: 1)
+            let label = Text(verbatim: town.name)
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+            context.draw(label, at: CGPoint(x: point.x, y: point.y - 10), anchor: .bottom)
+        }
+
         guard let camera else { return }
         let center = CGPoint(x: CGFloat(camera.x) * cell, y: CGFloat(camera.z) * cell)
         let length: CGFloat = 26

@@ -39,7 +39,9 @@
     ],
     "needPerResidentPerCheck": 0.25,
     "upgradeChecks": 3,
-    "downgradeChecks": 3
+    "downgradeChecks": 3,
+    "townPriceFactor": 1.5,
+    "tradeIntervalDays": 10
   },
   "goods": [
     {
@@ -281,8 +283,8 @@
       "maxCarriers": 1,
       "maxResidents": 0,
       "resource": {
-        "biome": "rock",
-        "radius": 3,
+        "deposit": "stone",
+        "radius": 2,
         "idealCount": 6
       },
       "color": {
@@ -498,9 +500,9 @@
       "maxCarriers": 1,
       "maxResidents": 0,
       "resource": {
-        "biome": "grass",
+        "deposit": "vines",
         "radius": 2,
-        "idealCount": 12
+        "idealCount": 6
       },
       "color": {
         "red": 0.5,
@@ -668,6 +670,124 @@
       "id": "city",
       "name": "City",
       "minimumPopulation": 600
+    }
+  ],
+  "townTemplates": [
+    {
+      "id": "fishingVillage",
+      "name": "Fishing village",
+      "population": 80,
+      "sells": [
+        {
+          "good": "fish",
+          "amount": 8
+        }
+      ],
+      "buys": [
+        {
+          "good": "bread",
+          "amount": 6
+        },
+        {
+          "good": "clothing",
+          "amount": 3
+        },
+        {
+          "good": "wood",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "id": "miningTown",
+      "name": "Mining town",
+      "population": 120,
+      "sells": [
+        {
+          "good": "stone",
+          "amount": 8
+        }
+      ],
+      "buys": [
+        {
+          "good": "bread",
+          "amount": 8
+        },
+        {
+          "good": "fish",
+          "amount": 6
+        },
+        {
+          "good": "wine",
+          "amount": 3
+        },
+        {
+          "good": "clothing",
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "id": "wineVillage",
+      "name": "Wine village",
+      "population": 90,
+      "sells": [
+        {
+          "good": "wine",
+          "amount": 4
+        },
+        {
+          "good": "grapes",
+          "amount": 6
+        }
+      ],
+      "buys": [
+        {
+          "good": "bread",
+          "amount": 6
+        },
+        {
+          "good": "clothing",
+          "amount": 3
+        },
+        {
+          "good": "stone",
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "id": "farmingVillage",
+      "name": "Farming village",
+      "population": 100,
+      "sells": [
+        {
+          "good": "grain",
+          "amount": 10
+        },
+        {
+          "good": "wool",
+          "amount": 6
+        }
+      ],
+      "buys": [
+        {
+          "good": "clothing",
+          "amount": 4
+        },
+        {
+          "good": "wine",
+          "amount": 3
+        },
+        {
+          "good": "stone",
+          "amount": 4
+        },
+        {
+          "good": "wood",
+          "amount": 4
+        }
+      ]
     }
   ]
 }

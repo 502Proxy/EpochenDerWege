@@ -21,6 +21,8 @@ struct BuildingDetails: Equatable {
     let rows: [Row]
     /// Whether the player may pause the building and set its priority.
     let isConfigurable: Bool
+    /// Towns' stops cannot be demolished.
+    let canDemolish: Bool
     let isPaused: Bool
     let priority: DeliveryPriority
 
@@ -63,6 +65,18 @@ struct BuildingDetails: Equatable {
             }
             row(String(localized: "Carriers out"), "\(building.activeCarriers) / \(definition.maxCarriers)")
         case .stop:
+            if let town = building.townID.flatMap(world.town) {
+                row(String(localized: "Neighbouring town"), GameText.townKind(town))
+                row(String(localized: "Residents"), "\(town.template.population)")
+                for offer in town.template.sells {
+                    let price = catalog.good(offer.good)?.basePrice ?? 0
+                    row(String(localized: "Sells \(goodName(offer.good))"), String(localized: "\(offer.amount) per \(world.rules.tradeIntervalDays) days, \(price) thalers each"))
+                }
+                for wish in town.template.buys {
+                    let price = Int((Double(catalog.good(wish.good)?.basePrice ?? 0) * world.rules.townPriceFactor).rounded())
+                    row(String(localized: "Buys \(goodName(wish.good))"), String(localized: "\(town.wanted[wish.good, default: 0]) of \(wish.amount) wanted, \(price) thalers each"))
+                }
+            }
             let stock = building.output.sortedItems
             if stock.isEmpty {
                 row(String(localized: "Waiting goods"), String(localized: "None"))
@@ -102,11 +116,12 @@ struct BuildingDetails: Equatable {
 
         let status = GameText.status(of: building)
         id = building.id
-        name = building.category == .stop ? String(localized: "Stop \(building.id.rawValue)") : GameText.name(of: definition)
+        name = building.category == .stop ? GameText.stopName(building.id, in: world) : GameText.name(of: definition)
         self.status = status.text
         tone = status.tone
         self.rows = rows
         isConfigurable = building.isConfigurable
+        canDemolish = building.townID == nil
         isPaused = building.isPaused
         priority = building.priority
     }

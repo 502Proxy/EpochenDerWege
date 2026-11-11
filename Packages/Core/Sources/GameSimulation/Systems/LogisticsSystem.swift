@@ -39,7 +39,8 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
         let rules = world.rules
         var best: (target: DeliveryTarget, score: Double)?
 
-        for candidate in world.buildings where candidate.id != source.id {
+        // Town stops trade only with vehicles, never with carriers.
+        for candidate in world.buildings where candidate.id != source.id && candidate.townID == nil {
             if source.category == .storage && candidate.category == .storage { continue }
             // Stops only take goods a line can bring somewhere they are wanted, and never
             // pass goods to another stop by carrier.
@@ -119,7 +120,8 @@ public struct LogisticsSystem: SimulationSystem {
     }
 
     private func dispatchCarriers(in world: inout WorldState) {
-        for sourceIndex in world.buildings.indices where world.buildings[sourceIndex].definition.maxCarriers > 0 {
+        for sourceIndex in world.buildings.indices
+        where world.buildings[sourceIndex].definition.maxCarriers > 0 && world.buildings[sourceIndex].townID == nil {
             var freeSlots = world.buildings[sourceIndex].definition.maxCarriers - world.buildings[sourceIndex].activeCarriers
             guard freeSlots > 0 else { continue }
 

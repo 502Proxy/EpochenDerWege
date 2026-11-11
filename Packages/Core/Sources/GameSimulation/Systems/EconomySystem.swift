@@ -12,7 +12,8 @@ public struct EconomySystem: SimulationSystem {
 
         var taxes = 0
         var upkeepByType: [BuildingTypeID: Int] = [:]
-        for building in world.buildings {
+        // Towns pay for their own stops.
+        for building in world.buildings where building.townID == nil {
             upkeepByType[building.definition.id, default: 0] += building.definition.upkeepPerYear
             if building.supplyRatio >= 0.5 {
                 taxes += building.residents * (building.definition.taxPerResidentPerYear ?? world.rules.taxPerResidentPerYear)

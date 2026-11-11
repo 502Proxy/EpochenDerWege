@@ -48,13 +48,15 @@ struct InspectorView: View {
                     .help(Text("Carriers serve buildings with high priority first."))
                 }
 
-                Divider()
+                if details.canDemolish {
+                    Divider()
 
-                Button(role: .destructive, action: onDemolish) {
-                    Label("Demolish", systemImage: "trash")
-                        .foregroundStyle(GameTheme.negative)
+                    Button(role: .destructive, action: onDemolish) {
+                        Label("Demolish", systemImage: "trash")
+                            .foregroundStyle(GameTheme.negative)
+                    }
+                    .help(Text("Half of the cost is refunded."))
                 }
-                .help(Text("Half of the cost is refunded."))
             }
             .padding(14)
         }

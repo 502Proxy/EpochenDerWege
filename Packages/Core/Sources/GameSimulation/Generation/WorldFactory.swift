@@ -9,10 +9,19 @@ public enum WorldFactory {
     }
 
     /// Builds a world on existing terrain.
-    public static func makeWorld(catalog: GameCatalog, terrain: Terrain, foundSettlement: Bool = true) -> WorldState {
-        var world = WorldState(catalog: catalog, terrain: terrain)
-        if foundSettlement {
-            SettlementFounder.found(in: &world)
+    ///
+    /// With a settlement and `region` set, the region around it gets deposits and
+    /// neighbouring towns beyond carrier range, so they are reached by roads and lines.
+    /// Tests of single rules turn the region off to keep their map to themselves.
+    public static func makeWorld(catalog: GameCatalog, terrain: Terrain, foundSettlement: Bool = true, region: Bool = true) -> WorldState {
+        guard foundSettlement, let start = SettlementFounder.findStartCell(on: terrain) else {
+            return WorldState(catalog: catalog, terrain: terrain)
+        }
+        let regionTerrain = region ? RegionPlanner.addDeposits(to: terrain, around: start) : terrain
+        var world = WorldState(catalog: catalog, terrain: regionTerrain)
+        SettlementFounder.found(in: &world)
+        if region {
+            RegionPlanner.foundTowns(in: &world, around: start)
         }
         return world
     }

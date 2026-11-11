@@ -117,6 +117,7 @@ extension GameText {
         case .roads: String(localized: "Roads")
         case .upkeep: String(localized: "Upkeep")
         case .vehicles: String(localized: "Vehicles")
+        case .purchases: String(localized: "Purchases from towns")
         }
     }
 }
