@@ -24,8 +24,13 @@ public struct WorldState: Sendable, Codable {
     public internal(set) var unemployed = 0
     /// Centre of the starting settlement, if one was founded.
     public internal(set) var startCell: GridPoint?
-    /// Cells covered by roads, including tunnels.
-    public internal(set) var roads: Set<GridPoint> = []
+    /// Cells covered by roads, including tunnels. Change them in one step per command:
+    /// every change rebuilds ``roadGraph``.
+    public internal(set) var roads: Set<GridPoint> = [] {
+        didSet { roadGraph = RoadGraph(roads: roads) }
+    }
+    /// Junctions and stretches of the road network, for routing.
+    public private(set) var roadGraph = RoadGraph()
     /// Road cells that run through a tunnel. Always a subset of `roads`.
     public internal(set) var tunnels: Set<GridPoint> = []
     /// Transport lines in creation order.
@@ -85,6 +90,7 @@ public struct WorldState: Sendable, Codable {
         unemployed = try container.decode(Int.self, forKey: .unemployed)
         startCell = try container.decodeIfPresent(GridPoint.self, forKey: .startCell)
         roads = try container.decode(Set<GridPoint>.self, forKey: .roads)
+        roadGraph = RoadGraph(roads: roads)
         tunnels = try container.decode(Set<GridPoint>.self, forKey: .tunnels)
         lines = try container.decode([TransportLine].self, forKey: .lines)
         vehicles = try container.decode([Vehicle].self, forKey: .vehicles)
