@@ -9,7 +9,8 @@ enum Fixtures {
         try BundledCatalogRepository().loadCatalog()
     }
 
-    /// A flat grass map with the starting settlement in the middle (cell 16, 16).
+    /// A flat grass map with the starting settlement in the middle (cell 16, 16), without
+    /// deposits and neighbouring towns, so tests of single rules control the whole map.
     static func flatSimulation(size: Int = 32, settlement: Bool = true, rules: ((inout GameRules) -> Void)? = nil) throws -> Simulation {
         var catalog = try catalog()
         if let rules {
@@ -17,7 +18,7 @@ enum Fixtures {
             rules(&modified)
             catalog = catalog.replacingRules(modified)
         }
-        let world = WorldFactory.makeWorld(catalog: catalog, terrain: .flat(size: size), foundSettlement: settlement)
+        let world = WorldFactory.makeWorld(catalog: catalog, terrain: .flat(size: size), foundSettlement: settlement, region: false)
         return Simulation(world: world)
     }
 }

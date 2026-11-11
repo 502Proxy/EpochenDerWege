@@ -64,7 +64,8 @@ struct RegionTests {
     @Test func quarriesNeedAStoneDeposit() throws {
         var simulation = Simulation(world: try regionWorld())
         let start = try #require(simulation.world.startCell)
-        simulation.execute(PlaceBuildingCommand(buildingType: "quarry", cell: start.offset(dx: 2, dz: 0)))
+        // Right next to the storehouse: free, flat, but far from any deposit.
+        simulation.execute(PlaceBuildingCommand(buildingType: "quarry", cell: start.offset(dx: 1, dz: 0)))
         #expect(simulation.lastEvent == .placementRejected(.missingDeposit(.stone)))
 
         let terrain = simulation.world.terrain
