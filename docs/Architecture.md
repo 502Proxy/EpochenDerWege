@@ -157,6 +157,8 @@ replaced in tests.
 | Animation time advances with game speed; only working buildings animate | `BuildingLayer` |
 | Diff-based updates; markers change material only on status change | `BuildingLayer` |
 | Placement preview ray cast only when mouse, tool or world changes | `SceneCoordinator` |
+| Range queries through a spatial index (64 m buckets) instead of scanning all buildings | `SpatialIndex` |
+| Routing on a road graph of junctions and stretches instead of every road cell | `RoadGraph` |
 | HUD refreshed 5× per second, not every frame; observation only fires on change | `GameViewModel` |
 
 ## Decisions

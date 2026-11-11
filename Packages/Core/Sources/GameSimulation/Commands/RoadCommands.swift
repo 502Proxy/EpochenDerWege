@@ -95,12 +95,9 @@ public struct BuildRoadCommand: GameCommand {
             return
         }
         world.book(-cost, as: .roads)
-        for (cell, kind) in buildable {
-            world.roads.insert(cell)
-            if kind == .tunnel {
-                world.tunnels.insert(cell)
-            }
-        }
+        // One change each, so the road graph is rebuilt once.
+        world.roads.formUnion(buildable.map(\.cell))
+        world.tunnels.formUnion(buildable.filter { $0.kind == .tunnel }.map(\.cell))
         world.emit(.roadBuilt(cells: buildable.count, cost: cost))
     }
 
