@@ -2,8 +2,13 @@
 
 ## Vision and key facts
 
-A peaceful 3D city-building and logistics game: you lead a people from antiquity to the
-modern age, and growth only happens when goods and people are physically transported.
+A peaceful 3D transport and city-building game: you found a settlement in antiquity
+and build a transport network across a large region up to the modern age. Towns and
+industries grow when you connect them, and you earn your money by moving goods and
+people.
+
+The game belongs to the genre of transport simulations and borrows city-building
+mechanics such as zoning and demand. It has its own world, names, models and look.
 
 | Aspect | Decision |
 | --- | --- |
@@ -11,73 +16,81 @@ modern age, and growth only happens when goods and people are physically transpo
 | Presentation | 3D, freely rotating camera, look between model railway and strategy map |
 | Time | Real time with pause and fast-forward (1×, 2×, 4×) |
 | Conflict | No military, no war; competition is economic only |
-| Map | One region of about 16 × 16 km with 3 to 6 towns and villages |
-| Starting era | Antiquity, ending in the modern age |
-| Residents | Middle ground: simulated in groups per house, visible figures are for show only |
+| Role | Transport company and founder of one town: lines and roads everywhere, zones in your own town |
+| Map | One region of 8 × 8 km (1024 × 1024 cells of 8 m) with 6 to 10 towns |
+| Unlocks | The calendar year unlocks vehicles, road types and technologies; the size of your town unlocks city buildings |
+| Starting era | 500 BC, through the Middle Ages and the industrial age to the modern age |
+| Residents | Every resident has a home, a workplace and shopping trips; a sample of about 1 in 5–10 is visible on its way |
 
 **Design pillars** – every decision is measured against these three:
 
 1. **Everything flows visibly.** Every good and every commuter is an object on a path. No invisible storage.
 2. **Logistics is the puzzle.** The challenge is not *what* to build but *how to connect* it.
 3. **Eras build on each other.** Old paths remain, get upgraded or replaced; the landscape tells the story of the game.
+4. **Roads first.** Every building stands on a road, towns grow along their roads, and people and goods move on the network.
 
 ## Core loop and progression
 
-The player runs through the same loop again and again; each round grows because new eras bring longer chains and wider networks.
-
 ```mermaid
 flowchart LR
-    A["1 Develop<br/>wood, stone, grain, ore"] --> B["2 Process<br/>grain → flour → bread"]
-    B --> C["3 Transport<br/>paths, lines, vehicles"]
-    C --> D["4 Supply<br/>needs of the houses"]
-    D --> E["5 Grow and research<br/>taxes, promotion, technology"]
-    E -- "new buildings, vehicles, eras" --> A
+    A["1 Connect<br/>roads, stops, lines"] --> B["2 Transport<br/>goods and passengers"]
+    B --> C["3 Earn<br/>freight, fares, taxes"]
+    C --> D["4 Grow<br/>towns, industries, your zones"]
+    D --> E["5 Unlock<br/>new years, bigger town"]
+    E -- "faster vehicles, new chains" --> A
 ```
 
-Transport is the bottleneck: without a connection, goods reach neither the next production step nor the houses.
+**Role of the player**
+
+- You found one town and plan it with zones, like in a city builder. Towns build houses, markets and processing businesses in their zones on their own when there is demand.
+- Across the region you are a transport company: you build roads, stops and lines and buy vehicles.
+- Raw material industries and 6–10 neighbouring towns are already on the map. They grow when you connect them and shrink when you do not.
+- Money comes mostly from transport: freight per unit and kilometre and fares per passenger and kilometre, plus the taxes of your own town.
+
+**Unlocks**
+
+| By | Unlocks | Example |
+| --- | --- | --- |
+| Calendar year | Vehicles, road types, stops, technologies, production chains | Ox cart from 500 BC, horse wagon from AD 600, steam train from 1830 |
+| Size of your town | City buildings and house tiers | Village (40): weaver; small town (100): wine press, townhouses |
 
 **Progression**
 
-1. **Start (years 0–10):** a village with 20 farmers, a storehouse and 10,000 thalers. First chains with carriers on footpaths.
-2. **Early game:** roads and ox carts connect the village to resources; first citizens, first neutral town connected.
-3. **Mid game:** several towns, rivers and canals as freight axes, transition to the Middle Ages and the industrial age.
-4. **Late game:** rail and road network across the whole region, modernising old routes, race for wonders.
+1. **Antiquity (500 BC – AD 500):** a hamlet with farmers, gravel roads, ox carts, barges; first neighbouring towns and quarries connected.
+2. **Middle Ages (500 – 1500):** paved roads, horse wagons and coaches, iron and tools, canals.
+3. **Industrial age (1750 – 1900):** railway, coal and steel, factories, trams.
+4. **Modern age (1900 –):** asphalt, trucks and buses, electricity.
 
 **Time model**
 
 - The simulation runs in fixed ticks: 10 ticks per second at 1×
-- 1 day = 2 seconds at 1×; 1 year = 60 days (2 minutes)
+- 1 day = 2 seconds at 1×; the length of a year is set in the game data
 - Fast-forward 2× and 4× only shortens the wait between ticks; the rules stay the same
 - Pause allows building and planning without time pressure
-- A game up to the modern age takes about 220 in-game years, roughly 7 to 8 hours at 1×
 
 ## World and map
 
-The map is a procedurally generated height field with rivers and coast; the terrain decides where building pays off and how expensive routes become.
+The map is a procedurally generated height field of 8 × 8 km with mountains, plains, coast and rivers; the terrain decides where building pays off and how expensive routes become.
 
 **Structure**
 
-- Height field on a 4 m grid (about 4,000 × 4,000 points), split into 256 × 256 tiles for rendering and level of detail
-- Biomes: plains, forest, hills, mountains, wetland, coast, river
-- A seed generates the map; the same seed always produces the same world (important for scenarios and tests)
+- 1024 × 1024 cells of 8 m; rendering in tiles with several detail levels
+- Biomes: water, sand, grassland, forest, rock, snow
+- Deposits placed by the generator: stone, vines; later ore, coal, clay, oil
+- 6–10 neutral towns of different sizes and specialisations, spread over the map
+- A seed generates the map; the same seed always produces the same world
 
-**Resources**
+**Roads**
 
-| Resource | Found in | Kind | Regeneration |
-| --- | --- | --- | --- |
-| Wood | Forest | renewable | Forest regrows, 1 tree per 10 days with a forester |
-| Grain, flax, grapes | Plains, fields | renewable | Harvest per season |
-| Fish | Coast, river | renewable | Stock recovers; overfishing is possible |
-| Clay, stone | Hills, river banks | finite, very large | none |
-| Ore, coal | Mountains | finite | none; deposits of 20,000 to 200,000 t |
-| Oil | Late era, hidden | finite | none; visible only after research |
+- Every building needs a road on one of its sides and faces it
+- Roads form a graph of junctions and segments; people, carriers and vehicles find their way on it
+- Road types: dirt track and gravel road (antiquity), paved road (Middle Ages), asphalt (modern); each with speed, capacity and upkeep; upgrades in place
+- Steep cells become tunnels; later bridges
 
 **Terrain rules**
 
-- Building on slopes above 15 % costs double; terrain can be levelled for money
-- Slopes slow vehicles depending on traction: carts from 6 %, steam locomotives from 2.5 %, trucks from 8 %
-- Bridges and tunnels cost 5 to 15 times a normal segment and need research
-- Rivers are natural waterways: navigable above a minimum width; canals can be built from the Middle Ages
+- Buildings cannot be placed on slopes above 35 %
+- Later: terraforming for money
 
 ## Population and settlements
 
@@ -100,22 +113,19 @@ Residents are simulated as a group per house; they grow and get promoted when th
 - Below 50 %: the house loses residents; 50 to 90 %: stable; above 90 % for 2 years: promotion to the next tier, if unlocked
 - Goods count as "in reach" when a market, shop or station has them in stock and the house is within its radius (market 300 m, shop 200 m)
 
-**Commuting**
+**People on the move**
 
-- Every production building needs workers of a specific tier
-- Workers walk up to 1.5 km; further only by passenger transport
+- Every resident has a home, a workplace and places to shop, and makes these trips every day
+- Short trips are walked along the roads; longer ones use a passenger line if one connects the stops; otherwise the trip does not happen and the house is less satisfied
 - A building with 50 % of its workers produces at 50 % efficiency
-
-**Presentation (middle ground)**
-
-- Simulation is per house and per line as numbers; visible figures are a sample (about 1 figure per 10 commuters)
-- Clicking a house shows its residents, their workplace and which needs are missing
+- About 1 in 5–10 residents is visible as a figure on the way; figures wait at stops and board vehicles
 
 **Towns**
 
-- The map starts with 3 to 6 neutral settlements (200 to 1,500 residents) and the player's starting village
-- Neutral towns grow on their own when supplied and connected, becoming customers and sources of labour
-- Towns build houses themselves within designated residential zones; the player builds production, routes and supply buildings
+- The map starts with 6 to 10 neutral towns (100 to 1,500 residents) and the player's starting hamlet
+- Every town has zones and demand like the player's town and grows along its roads when supplied and connected
+- The player's town grows through zones: demand bars show what it needs; houses, markets and businesses appear by themselves
+- Settlement levels by population: hamlet, village, small town, town, city
 
 ## Production and goods
 
@@ -213,34 +223,25 @@ The player builds routes and sets up lines; vehicles run the lines, load at stop
 - From 75 % of the lifetime, upkeep rises by 50 % and vehicles break down briefly more often
 - Replace with one click: the old vehicle is sold at residual value, a successor model takes over the line
 
-## Eras and research
+## Eras
 
-Four eras, each unlocked by research and a population threshold; an era change expands everything at once, but old technology remains usable.
+Eras follow the calendar. A new era unlocks everything at once, but old technology remains usable.
 
-| Era | In-game years (guide) | Condition | Unlocks |
-| --- | --- | --- | --- |
-| Antiquity | 0–60 | Start | Carriers, carts, barges, basic chains, farmers and citizens |
-| Middle Ages | 60–140 | 300 citizens + 4 key technologies | Iron, tools, paved roads, canals, sailing ships, craftsmen |
-| Industrial | 140–220 | 500 craftsmen + steam engine researched | Railway, coal, steel, factories, workers, engineers |
-| Modern | 220+ | 400 engineers + electricity researched | Electricity, oil, trucks, buses, electric locomotives, employees |
+| Era | Years | Unlocks |
+| --- | --- | --- |
+| Antiquity | 500 BC – AD 500 | Carriers, ox carts, barges, gravel roads, basic chains, farmers and citizens |
+| Middle Ages | 500 – 1500 | Horse wagons, coaches, paved roads, iron and tools, canals, sailing ships, craftsmen |
+| Industrial age | 1750 – 1900 | Railway, coal, steel, factories, trams, workers and engineers |
+| Modern age | 1900 – | Trucks, buses, asphalt, electricity, oil, employees |
 
-**Research points**
+**Vehicles age**
 
-- Citizens: 0.1 points per head and year; craftsmen 0.3; engineers 1.0; employees 0.6
-- Buildings boost research: library +20 %, monastery +30 % (Middle Ages), university +50 % (industrial)
-- A technology costs between 50 (early antiquity) and 5,000 points (late modern)
-
-**Technology tree (excerpt)**
-
-- Antiquity: wheel → ox cart → gravel road; boat building → river barge; weaving → clothing; writing → library
-- Middle Ages: metallurgy → smithy → tools; paving; hydraulic engineering → canal → lock; compass → sailing ship
-- Industrial: steam engine → railway → bridge building → tunnelling; blast furnace → steel; mechanics → machines
-- Modern: electricity → power plant → electric locomotive; combustion engine → truck, bus; petrochemistry → refinery
+- Every vehicle has a lifetime; from 75 % of it upkeep rises by 50 % and breakdowns become more frequent
+- Replace with one click: the old vehicle is sold at residual value, the newest model takes over the line
 
 **Infrastructure upgrades**
 
 - Existing routes can be upgraded without demolition (gravel → paved → asphalt); cost = difference plus 20 %
-- Vehicles of older eras keep running but become much less economical than new ones
 
 ## Economy and finances
 
@@ -248,9 +249,10 @@ One currency (thalers) for everything; money comes from taxes, transport and tra
 
 **Income**
 
-- Taxes per resident and year: farmer 1, citizen 3, craftsman 6, worker 8, engineer 15, employee 20 thalers; only when supplied above 50 %
-- Transport income: base price of the good × distance × speed bonus (faster than expected = up to +50 %)
-- Trade: sell surpluses at trading posts on the map edge or to other peoples
+- Freight: base price of the good × kilometres × speed bonus (faster than expected = up to +50 %)
+- Fares: per passenger and kilometre
+- Taxes per resident and year in the player's town: hut 1, house 2, townhouse 4, later tiers more; only when supplied above 50 %
+- Trade: towns pay a premium for goods they want
 
 **Expenses**
 
@@ -274,31 +276,9 @@ One currency (thalers) for everything; money comes from taxes, transport and tra
 - Loans in steps of 5,000 thalers, 5 % interest per year, repayable at any time
 - Bankruptcy when the balance stays below the credit limit for 2 years (competitive mode only)
 
-## Other peoples and territory
+## Later: rivals
 
-One to three AI peoples share the region with the player; they compete for resources, towns and trade, but never with weapons.
-
-**Influence area**
-
-- Every people has an influence area around its buildings and supplied houses
-- Influence grows through supply and connection: a neutral town supplied above 60 % joins that people
-- Building is only allowed on own or neutral land; routes may cross foreign land for a toll
-
-**Competition**
-
-- Two peoples can supply the same neutral town; whoever supplies it better wins its influence
-- Resource deposits belong to whoever's land they are on
-
-**Diplomacy and trade**
-
-- Trade contract: fixed amount of goods per year at a fixed price
-- Right of way: free passage through foreign land
-- Joint project: bridge, canal or railway with shared costs, usable by both
-- Relationship value from -100 to +100; rises with fulfilled contracts, falls when towns are poached
-
-**AI personalities**
-
-- Trader (trades a lot, builds less), builder (large networks, little diplomacy), scholar (fast research)
+Peaceful AI transport companies that compete for towns and routes are planned after the core game is complete (milestone *Later*): influence areas, trade contracts, rights of way and joint projects, never weapons.
 
 ## Goals and game modes
 
@@ -326,4 +306,15 @@ Three modes share the same rules and differ only in goals and opponents.
 - [ ] Endless play: what happens after the modern age?
 - [ ] Final name of the game
 
-The roadmap lives in the [GitHub milestones](https://github.com/502Proxy/EpochenDerWege/milestones).
+## Roadmap
+
+| Milestone | Content |
+| --- | --- |
+| 0.3 Foundation for a large world | Save and load, 8 × 8 km map, terrain detail levels, spatial index, road graph, performance budget |
+| 0.4 Roads & Towns | Road frontage for every building, towns grow along roads, 6–10 towns, road types, carriers on roads |
+| 0.5 People on the Move | Residents' trips, visible pedestrians, passenger lines and fares, traffic |
+| 0.6 Eras | Calendar from 500 BC, unlocks by year, vehicle ageing |
+| 0.7 Economy | Industries on the map, freight income by distance, city services and land value, construction materials, perishable goods |
+| Later | Railway, waterways, curved roads, terraforming, rivals |
+
+Details and progress live in the [GitHub milestones](https://github.com/502Proxy/EpochenDerWege/milestones).
