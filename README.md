@@ -4,7 +4,7 @@
 ![Platform](https://img.shields.io/badge/platform-macOS%2026-blue)
 ![Swift](https://img.shields.io/badge/Swift-6-orange)
 
-A peaceful 3D city-building and logistics game for macOS, written in Swift with
+A peaceful 3D transport and city-building game for macOS, written in Swift with
 SwiftUI and RealityKit.
 
 You lead a people from antiquity to the modern age. Growth only happens when goods
@@ -81,7 +81,7 @@ See [docs/Architecture.md](docs/Architecture.md) for how the pieces fit together
 
 ## Status
 
-The project is in milestone **0.1 Foundation**. See the
+The antiquity prototype (0.1, 0.2) is done; next is milestone **0.3 Foundation for a large world**. See the
 [milestones](https://github.com/502Proxy/EpochenDerWege/milestones) for the roadmap
 and the [issues](https://github.com/502Proxy/EpochenDerWege/issues) for planned work.
 
