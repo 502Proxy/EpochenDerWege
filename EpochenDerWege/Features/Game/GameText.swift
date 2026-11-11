@@ -17,6 +17,11 @@ enum GameText {
         catalog.building(id).map(name(of:)) ?? id.rawValue
     }
 
+    static func levelName(_ level: Int, in catalog: GameCatalog) -> String {
+        guard catalog.settlementLevels.indices.contains(level) else { return "" }
+        return String(localized: String.LocalizationValue(catalog.settlementLevels[level].name))
+    }
+
     static func goodName(_ id: GoodID, in catalog: GameCatalog) -> String {
         guard let good = catalog.good(id) else { return id.rawValue }
         return String(localized: String.LocalizationValue(good.name))
@@ -47,6 +52,15 @@ enum GameText {
             String(localized: "Drag to zone an area. The town builds markets next to roads; they buy food and pay for every delivery.")
         case .industrial:
             String(localized: "Drag to zone an area. The town builds workshops next to roads; they buy wood, stone and grain.")
+        }
+    }
+
+    /// One letter for a zone's demand bar.
+    static func zoneInitial(_ zone: ZoneKind) -> String {
+        switch zone {
+        case .residential: String(localized: "R", comment: "Initial of residential zone")
+        case .commercial: String(localized: "C", comment: "Initial of commercial zone")
+        case .industrial: String(localized: "I", comment: "Initial of industrial zone")
         }
     }
 
@@ -103,6 +117,8 @@ enum GameText {
             String(localized: "Only allowed in: \(zoneList(zones)).")
         case .missingResource(let biome):
             String(localized: "No \(name(of: biome)) nearby.")
+        case .requiresLevel(let level):
+            String(localized: "Unlocked when your settlement becomes a \(levelName(level, in: catalog)).")
         }
     }
 
@@ -139,7 +155,33 @@ enum GameText {
             String(localized: "Ox cart bought for \(cost) thalers.")
         case .vehicleSold(_, let refund):
             String(localized: "Ox cart sold for \(refund) thalers.")
+        case .settlementLevelReached(let level):
+            levelUpMessage(level, catalog: catalog)
         }
+    }
+
+    private static func levelUpMessage(_ level: Int, catalog: GameCatalog) -> String {
+        let title = levelName(level, in: catalog)
+        let unlocked = catalog.buildings(unlockedAt: level).map { name(of: $0) }
+        if unlocked.isEmpty {
+            return String(localized: "Your settlement is now a \(title)!")
+        }
+        return String(localized: "Your settlement is now a \(title)! New: \(unlocked.formatted(.list(type: .and))).")
+    }
+
+    /// Short explanation of a zone's demand for its tooltip.
+    static func explanation(of demand: ZoneDemand, zone: ZoneKind) -> String {
+        let reason: String = switch demand.reason {
+        case .none: String(localized: "No demand at the moment.")
+        case .openJobs(let jobs): String(localized: "\(jobs) jobs are open – people want to move in.")
+        case .foodSurplus: String(localized: "Plenty of food – people want to move in.")
+        case .lackOfFood: String(localized: "Too little food in the storehouses or houses badly supplied.")
+        case .waitingForResidents: String(localized: "A new house is waiting for residents. They move in once food is delivered.")
+        case .population: String(localized: "The population supports more businesses.")
+        case .locked: String(localized: "Nothing to build here yet.")
+        }
+        guard demand.lacksSpace else { return reason }
+        return reason + " " + String(localized: "No free space: draw more \(name(of: zone)) next to roads.")
     }
 
     static func title(of panel: GamePanel) -> String {
@@ -164,6 +206,7 @@ enum GameText {
         case .zoneChanged: (.neutral, "square.dashed")
         case .lineCreated: (.good, "point.topleft.down.to.point.bottomright.curvepath")
         case .vehicleBought, .vehicleSold: (.neutral, "cart.fill")
+        case .settlementLevelReached: (.good, "star.fill")
         }
     }
 

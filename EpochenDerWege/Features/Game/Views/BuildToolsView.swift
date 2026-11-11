@@ -46,6 +46,7 @@ struct ToolPaletteView: View {
                     ToolCard(
                         presentation: ToolPresentation(tool, catalog: viewModel.catalog),
                         isSelected: viewModel.selectedTool == tool,
+                        lockedUntil: lockedLevel(of: tool),
                         action: { viewModel.toggleTool(tool) }
                     )
                 }
@@ -53,6 +54,14 @@ struct ToolPaletteView: View {
         }
         .padding(10)
         .gamePanel()
+    }
+
+    /// Name of the level a locked building needs, or `nil` if it can be built.
+    private func lockedLevel(of tool: BuildTool) -> String? {
+        guard case .building(let type) = tool, !viewModel.isUnlocked(type),
+              let level = viewModel.catalog.building(type)?.requiredLevel
+        else { return nil }
+        return GameText.levelName(level, in: viewModel.catalog)
     }
 }
 
@@ -110,6 +119,8 @@ private struct ToolPresentation {
 private struct ToolCard: View {
     let presentation: ToolPresentation
     let isSelected: Bool
+    /// Level a locked tool needs; `nil` when available.
+    let lockedUntil: String?
     let action: () -> Void
 
     var body: some View {
@@ -130,7 +141,13 @@ private struct ToolCard: View {
                     .font(GameTheme.caption)
                     .lineLimit(1)
                     .foregroundStyle(GameTheme.primaryText)
-                if let costLabel = presentation.costLabel {
+                if let lockedUntil {
+                    Label(lockedUntil, systemImage: "lock.fill")
+                        .labelStyle(.titleAndIcon)
+                        .font(.system(size: 10, design: .rounded))
+                        .lineLimit(1)
+                        .foregroundStyle(GameTheme.secondaryText)
+                } else if let costLabel = presentation.costLabel {
                     Label {
                         Text(verbatim: costLabel)
                     } icon: {
@@ -147,10 +164,12 @@ private struct ToolCard: View {
                 RoundedRectangle(cornerRadius: 8)
                     .strokeBorder(isSelected ? GameTheme.accent : GameTheme.stroke, lineWidth: isSelected ? 1.5 : 1)
             )
+            .opacity(lockedUntil == nil ? 1 : 0.5)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .help(presentation.detail)
+        .disabled(lockedUntil != nil)
+        .help(lockedUntil.map { String(localized: "Unlocked when your settlement becomes a \($0).") } ?? presentation.detail)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

@@ -65,3 +65,35 @@ struct CameraPose: Equatable {
     /// Camera yaw in radians: the camera looks along (−sin, −cos) in x and z.
     var yaw: Double
 }
+
+/// The settlement's size class and the way to the next one.
+struct SettlementProgress: Equatable {
+    var level = 0
+    var name = ""
+    var population = 0
+    /// Name of the next level; `nil` at the highest level.
+    var nextName: String?
+    /// Residents needed for the next level.
+    var nextPopulation = 0
+    /// Share of the way from the current level's threshold to the next, `0...1`.
+    var progress = 0.0
+
+    init() {}
+
+    init(world: WorldState) {
+        let catalog = world.catalog
+        let levels = catalog.settlementLevels
+        level = world.settlementLevel
+        name = GameText.levelName(level, in: catalog)
+        population = world.population
+        guard levels.indices.contains(level + 1) else {
+            progress = 1
+            return
+        }
+        let start = levels[level].minimumPopulation
+        let goal = levels[level + 1].minimumPopulation
+        nextName = GameText.levelName(level + 1, in: catalog)
+        nextPopulation = goal
+        progress = min(1, max(0, Double(population - start) / Double(max(1, goal - start))))
+    }
+}

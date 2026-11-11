@@ -182,6 +182,8 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
     public var allowedZones: [ZoneKind]?
     /// Whether the building must stand next to a road (stops).
     public var requiresRoadAccess: Bool?
+    /// Index into ``GameCatalog/settlementLevels`` the settlement must have reached; `nil` means from the start.
+    public var requiredLevel: Int?
 
     public init(
         id: BuildingTypeID,
@@ -201,7 +203,8 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         zone: ZoneKind? = nil,
         residentsPerBuilding: Int? = nil,
         allowedZones: [ZoneKind]? = nil,
-        requiresRoadAccess: Bool? = nil
+        requiresRoadAccess: Bool? = nil,
+        requiredLevel: Int? = nil
     ) {
         self.id = id
         self.name = name
@@ -221,6 +224,7 @@ public struct BuildingDefinition: Identifiable, Hashable, Sendable, Codable {
         self.residentsPerBuilding = residentsPerBuilding
         self.allowedZones = allowedZones
         self.requiresRoadAccess = requiresRoadAccess
+        self.requiredLevel = requiredLevel
     }
 
     /// Whether this building consumes the given good as a production input.
@@ -235,21 +239,30 @@ public struct GameCatalog: Sendable, Codable {
     public let goods: [GoodDefinition]
     public let buildings: [BuildingDefinition]
     public let vehicles: [VehicleDefinition]
+    /// Size classes of the settlement, ordered by population. Never empty.
+    public let settlementLevels: [SettlementLevel]
 
     private let goodsByID: [GoodID: GoodDefinition]
     private let buildingsByID: [BuildingTypeID: BuildingDefinition]
 
-    public init(rules: GameRules, goods: [GoodDefinition], buildings: [BuildingDefinition], vehicles: [VehicleDefinition] = []) {
+    public init(
+        rules: GameRules,
+        goods: [GoodDefinition],
+        buildings: [BuildingDefinition],
+        vehicles: [VehicleDefinition] = [],
+        settlementLevels: [SettlementLevel] = []
+    ) {
         self.rules = rules
         self.goods = goods
         self.buildings = buildings
         self.vehicles = vehicles
+        self.settlementLevels = settlementLevels.isEmpty ? [.single] : settlementLevels
         goodsByID = Dictionary(goods.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         buildingsByID = Dictionary(buildings.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
     private enum CodingKeys: String, CodingKey {
-        case rules, goods, buildings, vehicles
+        case rules, goods, buildings, vehicles, settlementLevels
     }
 
     public init(from decoder: any Decoder) throws {
@@ -258,7 +271,8 @@ public struct GameCatalog: Sendable, Codable {
             rules: try container.decode(GameRules.self, forKey: .rules),
             goods: try container.decode([GoodDefinition].self, forKey: .goods),
             buildings: try container.decode([BuildingDefinition].self, forKey: .buildings),
-            vehicles: try container.decodeIfPresent([VehicleDefinition].self, forKey: .vehicles) ?? []
+            vehicles: try container.decodeIfPresent([VehicleDefinition].self, forKey: .vehicles) ?? [],
+            settlementLevels: try container.decodeIfPresent([SettlementLevel].self, forKey: .settlementLevels) ?? []
         )
     }
 
@@ -268,6 +282,7 @@ public struct GameCatalog: Sendable, Codable {
         try container.encode(goods, forKey: .goods)
         try container.encode(buildings, forKey: .buildings)
         try container.encode(vehicles, forKey: .vehicles)
+        try container.encode(settlementLevels, forKey: .settlementLevels)
     }
 
     public func good(_ id: GoodID) -> GoodDefinition? {
@@ -284,12 +299,22 @@ public struct GameCatalog: Sendable, Codable {
 
     /// Returns a copy with different rules. Handy for tests and scenarios.
     public func replacingRules(_ rules: GameRules) -> GameCatalog {
-        GameCatalog(rules: rules, goods: goods, buildings: buildings, vehicles: vehicles)
+        GameCatalog(rules: rules, goods: goods, buildings: buildings, vehicles: vehicles, settlementLevels: settlementLevels)
     }
 
     /// Buildings that towns build on their own in a zone.
     public func buildings(forZone zone: ZoneKind) -> [BuildingDefinition] {
         buildings.filter { $0.zone == zone }
+    }
+
+    /// The highest level whose population threshold is met.
+    public func settlementLevel(forPopulation population: Int) -> Int {
+        settlementLevels.lastIndex { population >= $0.minimumPopulation } ?? 0
+    }
+
+    /// Buildings that become available at a level.
+    public func buildings(unlockedAt level: Int) -> [BuildingDefinition] {
+        buildings.filter { ($0.requiredLevel ?? 0) == level }
     }
 
     /// The first building of a category, e.g. the storehouse used for a new settlement.

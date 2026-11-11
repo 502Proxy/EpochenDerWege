@@ -11,4 +11,6 @@ public enum PlacementError: Error, Hashable, Sendable, Codable {
     case requiresZone([ZoneKind])
     /// The building must stand next to a road.
     case noRoadAccess
+    /// The settlement has not reached the level the building needs (index into the catalog's levels).
+    case requiresLevel(Int)
 }

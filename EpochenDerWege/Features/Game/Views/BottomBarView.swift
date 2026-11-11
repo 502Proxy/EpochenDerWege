@@ -28,6 +28,14 @@ struct BottomBarView: View {
                 .padding(.horizontal, 8)
                 .help(Text("\(hud.unemployed) unemployed"))
 
+            BarDivider()
+
+            ZoneDemandView(demand: viewModel.zoneDemand) { kind in
+                if viewModel.selectedTool != .zone(kind) {
+                    viewModel.toggleTool(.zone(kind))
+                }
+            }
+
             Spacer(minLength: 12)
 
             ClockView(viewModel: viewModel)

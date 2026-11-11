@@ -94,6 +94,19 @@ public enum CatalogValidator {
             }
         }
 
+        let levels = catalog.settlementLevels
+        if levels.first?.minimumPopulation != 0 {
+            throw GameDataError.invalidValue("the first settlement level must start at 0 residents")
+        }
+        for (lower, higher) in zip(levels, levels.dropFirst()) where higher.minimumPopulation <= lower.minimumPopulation {
+            throw GameDataError.invalidValue("settlement level '\(higher.id)' must need more residents than '\(lower.id)'")
+        }
+        for building in catalog.buildings {
+            if let level = building.requiredLevel, !levels.indices.contains(level) {
+                throw GameDataError.invalidValue("'\(building.id)' requires unknown settlement level \(level)")
+            }
+        }
+
         let rules = catalog.rules
         for good in rules.foodGoods where !goods.contains(good) {
             throw GameDataError.unknownGood(good, referencedBy: "rules.foodGoods")
