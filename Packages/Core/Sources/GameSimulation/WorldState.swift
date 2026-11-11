@@ -43,6 +43,7 @@ public struct WorldState: Sendable, Codable {
 
     private var indexByID: [BuildingID: Int] = [:]
     private var occupancy: [GridPoint: BuildingID] = [:]
+    private var spatialIndex = SpatialIndex()
     private var nextBuildingID = 1
     private var nextCarrierID = 1
     private var nextEventSequence = 1
@@ -101,6 +102,7 @@ public struct WorldState: Sendable, Codable {
         for (index, building) in buildings.enumerated() {
             indexByID[building.id] = index
             occupancy[building.cell] = building.id
+            spatialIndex.insert(building.id, at: building.center)
         }
     }
 
@@ -175,6 +177,14 @@ public struct WorldState: Sendable, Codable {
         roads.contains(cell)
     }
 
+    /// Buildings whose centre lies within `radius` metres of `point`, in placement order.
+    public func buildings(within radius: Double, of point: WorldPoint) -> [Building] {
+        spatialIndex.candidates(near: point, radius: radius).compactMap { id in
+            guard let building = building(id), building.center.distance(to: point) <= radius else { return nil }
+            return building
+        }
+    }
+
     public var population: Int {
         buildings.reduce(0) { $0 + $1.residents }
     }
@@ -228,6 +238,7 @@ public struct WorldState: Sendable, Codable {
         building.resourceFactor = resourceFactor
         indexByID[id] = buildings.count
         occupancy[cell] = id
+        spatialIndex.insert(id, at: building.center)
         buildings.append(building)
         return id
     }
@@ -238,6 +249,7 @@ public struct WorldState: Sendable, Codable {
         let removed = buildings.remove(at: index)
         occupancy[removed.cell] = nil
         indexByID[id] = nil
+        spatialIndex.remove(id, at: removed.center)
         for i in index..<buildings.count {
             indexByID[buildings[i].id] = i
         }

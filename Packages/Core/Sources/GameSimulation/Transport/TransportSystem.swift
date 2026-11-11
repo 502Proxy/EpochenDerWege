@@ -12,11 +12,9 @@ enum StopDemand {
         if let townID = stop.townID {
             return world.town(townID)?.buys(good) ?? false
         }
-        let range = world.rules.carrierRangeMeters
-        return world.buildings.contains { building in
+        return world.buildings(within: world.rules.carrierRangeMeters, of: stop.center).contains { building in
             building.category != .stop
                 && building.category != .storage
-                && stop.center.distance(to: building.center) <= range
                 && NearestConsumerPlanner.demand(of: building, for: good, in: world) > 0
         }
     }
