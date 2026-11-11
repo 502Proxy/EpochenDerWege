@@ -105,7 +105,7 @@ public struct FileSaveGameRepository: SaveGameRepository {
         return try Self.decodeHeader(fixed + summary).summary
     }
 
-    private static func decodeHeader(_ data: Data) throws -> (SaveGameSummary, Data.Index) {
+    private static func decodeHeader(_ data: Data) throws -> (summary: SaveGameSummary, bodyStart: Data.Index) {
         let fixedLength = magic.count + 1 + 4
         guard data.count >= fixedLength, Array(data.prefix(magic.count)) == magic else { throw SaveGameError.notASaveGame }
         let version = data[data.startIndex + magic.count]
