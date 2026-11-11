@@ -3,35 +3,54 @@ import GameDomain
 /// Places what makes the region more than one village: deposits of stone and vines
 /// away from the start, and neutral towns further out.
 ///
-/// Everything is placed beyond carrier range of the start, so using it needs roads,
-/// stops and lines. Placement is deterministic: the same terrain always yields the
+/// The first deposits and towns lie in a ring around the start, beyond carrier range,
+/// so using them needs roads, stops and lines. Larger maps get more of both, spread
+/// over the whole map. Placement is deterministic: the same terrain always yields the
 /// same region.
 enum RegionPlanner {
     /// Deposits lie this many cells from the start (carriers reach about 19 cells).
     static let depositDistance = 22...45
     /// Towns lie this many cells from the start.
     static let townDistance = 34...60
+    /// Deposits of each kind in the ring around the start.
     static let clustersPerDeposit = 3
-    static let maximumTowns = 3
+    /// Cells per map edge of the 1 km reference map; larger maps get proportionally more.
+    static let referenceSize = 128
     /// Cells around a town's centre covered by its houses and roads.
     static let townRadius = 3
     /// Proper names for towns; they are not translated.
-    static let townNames = ["Aquilon", "Belcastro", "Corvia", "Dunmere", "Esterra", "Falkenau", "Galena", "Hollin"]
+    static let townNames = ["Aquilon", "Belcastro", "Corvia", "Dunmere", "Esterra", "Falkenau", "Galena", "Hollin", "Isenhag", "Junara"]
+
+    /// Towns per map: 3 on the reference map, up to 10 on an 8 km map.
+    static func townCount(forMapSize size: Int) -> Int {
+        min(townNames.count, max(3, 2 + size / referenceSize))
+    }
+
+    /// Extra deposit clusters of each kind spread over larger maps (none on the reference map).
+    static func extraClusters(forMapSize size: Int) -> Int {
+        let area = Double(size * size) / Double(referenceSize * referenceSize)
+        return Int((area - 1) * 0.75)
+    }
+
+    /// Minimum distance between towns in cells.
+    static func townSpacing(forMapSize size: Int) -> Double {
+        max(28, Double(size) / 12)
+    }
 
     // MARK: - Deposits
 
     static func addDeposits(to terrain: Terrain, around start: GridPoint) -> Terrain {
         var placed: [GridPoint: Deposit] = [:]
         var centres: [GridPoint] = []
-        for deposit in Deposit.allCases {
-            let candidates = ringCells(around: start, distance: depositDistance, on: terrain)
+        func place(_ deposit: Deposit, count: Int, among cells: [GridPoint], spacing: Double) {
+            let candidates = cells
                 .filter { isBuildable($0, on: terrain) }
                 .map { (cell: $0, score: score(of: $0, for: deposit, on: terrain)) }
                 .sorted { ($0.score, tieBreak($0.cell)) > ($1.score, tieBreak($1.cell)) }
             var chosen = 0
-            for candidate in candidates where chosen < clustersPerDeposit {
-                // Keep clusters apart so they spread around the start.
-                guard centres.allSatisfy({ distance($0, candidate.cell) >= 16 }) else { continue }
+            for candidate in candidates where chosen < count {
+                // Keep clusters apart so they spread over the map.
+                guard centres.allSatisfy({ distance($0, candidate.cell) >= spacing }) else { continue }
                 centres.append(candidate.cell)
                 chosen += 1
                 for dz in -2...2 {
@@ -42,6 +61,18 @@ enum RegionPlanner {
                         }
                     }
                 }
+            }
+        }
+
+        // First a few near the start, then more across larger maps.
+        for deposit in Deposit.allCases {
+            place(deposit, count: clustersPerDeposit, among: ringCells(around: start, distance: depositDistance, on: terrain), spacing: 16)
+        }
+        let extra = extraClusters(forMapSize: terrain.size)
+        if extra > 0 {
+            let far = sampledCells(on: terrain, stride: 3).filter { distance($0, start) > Double(depositDistance.upperBound) }
+            for deposit in Deposit.allCases {
+                place(deposit, count: extra, among: far, spacing: 24)
             }
         }
         return terrain.addingDeposits(placed)
@@ -71,15 +102,27 @@ enum RegionPlanner {
         let catalog = world.catalog
         guard let stop = catalog.firstBuilding(of: .stop), !catalog.townTemplates.isEmpty else { return }
         let terrain = world.terrain
-        let candidates = ringCells(around: start, distance: townDistance, on: terrain)
+        // Near towns lie in the ring around the start; on larger maps the rest spread across it.
+        let reach = max(townDistance.upperBound, terrain.size)
+        let area = terrain.size > referenceSize * 2
+            ? sampledCells(on: terrain, stride: 2).filter { distance($0, start) >= Double(townDistance.lowerBound) }
+            : ringCells(around: start, distance: townDistance.lowerBound...reach, on: terrain)
+        let candidates = area
             .filter { isTownSite($0, in: world) }
             .map { (cell: $0, score: flatness(around: $0, on: terrain)) }
             .sorted { ($0.score, tieBreak($0.cell)) > ($1.score, tieBreak($1.cell)) }
 
         var centres: [GridPoint] = []
         let offset = tieBreak(start)
-        for candidate in candidates where centres.count < min(maximumTowns, catalog.townTemplates.count) {
-            guard centres.allSatisfy({ distance($0, candidate.cell) >= 28 }) else { continue }
+        let count = townCount(forMapSize: terrain.size)
+        let spacing = townSpacing(forMapSize: terrain.size)
+        // The nearest town is placed first, so every map has a trading partner within reach.
+        if let near = candidates.first(where: { townDistance.contains(Int(distance($0.cell, start))) }) {
+            centres.append(near.cell)
+            found(catalog.townTemplates[offset % catalog.townTemplates.count], named: townNames[offset % townNames.count], at: near.cell, stop: stop, in: &world)
+        }
+        for candidate in candidates where centres.count < count {
+            guard centres.allSatisfy({ distance($0, candidate.cell) >= spacing }) else { continue }
             let index = centres.count
             centres.append(candidate.cell)
             let template = catalog.townTemplates[(index + offset) % catalog.townTemplates.count]
@@ -157,6 +200,17 @@ enum RegionPlanner {
                 if range.contains(d) && terrain.contains(cell) {
                     cells.append(cell)
                 }
+            }
+        }
+        return cells
+    }
+
+    /// Every `stride`-th cell in both directions, for searches over the whole map.
+    private static func sampledCells(on terrain: Terrain, stride step: Int) -> [GridPoint] {
+        var cells: [GridPoint] = []
+        for z in stride(from: 0, to: terrain.size, by: step) {
+            for x in stride(from: 0, to: terrain.size, by: step) {
+                cells.append(GridPoint(x: x, z: z))
             }
         }
         return cells

@@ -148,9 +148,9 @@ replaced in tests.
 | --- | --- |
 | Simulation off the main thread, fixed time step | `SimulationEngine` |
 | Interpolation between ticks | `CarrierLayer` |
-| Terrain built once as smooth 16 × 16 chunks at twice the grid resolution (bicubic `TerrainSurface`) | `TerrainLayer` |
-| Ground texture (2048²) painted on a background task (`@concurrent`), plain colour until ready | `TerrainTextureBuilder` |
-| Vegetation merged into one mesh per chunk; only touched chunks rebuild | `TerrainLayer` |
+| Terrain in 32 × 32-cell tiles with five detail levels by camera distance (half a cell to eight cells per vertex), skirts against seams, a few tiles rebuilt per frame | `TerrainLayer` |
+| Ground texture (2–4k pixels, about 2 m per pixel) painted on a background task (`@concurrent`), plain colour until ready | `TerrainTextureBuilder` |
+| Vegetation merged into one mesh per tile, only within 900 m of the camera; only touched tiles rebuild | `TerrainLayer` |
 | Shared materials and meshes | `MaterialLibrary` |
 | Entity pooling | `CarrierLayer` |
 | Building models cloned from per-type templates | `BuildingModelFactory` |
