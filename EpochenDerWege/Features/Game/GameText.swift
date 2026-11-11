@@ -142,6 +142,31 @@ enum GameText {
         }
     }
 
+    static func title(of panel: GamePanel) -> String {
+        switch panel {
+        case .finances: String(localized: "Finances")
+        case .goods: String(localized: "Goods")
+        case .buildings: String(localized: "Buildings")
+        case .lines: String(localized: "Lines")
+        }
+    }
+
+    /// Tone and SF Symbol of a notification about an event.
+    static func notificationStyle(for event: SimulationEvent) -> (tone: StatusTone, symbol: String) {
+        switch event {
+        case .settlementFounded, .townGrew: (.good, "house.fill")
+        case .buildingPlaced: (.neutral, "hammer.fill")
+        case .buildingDemolished, .roadDemolished, .lineDeleted: (.neutral, "trash")
+        case .placementRejected, .lineRejected: (.problem, "exclamationmark.triangle.fill")
+        case .residentLeft: (.warning, "person.fill.xmark")
+        case .yearClosed: (.good, "banknote.fill")
+        case .roadBuilt: (.neutral, "road.lanes")
+        case .zoneChanged: (.neutral, "square.dashed")
+        case .lineCreated: (.good, "point.topleft.down.to.point.bottomright.curvepath")
+        case .vehicleBought, .vehicleSold: (.neutral, "cart.fill")
+        }
+    }
+
     // MARK: - Status
 
     static func status(of building: Building) -> (text: String, tone: StatusTone) {

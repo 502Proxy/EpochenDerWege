@@ -1,85 +1,58 @@
 import GameDomain
 import SwiftUI
 
-/// Build toolbar at the bottom of the screen: categories, and above them the tools
-/// of the open category.
-struct BuildToolbarView: View {
-    let viewModel: GameViewModel
-    @State private var openCategory: ToolCategory?
+/// Build categories in the bottom bar. The open category's tools appear in a
+/// `ToolPaletteView` above the bar.
+struct BuildCategoryBar: View {
+    @Binding var openCategory: ToolCategory?
 
     var body: some View {
-        VStack(spacing: 8) {
-            if let openCategory {
-                ToolPaletteView(viewModel: viewModel, category: openCategory)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-
-            HStack(spacing: 4) {
-                ForEach(ToolCategory.allCases) { category in
-                    CategoryButton(category: category, isOpen: openCategory == category) {
-                        openCategory = openCategory == category ? nil : category
+        HStack(spacing: 4) {
+            ForEach(ToolCategory.allCases) { category in
+                let isOpen = openCategory == category
+                Button {
+                    openCategory = isOpen ? nil : category
+                } label: {
+                    VStack(spacing: 3) {
+                        Image(systemName: category.symbol)
+                            .font(.system(size: 17, weight: .medium))
+                        Text(category.title)
+                            .font(GameTheme.caption)
+                            .lineLimit(1)
                     }
+                    .padding(.horizontal, 6)
                 }
-
-                Divider()
-                    .frame(height: 28)
-                    .padding(.horizontal, 4)
-
-                ControlsHelpButton()
-            }
-            .padding(6)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-        }
-        .animation(.easeOut(duration: 0.15), value: openCategory)
-        .onChange(of: viewModel.selectedTool) { _, tool in
-            // Keep the palette of the active tool open, e.g. after a keyboard shortcut.
-            if let tool {
-                openCategory = ToolCategory.of(tool, in: viewModel.catalog)
+                .buttonStyle(HUDButtonStyle(isActive: isOpen, size: CGSize(width: 74, height: 48)))
+                .keyboardShortcut(KeyEquivalent(category.shortcut), modifiers: [])
+                .help(Text(verbatim: "\(category.title) (\(category.shortcut))"))
+                .accessibilityAddTraits(isOpen ? .isSelected : [])
             }
         }
     }
 }
 
-private struct CategoryButton: View {
-    let category: ToolCategory
-    let isOpen: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 2) {
-                Image(systemName: category.symbol)
-                    .font(.system(size: 16))
-                Text(category.title)
-                    .font(.caption2)
-            }
-            .frame(width: 76, height: 44)
-            .background(isOpen ? Color.accentColor.opacity(0.25) : .clear, in: RoundedRectangle(cornerRadius: 8))
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .keyboardShortcut(KeyEquivalent(category.shortcut), modifiers: [])
-        .help(Text(verbatim: "\(category.title) (\(category.shortcut))"))
-        .accessibilityAddTraits(isOpen ? .isSelected : [])
-    }
-}
-
-private struct ToolPaletteView: View {
+/// The tools of one category as cards with colour, name and price.
+struct ToolPaletteView: View {
     let viewModel: GameViewModel
     let category: ToolCategory
 
     var body: some View {
-        HStack(spacing: 6) {
-            ForEach(category.tools(in: viewModel.catalog), id: \.self) { tool in
-                ToolCard(
-                    presentation: ToolPresentation(tool, catalog: viewModel.catalog),
-                    isSelected: viewModel.selectedTool == tool,
-                    action: { viewModel.toggleTool(tool) }
-                )
+        VStack(alignment: .leading, spacing: 8) {
+            Text(category.title)
+                .font(GameTheme.title)
+                .padding(.horizontal, 4)
+            HStack(spacing: 6) {
+                ForEach(category.tools(in: viewModel.catalog), id: \.self) { tool in
+                    ToolCard(
+                        presentation: ToolPresentation(tool, catalog: viewModel.catalog),
+                        isSelected: viewModel.selectedTool == tool,
+                        action: { viewModel.toggleTool(tool) }
+                    )
+                }
             }
         }
-        .padding(8)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .padding(10)
+        .gamePanel()
     }
 }
 
@@ -141,31 +114,38 @@ private struct ToolCard: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 4) {
+            VStack(spacing: 5) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(presentation.color.opacity(presentation.symbol == nil ? 1 : 0.2))
+                    RoundedRectangle(cornerRadius: 5)
+                        .fill(presentation.color.gradient.opacity(presentation.symbol == nil ? 1 : 0.25))
                     if let symbol = presentation.symbol {
                         Image(systemName: symbol)
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(presentation.color)
                     }
                 }
-                .frame(width: 34, height: 26)
+                .frame(width: 44, height: 30)
 
                 Text(presentation.name)
-                    .font(.caption)
+                    .font(GameTheme.caption)
                     .lineLimit(1)
+                    .foregroundStyle(GameTheme.primaryText)
                 if let costLabel = presentation.costLabel {
-                    Text(verbatim: costLabel)
-                        .font(.caption2.monospacedDigit())
-                        .foregroundStyle(.secondary)
+                    Label {
+                        Text(verbatim: costLabel)
+                    } icon: {
+                        Image(systemName: "circle.circle.fill")
+                    }
+                    .labelStyle(.titleAndIcon)
+                    .font(.system(size: 10, design: .rounded).monospacedDigit())
+                    .foregroundStyle(GameTheme.accent)
                 }
             }
-            .frame(width: 92, height: 74)
-            .background(isSelected ? Color.accentColor.opacity(0.3) : Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 8))
+            .frame(width: 96, height: 84)
+            .background(isSelected ? GameTheme.accent.opacity(0.22) : GameTheme.raised.opacity(0.7), in: RoundedRectangle(cornerRadius: 8))
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(isSelected ? Color.accentColor : .clear, lineWidth: 1.5)
+                    .strokeBorder(isSelected ? GameTheme.accent : GameTheme.stroke, lineWidth: isSelected ? 1.5 : 1)
             )
             .contentShape(Rectangle())
         }
@@ -176,18 +156,17 @@ private struct ToolCard: View {
 }
 
 /// Small popover with the mouse and keyboard controls.
-private struct ControlsHelpButton: View {
+struct ControlsHelpButton: View {
     @State private var isShown = false
 
     var body: some View {
         Button {
             isShown.toggle()
         } label: {
-            Image(systemName: "questionmark.circle")
-                .font(.system(size: 16))
-                .frame(width: 36, height: 44)
+            Image(systemName: "questionmark")
+                .font(.system(size: 15, weight: .semibold))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(HUDButtonStyle(size: CGSize(width: 36, height: 36)))
         .help(Text("Controls"))
         .popover(isPresented: $isShown, arrowEdge: .top) {
             VStack(alignment: .leading, spacing: 4) {
@@ -200,6 +179,7 @@ private struct ControlsHelpButton: View {
                 Text("Right-click or Esc: cancel")
                 Text("WASD, Q/E, Space")
                 Text("1–4: open a build category")
+                Text("F, G, B, L: finances, goods, buildings, lines")
             }
             .font(.callout)
             .padding(12)

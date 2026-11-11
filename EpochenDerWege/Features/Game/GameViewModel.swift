@@ -18,13 +18,8 @@ struct HUDState: Equatable {
         let id: GoodID
         let name: String
         let amount: Int
+        let color: GameColor
     }
-}
-
-/// A short message at the bottom of the screen.
-struct Toast: Equatable, Identifiable {
-    let id: Int
-    let text: String
 }
 
 /// Presentation state and user intents for the game screen (MVVM).
@@ -38,7 +33,8 @@ final class GameViewModel {
     private(set) var selectedTool: BuildTool?
     private(set) var selectedBuildingID: BuildingID?
     private(set) var inspector: BuildingDetails?
-    private(set) var toast: Toast?
+    /// Recent messages, oldest first; each disappears after `notificationDuration`.
+    private(set) var notifications: [GameNotification] = []
     private(set) var speed: Int
     private(set) var finances = FinanceSummary()
     private(set) var lines: [LineSummary] = []
@@ -50,15 +46,21 @@ final class GameViewModel {
     private(set) var cameraFocus: CameraFocus?
     /// Stops picked so far with the line tool, in order.
     private(set) var pendingLineStops: [BuildingID] = []
+    /// Open floating panels; the last one is drawn on top.
+    private(set) var openPanels: [GamePanel] = []
+    /// Roads and buildings for the mini map.
+    private(set) var miniMap = MiniMapContent()
+    /// Where the camera looks; reported by the scene.
+    private(set) var camera: CameraPose?
 
     let catalog: GameCatalog
 
     @ObservationIgnored private let engine: SimulationEngine
     @ObservationIgnored private var lastHandledEvent = 0
-    @ObservationIgnored private var toastExpiry: ContinuousClock.Instant?
 
     static let refreshInterval: Duration = .milliseconds(200)
-    static let toastDuration: Duration = .seconds(4)
+    static let notificationDuration: Duration = .seconds(6)
+    static let maximumNotifications = 4
 
     init(engine: SimulationEngine) {
         self.engine = engine
@@ -102,15 +104,63 @@ final class GameViewModel {
         refresh(with: world)
     }
 
-    /// Escape or right click: drop the tool first, then the selection.
+    /// Escape or right click: drop the tool first, then the selection, then the topmost panel.
     func cancel() {
         if !pendingLineStops.isEmpty {
             pendingLineStops = []
         } else if selectedTool != nil {
             selectedTool = nil
-        } else {
+        } else if selectedBuildingID != nil {
             selectBuilding(nil)
+        } else if !openPanels.isEmpty {
+            openPanels.removeLast()
         }
+    }
+
+    // MARK: - Panels
+
+    func isOpen(_ panel: GamePanel) -> Bool {
+        openPanels.contains(panel)
+    }
+
+    /// Opens a panel on top of the others, or closes it if it is already open.
+    func togglePanel(_ panel: GamePanel) {
+        if isOpen(panel) {
+            closePanel(panel)
+        } else {
+            openPanels.append(panel)
+        }
+    }
+
+    func closePanel(_ panel: GamePanel) {
+        openPanels.removeAll { $0 == panel }
+    }
+
+    /// Draws a panel above the others, e.g. when it is clicked or dragged.
+    func bringToFront(_ panel: GamePanel) {
+        guard openPanels.last != panel, isOpen(panel) else { return }
+        openPanels.removeAll { $0 == panel }
+        openPanels.append(panel)
+    }
+
+    func dismissNotification(_ id: Int) {
+        notifications.removeAll { $0.id == id }
+    }
+
+    // MARK: - Camera
+
+    /// Moves the camera to a cell, e.g. from a click on the mini map.
+    func focus(on cell: GridPoint) {
+        cameraFocus = CameraFocus(id: (cameraFocus?.id ?? 0) + 1, cell: cell)
+    }
+
+    /// Called by the scene every frame. Only noticeable changes are published, so the
+    /// mini map does not redraw on every frame.
+    func reportCamera(_ view: CameraPose) {
+        if let camera, abs(camera.x - view.x) < 0.5, abs(camera.z - view.z) < 0.5, abs(camera.yaw - view.yaw) < 0.05 {
+            return
+        }
+        camera = view
     }
 
     func click(on cell: GridPoint?) {
@@ -158,7 +208,7 @@ final class GameViewModel {
     func focus(on id: BuildingID) {
         guard let building = world.building(id) else { return }
         selectBuilding(id)
-        cameraFocus = CameraFocus(id: (cameraFocus?.id ?? 0) + 1, cell: building.cell)
+        focus(on: building.cell)
     }
 
     func setPaused(_ paused: Bool, building: BuildingID) {
@@ -236,7 +286,12 @@ final class GameViewModel {
         next.unemployed = world.unemployed
         next.carriers = world.carriers.count
         next.stock = world.storedGoods.map {
-            HUDState.StockItem(id: $0.good, name: GameText.goodName($0.good, in: catalog), amount: $0.amount)
+            HUDState.StockItem(
+                id: $0.good,
+                name: GameText.goodName($0.good, in: catalog),
+                amount: $0.amount,
+                color: catalog.good($0.good)?.color ?? GameColor(red: 0.5, green: 0.5, blue: 0.5)
+            )
         }
         if next != hud {
             hud = next
@@ -252,6 +307,10 @@ final class GameViewModel {
         let lineSummaries = LineSummary.make(for: world)
         if lineSummaries != lines {
             lines = lineSummaries
+        }
+        let mapContent = MiniMapContent(world: world)
+        if mapContent != miniMap {
+            miniMap = mapContent
         }
         let summary = FinanceSummary(world: world)
         if summary != finances {
@@ -274,16 +333,18 @@ final class GameViewModel {
 
     private func handleNewEvents(in world: WorldState) {
         let now = ContinuousClock.now
+        var next = notifications.filter { $0.expiresAt > now }
         for record in world.events where record.sequence > lastHandledEvent {
             lastHandledEvent = record.sequence
-            if let text = GameText.message(for: record.event, catalog: catalog) {
-                toast = Toast(id: record.sequence, text: text)
-                toastExpiry = now + Self.toastDuration
-            }
+            guard let text = GameText.message(for: record.event, catalog: catalog) else { continue }
+            let style = GameText.notificationStyle(for: record.event)
+            next.append(GameNotification(id: record.sequence, text: text, tone: style.tone, symbol: style.symbol, expiresAt: now + Self.notificationDuration))
         }
-        if let toastExpiry, now >= toastExpiry {
-            toast = nil
-            self.toastExpiry = nil
+        if next.count > Self.maximumNotifications {
+            next.removeFirst(next.count - Self.maximumNotifications)
+        }
+        if next != notifications {
+            notifications = next
         }
     }
 }

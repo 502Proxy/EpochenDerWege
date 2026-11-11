@@ -4,7 +4,6 @@ import SwiftUI
 /// Every building with its state; selecting one moves the camera there.
 struct BuildingListView: View {
     let viewModel: GameViewModel
-    let onClose: () -> Void
 
     @State private var filter = Filter.all
     @State private var sortOrder = [KeyPathComparator(\BuildingRow.name)]
@@ -40,17 +39,10 @@ struct BuildingListView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Buildings")
-                    .font(.title2.bold())
-                Spacer()
-                Picker("Show", selection: $filter) {
-                    ForEach(Filter.allCases, id: \.self) { Text($0.title).tag($0) }
-                }
-                .frame(width: 260)
-                Button("Done", action: onClose)
-                    .keyboardShortcut(.cancelAction)
+            Picker("Show", selection: $filter) {
+                ForEach(Filter.allCases, id: \.self) { Text($0.title).tag($0) }
             }
+            .frame(width: 300)
 
             Table(rows, selection: $selection, sortOrder: $sortOrder) {
                 TableColumn("Building", value: \.name)
@@ -75,20 +67,14 @@ struct BuildingListView: View {
 
             Text("Select a building to jump to it.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(GameTheme.secondaryText)
         }
-        .padding(20)
-        .frame(width: 720, height: 480)
+        .frame(width: 640, height: 400)
     }
 }
 
 extension StatusTone {
     var color: Color {
-        switch self {
-        case .good: .green
-        case .warning: .orange
-        case .problem: .red
-        case .neutral: .secondary
-        }
+        GameTheme.color(of: self)
     }
 }

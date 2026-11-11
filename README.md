@@ -37,18 +37,20 @@ If Xcode asks for signing, choose *Sign to Run Locally* or your own team under
 
 | Input | Action |
 | --- | --- |
-| 1 – 4 | Open a category of the build toolbar (transport, zones, production, storage) |
+| 1 – 4 | Open a category of the build bar (transport, zones, production, storage) |
 | Click | Build (with a building selected) or select a building |
 | Drag | Move the map; with the road or zone tool, draw a road or zone an area |
 | Right-drag | Rotate and tilt the camera |
 | Scroll / pinch | Zoom |
 | W A S D / arrow keys | Move the camera |
 | Q / E | Rotate the camera |
-| Right-click / Esc | Drop the build tool or clear the selection |
+| Right-click / Esc | Drop the build tool, clear the selection, then close the top window |
 | O | Map overlay: supply, carrier range, off |
 | F | Finance window |
 | G | Goods overview |
 | B | Building list |
+| L | Transport lines |
+| Click on the mini map | Move the camera there |
 | Space | Pause |
 
 Coloured spheres above buildings show their state: green working, yellow waiting or
@@ -100,6 +102,7 @@ Playable today:
 - Goods overview (key G): production, consumption, stock and sales per good; building list (key B) with status and efficiency, click to jump there
 - Finance window (key F or click the money): income and expenses per month and year, sales per good, costs per building and vehicle type, balance chart
 - Pause and 1× / 2× / 4× speed
+- Game interface in its own dark style: bottom bar with build categories, key figures, date and speed; windows that float above the map and can be dragged; mini map with roads, buildings and camera; notifications with icons
 
 Known simplifications of the prototype: carriers walk in straight lines within their short range, farmers and citizens are not yet distinguished, buildings cost only money, and there is no save game yet.
 

@@ -135,6 +135,10 @@ final class SceneCoordinator: NSObject {
         let ground = Float(renderer.space.surface.surfaceHeight(at: renderer.space.worldPoint(fromScene: rig.target)))
         rig.target.y += (ground - rig.target.y) * min(1, Float(deltaTime) * 8)
         applyCamera()
+
+        let look = renderer.space.worldPoint(fromScene: rig.target)
+        let cellSize = renderer.space.terrain.cellSize
+        viewModel.reportCamera(CameraPose(x: look.x / cellSize, z: look.z / cellSize, yaw: Double(rig.yaw)))
     }
 
     private func applyCamera() {
