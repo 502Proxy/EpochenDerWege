@@ -2,8 +2,11 @@ import GameDomain
 
 /// Creates new worlds (factory pattern): terrain plus a starting settlement.
 public enum WorldFactory {
+    /// Cells per map edge of a new game: 1024 cells of 8 m are 8 × 8 km.
+    public static let defaultMapSize = 1024
+
     /// Generates terrain from a seed and founds a settlement near the map centre.
-    public static func makeWorld(catalog: GameCatalog, seed: UInt64, mapSize: Int = 128) -> WorldState {
+    public static func makeWorld(catalog: GameCatalog, seed: UInt64, mapSize: Int = defaultMapSize) -> WorldState {
         let terrain = TerrainGenerator(seed: seed, size: mapSize).generate()
         return makeWorld(catalog: catalog, terrain: terrain)
     }

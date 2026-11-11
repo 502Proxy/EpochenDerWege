@@ -17,7 +17,7 @@ struct SaveGameTests {
     /// A generated world with a region, some buildings, a line and a few days of history.
     private func playedSimulation() throws -> Simulation {
         let catalog = try BundledCatalogRepository().loadCatalog()
-        var simulation = Simulation(world: WorldFactory.makeWorld(catalog: catalog, seed: 7))
+        var simulation = Simulation(world: WorldFactory.makeWorld(catalog: catalog, seed: 7, mapSize: 128))
         let start = try #require(simulation.world.startCell)
         simulation.execute(PlaceBuildingCommand(buildingType: "grainFarm", cell: start.offset(dx: 1, dz: 0)))
         simulation.execute(ZoneCommand(cells: [start.offset(dx: -1, dz: 0)], kind: .industrial))

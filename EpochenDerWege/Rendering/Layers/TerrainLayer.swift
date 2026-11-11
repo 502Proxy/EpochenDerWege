@@ -1,28 +1,51 @@
 import AppKit
 import GameDomain
 import RealityKit
+import simd
 
 /// Ground, water and vegetation.
 ///
-/// The ground is a smooth, textured mesh at twice the simulation's grid resolution,
-/// split into chunks. Its texture is painted on a background task; until it is ready
-/// the ground shows a plain colour. Vegetation is merged into one mesh per chunk, so
-/// placing a building only rebuilds the vegetation of that chunk.
+/// The ground is split into tiles of `chunkSize` cells. Each tile is drawn at a detail
+/// level that depends on its distance to the camera, from a vertex every half cell
+/// close up to one every eight cells far away; a short skirt along the tile edges
+/// hides the seams between levels. Tiles change level a few at a time, nearest first,
+/// so the frame rate stays smooth while the camera moves.
+///
+/// The ground texture is painted on a background task; until it is ready the ground
+/// shows a plain colour. Vegetation is merged into one mesh per tile and exists only
+/// near the camera; far away, forests are part of the texture.
 final class TerrainLayer: SceneLayer {
-    static let chunkSize = 16
-    /// Mesh vertices per cell edge; 2 doubles the simulation's resolution.
-    static let subdivisions = 2
-    /// Pixels per texture edge.
-    static let textureSize = 2048
+    static let chunkSize = 32
+    /// Metres between vertices per detail level, as a multiple of the cell size.
+    static let levelSteps: [Double] = [0.5, 1, 2, 4, 8]
+    /// Camera distance in metres up to which a level is used.
+    static let levelDistances: [Float] = [700, 1500, 3000, 6000]
+    /// A tile switches to a coarser level only this much beyond the threshold, so it
+    /// does not flicker between two levels at the boundary.
+    static let hysteresis: Float = 1.15
+    /// Tiles rebuilt per frame at most.
+    static let groundBudget = 6
+    /// Vegetation is built within this camera distance and removed beyond `vegetationRemoval`.
+    static let vegetationDistance: Float = 900
+    static let vegetationRemoval: Float = 1150
+    static let vegetationBudget = 2
 
     private let parent: Entity
     private let space: SceneSpace
-    private var groundChunks: [ModelEntity] = []
+    private var groundChunks: [ChunkKey: GroundChunk] = [:]
+    /// Centre of each tile on the ground, for distance checks every frame.
+    private var chunkCentres: [ChunkKey: SIMD3<Float>] = [:]
+    private var groundMaterial: any RealityKit.Material
     private var vegetationChunks: [ChunkKey: ModelEntity] = [:]
     private var occupiedCellsByChunk: [ChunkKey: Set<GridPoint>] = [:]
     private var lastBuildingIDs: [BuildingID] = []
     private var lastRoads: Set<GridPoint> = []
     private var textureTask: Task<Void, Never>?
+
+    private struct GroundChunk {
+        let entity: ModelEntity
+        let level: Int
+    }
 
     /// Materials of the vegetation meshes, indexed by `Part`.
     private static let vegetationColors = [
@@ -44,11 +67,17 @@ final class TerrainLayer: SceneLayer {
     init(parent: Entity, space: SceneSpace) {
         self.parent = parent
         self.space = space
-        makeGround()
-        parent.addChild(makeWater())
+        groundMaterial = MaterialLibrary.shared.matte(Self.placeholderGround)
+        // Start with every tile at the coarsest level; detail follows the camera.
+        let coarsest = Self.levelSteps.count - 1
+        let tileSize = Double(Self.chunkSize) * space.terrain.cellSize
         for key in allChunks() {
-            rebuildVegetation(in: key)
+            let x = (Double(key.x) + 0.5) * tileSize
+            let z = (Double(key.z) + 0.5) * tileSize
+            chunkCentres[key] = SIMD3<Float>(Float(x), Float(space.surface.surfaceHeight(at: WorldPoint(x: x, z: z))), Float(z))
+            setGround(key, level: coarsest)
         }
+        parent.addChild(makeWater())
         paintTexture()
     }
 
@@ -57,13 +86,18 @@ final class TerrainLayer: SceneLayer {
     }
 
     func update(with context: RenderContext) {
-        let world = context.world
+        updateOccupancy(context.world)
+        updateGroundDetail(camera: context.camera)
+        updateVegetation(camera: context.camera)
+    }
+
+    /// Vegetation gives way to buildings, roads and towns.
+    private func updateOccupancy(_ world: WorldState) {
         let ids = world.buildings.map(\.id)
         guard ids != lastBuildingIDs || world.roads != lastRoads else { return }
         lastBuildingIDs = ids
         lastRoads = world.roads
 
-        // Vegetation gives way to buildings and roads.
         var occupied: [ChunkKey: Set<GridPoint>] = [:]
         for cell in world.buildings.map(\.cell) + Array(world.roads) + world.towns.flatMap(\.footprint) {
             occupied[ChunkKey(cell), default: []].insert(cell)
@@ -72,72 +106,151 @@ final class TerrainLayer: SceneLayer {
             occupied[$0] != occupiedCellsByChunk[$0]
         }
         occupiedCellsByChunk = occupied
-        for key in changed {
+        // Only tiles that currently show vegetation need a rebuild; others build it when the camera comes near.
+        for key in changed where vegetationChunks[key] != nil {
             rebuildVegetation(in: key)
+        }
+    }
+
+    // MARK: - Detail levels
+
+    private func distance(from camera: SIMD3<Float>, to key: ChunkKey) -> Float {
+        chunkCentres[key].map { simd_distance(camera, $0) } ?? .infinity
+    }
+
+    private func level(forDistance distance: Float, current: Int?) -> Int {
+        let wanted = Self.levelDistances.firstIndex { distance <= $0 } ?? Self.levelDistances.count
+        // Become coarser only when clearly beyond the threshold.
+        if let current, wanted > current, distance <= Self.levelDistances[min(current, Self.levelDistances.count - 1)] * Self.hysteresis {
+            return current
+        }
+        return wanted
+    }
+
+    private func updateGroundDetail(camera: SIMD3<Float>) {
+        var pending: [(key: ChunkKey, level: Int, distance: Float)] = []
+        for (key, chunk) in groundChunks {
+            let distance = distance(from: camera, to: key)
+            let wanted = level(forDistance: distance, current: chunk.level)
+            if wanted != chunk.level {
+                pending.append((key, wanted, distance))
+            }
+        }
+        // Nearest tiles first, a few per frame.
+        for change in pending.sorted(by: { $0.distance < $1.distance }).prefix(Self.groundBudget) {
+            setGround(change.key, level: change.level)
+        }
+    }
+
+    private func updateVegetation(camera: SIMD3<Float>) {
+        var missing: [(key: ChunkKey, distance: Float)] = []
+        for key in groundChunks.keys {
+            let distance = distance(from: camera, to: key)
+            if vegetationChunks[key] == nil, distance <= Self.vegetationDistance {
+                missing.append((key, distance))
+            } else if let entity = vegetationChunks[key], distance > Self.vegetationRemoval {
+                entity.removeFromParent()
+                vegetationChunks[key] = nil
+            }
+        }
+        for item in missing.sorted(by: { $0.distance < $1.distance }).prefix(Self.vegetationBudget) {
+            rebuildVegetation(in: item.key)
         }
     }
 
     // MARK: - Ground and water
 
-    /// One smooth mesh per chunk; vertices are shared within a chunk so shading is smooth.
-    private func makeGround() {
+    /// Replaces a tile's mesh with one at the given detail level.
+    private func setGround(_ key: ChunkKey, level: Int) {
+        guard let mesh = makeGroundMesh(key, step: Self.levelSteps[level]) else { return }
+        if let existing = groundChunks[key] {
+            existing.entity.model?.mesh = mesh
+            groundChunks[key] = GroundChunk(entity: existing.entity, level: level)
+        } else {
+            let entity = ModelEntity(mesh: mesh, materials: [groundMaterial])
+            parent.addChild(entity)
+            groundChunks[key] = GroundChunk(entity: entity, level: level)
+        }
+    }
+
+    /// A smooth tile mesh with a vertex every `step` cells, plus a skirt along its edges.
+    private func makeGroundMesh(_ key: ChunkKey, step cellsPerStep: Double) -> MeshResource? {
         let terrain = space.terrain
         let surface = space.surface
-        let steps = Self.chunkSize * Self.subdivisions
-        let step = terrain.cellSize / Double(Self.subdivisions)
-        let material = MaterialLibrary.shared.matte(Self.placeholderGround)
+        let step = terrain.cellSize * cellsPerStep
+        let originX = Double(key.x * Self.chunkSize) * terrain.cellSize
+        let originZ = Double(key.z * Self.chunkSize) * terrain.cellSize
+        let cellsX = min(Self.chunkSize, terrain.size - key.x * Self.chunkSize)
+        let cellsZ = min(Self.chunkSize, terrain.size - key.z * Self.chunkSize)
+        let columns = Int((Double(cellsX) / cellsPerStep).rounded(.up))
+        let rows = Int((Double(cellsZ) / cellsPerStep).rounded(.up))
+        guard columns > 0, rows > 0 else { return nil }
+        let maxX = originX + Double(cellsX) * terrain.cellSize
+        let maxZ = originZ + Double(cellsZ) * terrain.cellSize
 
-        for key in allChunks() {
-            let originX = Double(key.x * Self.chunkSize) * terrain.cellSize
-            let originZ = Double(key.z * Self.chunkSize) * terrain.cellSize
-            let columns = min(steps, (terrain.size - key.x * Self.chunkSize) * Self.subdivisions)
-            let rows = min(steps, (terrain.size - key.z * Self.chunkSize) * Self.subdivisions)
-            guard columns > 0, rows > 0 else { continue }
-
-            var positions: [SIMD3<Float>] = []
-            var normals: [SIMD3<Float>] = []
-            var uvs: [SIMD2<Float>] = []
-            positions.reserveCapacity((columns + 1) * (rows + 1))
-            for row in 0...rows {
-                for column in 0...columns {
-                    let x = originX + Double(column) * step
-                    let z = originZ + Double(row) * step
-                    positions.append(SIMD3<Float>(Float(x), Float(surface.height(x: x, z: z)), Float(z)))
-                    normals.append(surface.normal(x: x, z: z, step: step))
-                    // RealityKit samples textures with v = 0 at the bottom of the image;
-                    // image rows run along z from the top, hence the flip.
-                    uvs.append(SIMD2<Float>(Float(x / terrain.extent), Float(1 - z / terrain.extent)))
-                }
-            }
-            var indices: [UInt32] = []
-            indices.reserveCapacity(columns * rows * 6)
-            let width = UInt32(columns + 1)
-            for row in 0..<UInt32(rows) {
-                for column in 0..<UInt32(columns) {
-                    let a = row * width + column
-                    let b = a + 1
-                    let c = a + width
-                    let d = c + 1
-                    // Counter-clockwise seen from above.
-                    indices.append(contentsOf: [a, c, b, b, c, d])
-                }
-            }
-
-            var descriptor = MeshDescriptor(name: "ground-\(key.x)-\(key.z)")
-            descriptor.positions = MeshBuffers.Positions(positions)
-            descriptor.normals = MeshBuffers.Normals(normals)
-            descriptor.textureCoordinates = MeshBuffers.TextureCoordinates(uvs)
-            descriptor.primitives = .triangles(indices)
-            guard let mesh = try? MeshResource.generate(from: [descriptor]) else { continue }
-            let chunk = ModelEntity(mesh: mesh, materials: [material])
-            parent.addChild(chunk)
-            groundChunks.append(chunk)
+        var positions: [SIMD3<Float>] = []
+        var normals: [SIMD3<Float>] = []
+        var uvs: [SIMD2<Float>] = []
+        positions.reserveCapacity((columns + 1) * (rows + 1) + 2 * (columns + rows + 2))
+        func addVertex(x: Double, z: Double, drop: Float = 0) {
+            positions.append(SIMD3<Float>(Float(x), Float(surface.height(x: x, z: z)) - drop, Float(z)))
+            normals.append(surface.normal(x: x, z: z, step: step))
+            // RealityKit samples textures with v = 0 at the bottom of the image;
+            // image rows run along z from the top, hence the flip.
+            uvs.append(SIMD2<Float>(Float(x / terrain.extent), Float(1 - z / terrain.extent)))
         }
+        for row in 0...rows {
+            for column in 0...columns {
+                addVertex(x: min(maxX, originX + Double(column) * step), z: min(maxZ, originZ + Double(row) * step))
+            }
+        }
+        var indices: [UInt32] = []
+        indices.reserveCapacity(columns * rows * 6)
+        let width = UInt32(columns + 1)
+        for row in 0..<UInt32(rows) {
+            for column in 0..<UInt32(columns) {
+                let a = row * width + column
+                let b = a + 1
+                let c = a + width
+                let d = c + 1
+                // Counter-clockwise seen from above.
+                indices.append(contentsOf: [a, c, b, b, c, d])
+            }
+        }
+
+        // Skirt: the outline once more, lowered, joined to the edge by faces seen from both sides.
+        let drop = Float(step) * 0.6 + 2
+        var outline: [UInt32] = []
+        for column in 0...columns { outline.append(UInt32(column)) }
+        for row in 1...rows { outline.append(UInt32(row) * width + UInt32(columns)) }
+        for column in stride(from: columns - 1, through: 0, by: -1) { outline.append(UInt32(rows) * width + UInt32(column)) }
+        for row in stride(from: rows - 1, through: 1, by: -1) { outline.append(UInt32(row) * width) }
+        let skirtStart = UInt32(positions.count)
+        for index in outline {
+            let top = positions[Int(index)]
+            addVertex(x: Double(top.x), z: Double(top.z), drop: drop)
+        }
+        for (offset, index) in outline.enumerated() {
+            let next = outline[(offset + 1) % outline.count]
+            let low = skirtStart + UInt32(offset)
+            let lowNext = skirtStart + UInt32((offset + 1) % outline.count)
+            indices.append(contentsOf: [index, low, next, next, low, lowNext])
+            indices.append(contentsOf: [index, next, low, next, lowNext, low])
+        }
+
+        var descriptor = MeshDescriptor(name: "ground-\(key.x)-\(key.z)")
+        descriptor.positions = MeshBuffers.Positions(positions)
+        descriptor.normals = MeshBuffers.Normals(normals)
+        descriptor.textureCoordinates = MeshBuffers.TextureCoordinates(uvs)
+        descriptor.primitives = .triangles(indices)
+        return try? MeshResource.generate(from: [descriptor])
     }
 
     /// Paints the ground texture on a background task and applies it when done.
     private func paintTexture() {
-        let builder = TerrainTextureBuilder(surface: space.surface, size: Self.textureSize)
+        // About two metres per pixel, between 2048 and 4096 pixels per edge.
+        let size = min(4096, max(2048, space.terrain.size * 4))
+        let builder = TerrainTextureBuilder(surface: space.surface, size: size)
         textureTask = Task { [weak self] in
             let pixels = await Self.paint(builder)
             guard !Task.isCancelled, let self else { return }
@@ -159,8 +272,9 @@ final class TerrainLayer: SceneLayer {
         material.baseColor = .init(texture: .init(texture))
         material.roughness = 0.95
         material.metallic = 0.0
-        for chunk in groundChunks {
-            chunk.model?.materials = [material]
+        groundMaterial = material
+        for chunk in groundChunks.values {
+            chunk.entity.model?.materials = [material]
         }
     }
 

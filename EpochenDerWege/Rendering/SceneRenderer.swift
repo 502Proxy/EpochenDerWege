@@ -16,6 +16,8 @@ struct RenderContext {
     /// Seconds of animation time; advances with the game speed and stops while paused.
     let animationTime: TimeInterval
     let overlay: MapOverlay
+    /// Camera position in simulation coordinates (below the root anchor), for detail levels.
+    let camera: SIMD3<Float>
 
     var world: WorldState { frame.world }
 }

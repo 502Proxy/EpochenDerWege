@@ -67,7 +67,7 @@ struct WorldGenerationTests {
 
     @Test(arguments: [UInt64(1), 7, 42, 99, 2026])
     func everySeedFindsAStart(seed: UInt64) throws {
-        let world = WorldFactory.makeWorld(catalog: try Fixtures.catalog(), seed: seed)
+        let world = WorldFactory.makeWorld(catalog: try Fixtures.catalog(), seed: seed, mapSize: 128)
         #expect(world.startCell != nil)
         #expect(world.population == 20)
     }
@@ -207,7 +207,7 @@ struct EconomyLoopTests {
 
     @Test func simulationIsDeterministic() throws {
         func run() throws -> (treasury: Int, population: Int, stock: [GoodAmount]) {
-            var simulation = Simulation(world: WorldFactory.makeWorld(catalog: try Fixtures.catalog(), seed: 7))
+            var simulation = Simulation(world: WorldFactory.makeWorld(catalog: try Fixtures.catalog(), seed: 7, mapSize: 128))
             let start = try #require(simulation.world.startCell)
             simulation.execute(PlaceBuildingCommand(buildingType: "grainFarm", cell: start.offset(dx: 1, dz: 0)))
             simulation.execute(ZoneCommand(cells: [start.offset(dx: -1, dz: 0)], kind: .industrial))

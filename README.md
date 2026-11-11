@@ -90,7 +90,7 @@ and the [issues](https://github.com/502Proxy/EpochenDerWege/issues) for planned 
 
 Playable today:
 
-- Procedural 3D map with smooth, finely resolved hills and a painted ground texture: grass patches, beaches, cliffs on steep slopes, snow on peaks; forests, bushes and boulders
+- Procedural 8 × 8 km map (1024 × 1024 cells) with up to ten towns, rendered in tiles whose detail follows the camera; smooth, finely resolved hills and a painted ground texture: grass patches, beaches, cliffs on steep slopes, snow on peaks; forests, bushes and boulders
 - Starting settlement with a storehouse and five houses (20 farmers)
 - Build toolbar with categories; gravel roads drawn by dragging (steep hills are crossed by tunnels), demolish tool
 - Residential, commercial and industrial zones: towns build houses, markets and workshops next to roads on their own

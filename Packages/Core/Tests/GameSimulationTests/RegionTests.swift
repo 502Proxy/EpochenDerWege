@@ -18,7 +18,7 @@ struct RegionTests {
 
     @Test(arguments: [UInt64(7), 2026])
     func depositsLieBeyondCarrierRange(seed: UInt64) throws {
-        let world = WorldFactory.makeWorld(catalog: try Fixtures.catalog(), seed: seed)
+        let world = WorldFactory.makeWorld(catalog: try Fixtures.catalog(), seed: seed, mapSize: 128)
         let start = try #require(world.startCell)
         let rangeInCells = world.rules.carrierRangeMeters / world.terrain.cellSize
         var found = Set<Deposit>()
@@ -31,6 +31,28 @@ struct RegionTests {
             }
         }
         #expect(found == Set(Deposit.allCases))
+    }
+
+    @Test func largeMapHasManyTownsAndDeposits() throws {
+        let world = WorldFactory.makeWorld(catalog: try Fixtures.catalog(), seed: 2026)
+        #expect(world.terrain.size == WorldFactory.defaultMapSize)
+        let start = try #require(world.startCell)
+        #expect(world.towns.count >= 6)
+        // Towns keep their distance from each other.
+        for (index, town) in world.towns.enumerated() {
+            for other in world.towns.dropFirst(index + 1) {
+                #expect(cellDistance(town.center, other.center) >= RegionPlanner.townSpacing(forMapSize: world.terrain.size))
+            }
+        }
+        // At least one town is near enough to start trading early.
+        #expect(world.towns.contains { cellDistance($0.center, start) <= Double(RegionPlanner.townDistance.upperBound) })
+        var stone = 0
+        for z in stride(from: 0, to: world.terrain.size, by: 2) {
+            for x in stride(from: 0, to: world.terrain.size, by: 2) where world.terrain.deposit(at: GridPoint(x: x, z: z)) == .stone {
+                stone += 1
+            }
+        }
+        #expect(stone > 100)
     }
 
     @Test func townsAreFoundedFarAwayWithTheirOwnStop() throws {

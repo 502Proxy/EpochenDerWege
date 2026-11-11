@@ -70,7 +70,8 @@ final class SceneCoordinator: NSObject {
 
         camera.camera.fieldOfViewInDegrees = 45
         camera.camera.near = 1
-        camera.camera.far = 8000
+        // Far enough to see across an 8 km map from the highest zoom.
+        camera.camera.far = 30000
         let cameraAnchor = AnchorEntity(world: .zero)
         cameraAnchor.addChild(camera)
         view.scene.addAnchor(cameraAnchor)
@@ -121,7 +122,8 @@ final class SceneCoordinator: NSObject {
             roadPreview: roadPreview(in: frame.world),
             zonePreview: zonePreview(),
             animationTime: animationTime,
-            overlay: viewModel.overlay
+            overlay: viewModel.overlay,
+            camera: rig.position + SIMD3<Float>(renderer.space.halfExtent, 0, renderer.space.halfExtent)
         )
         renderer.update(with: context)
 

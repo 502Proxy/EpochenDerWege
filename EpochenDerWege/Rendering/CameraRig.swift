@@ -13,7 +13,7 @@ struct CameraRig {
     /// The target stays within ±bounds on x and z.
     var bounds: Float = 512
 
-    static let distanceRange: ClosedRange<Float> = 25...1400
+    static let distanceRange: ClosedRange<Float> = 25...6000
     static let pitchRange: ClosedRange<Float> = 0.2...1.45
 
     var position: SIMD3<Float> {
