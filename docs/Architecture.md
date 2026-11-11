@@ -141,8 +141,9 @@ replaced in tests.
 | --- | --- |
 | Simulation off the main thread, fixed time step | `SimulationEngine` |
 | Interpolation between ticks | `CarrierLayer` |
-| Terrain built once, flat-shaded, one mesh | `TerrainLayer` |
-| Trees merged into one mesh per 16 × 16 chunk; only touched chunks rebuild | `TerrainLayer` |
+| Terrain built once as smooth 16 × 16 chunks at twice the grid resolution (bicubic `TerrainSurface`) | `TerrainLayer` |
+| Ground texture (2048²) painted on a background task (`@concurrent`), plain colour until ready | `TerrainTextureBuilder` |
+| Vegetation merged into one mesh per chunk; only touched chunks rebuild | `TerrainLayer` |
 | Shared materials and meshes | `MaterialLibrary` |
 | Entity pooling | `CarrierLayer` |
 | Building models cloned from per-type templates | `BuildingModelFactory` |

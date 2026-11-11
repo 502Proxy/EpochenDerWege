@@ -2,54 +2,58 @@ import AppKit
 import GameDomain
 import RealityKit
 
-/// Ground, water and forest.
+/// Ground, water and vegetation.
 ///
-/// The ground mesh is built once. Trees are split into chunks so that placing a
-/// building only rebuilds the trees of one chunk instead of the whole forest.
+/// The ground is a smooth, textured mesh at twice the simulation's grid resolution,
+/// split into chunks. Its texture is painted on a background task; until it is ready
+/// the ground shows a plain colour. Vegetation is merged into one mesh per chunk, so
+/// placing a building only rebuilds the vegetation of that chunk.
 final class TerrainLayer: SceneLayer {
     static let chunkSize = 16
+    /// Mesh vertices per cell edge; 2 doubles the simulation's resolution.
+    static let subdivisions = 2
+    /// Pixels per texture edge.
+    static let textureSize = 2048
 
     private let parent: Entity
     private let space: SceneSpace
-    private var treeChunks: [ChunkKey: ModelEntity] = [:]
+    private var groundChunks: [ModelEntity] = []
+    private var vegetationChunks: [ChunkKey: ModelEntity] = [:]
     private var occupiedCellsByChunk: [ChunkKey: Set<GridPoint>] = [:]
     private var lastBuildingIDs: [BuildingID] = []
     private var lastRoads: Set<GridPoint> = []
+    private var textureTask: Task<Void, Never>?
 
-    private static let biomeColors: [Biome: GameColor] = [
-        .water: GameColor(red: 0.55, green: 0.50, blue: 0.36),
-        .sand: GameColor(red: 0.87, green: 0.80, blue: 0.56),
-        .grass: GameColor(red: 0.47, green: 0.66, blue: 0.30),
-        .forest: GameColor(red: 0.27, green: 0.47, blue: 0.20),
-        .rock: GameColor(red: 0.52, green: 0.50, blue: 0.47),
-        .snow: GameColor(red: 0.95, green: 0.95, blue: 0.97),
-    ]
-    /// Materials of the tree meshes, indexed by `TreePart`.
-    private static let treeColors = [
+    /// Materials of the vegetation meshes, indexed by `Part`.
+    private static let vegetationColors = [
         GameColor(red: 0.40, green: 0.28, blue: 0.17),
         GameColor(red: 0.15, green: 0.35, blue: 0.17),
         GameColor(red: 0.30, green: 0.52, blue: 0.20),
         GameColor(red: 0.38, green: 0.58, blue: 0.22),
+        GameColor(red: 0.50, green: 0.49, blue: 0.47),
+        GameColor(red: 0.33, green: 0.50, blue: 0.20),
     ]
 
-    private enum TreePart: UInt32 {
-        case trunk = 0, needles, leaves, lightLeaves
+    private enum Part: UInt32 {
+        case trunk = 0, needles, leaves, lightLeaves, boulder, bush
     }
 
-    /// Shades per biome; neighbouring cells pick different shades so the ground looks less uniform.
-    private static let shadeSteps: [Double] = [0, 0.05, 0.10]
-    private static let waterColor = GameColor(red: 0.20, green: 0.45, blue: 0.70)
+    private static let placeholderGround = GameColor(red: 0.42, green: 0.60, blue: 0.29)
+    private static let waterColor = GameColor(red: 0.16, green: 0.40, blue: 0.62)
 
     init(parent: Entity, space: SceneSpace) {
         self.parent = parent
         self.space = space
-        if let ground = makeGround() {
-            parent.addChild(ground)
-        }
+        makeGround()
         parent.addChild(makeWater())
         for key in allChunks() {
-            rebuildTrees(in: key)
+            rebuildVegetation(in: key)
         }
+        paintTexture()
+    }
+
+    deinit {
+        textureTask?.cancel()
     }
 
     func update(with context: RenderContext) {
@@ -59,7 +63,7 @@ final class TerrainLayer: SceneLayer {
         lastBuildingIDs = ids
         lastRoads = world.roads
 
-        // Trees give way to buildings and roads.
+        // Vegetation gives way to buildings and roads.
         var occupied: [ChunkKey: Set<GridPoint>] = [:]
         for cell in world.buildings.map(\.cell) + Array(world.roads) {
             occupied[ChunkKey(cell), default: []].insert(cell)
@@ -69,54 +73,111 @@ final class TerrainLayer: SceneLayer {
         }
         occupiedCellsByChunk = occupied
         for key in changed {
-            rebuildTrees(in: key)
+            rebuildVegetation(in: key)
         }
     }
 
     // MARK: - Ground and water
 
-    private func makeGround() -> Entity? {
+    /// One smooth mesh per chunk; vertices are shared within a chunk so shading is smooth.
+    private func makeGround() {
         let terrain = space.terrain
-        let biomes = Biome.allCases
-        let biomeIndex = Dictionary(uniqueKeysWithValues: biomes.enumerated().map { ($1, $0) })
-        let shades = Self.shadeSteps.count
-        let cellSize = Float(terrain.cellSize)
+        let surface = space.surface
+        let steps = Self.chunkSize * Self.subdivisions
+        let step = terrain.cellSize / Double(Self.subdivisions)
+        let material = MaterialLibrary.shared.matte(Self.placeholderGround)
 
-        func corner(_ x: Int, _ z: Int) -> SIMD3<Float> {
-            SIMD3<Float>(Float(x) * cellSize, Float(terrain.cornerHeight(x: x, z: z)), Float(z) * cellSize)
-        }
+        for key in allChunks() {
+            let originX = Double(key.x * Self.chunkSize) * terrain.cellSize
+            let originZ = Double(key.z * Self.chunkSize) * terrain.cellSize
+            let columns = min(steps, (terrain.size - key.x * Self.chunkSize) * Self.subdivisions)
+            let rows = min(steps, (terrain.size - key.z * Self.chunkSize) * Self.subdivisions)
+            guard columns > 0, rows > 0 else { continue }
 
-        var mesh = TriangleMeshBuilder(estimatedTriangles: terrain.size * terrain.size * 2)
-        let up = SIMD3<Float>(0, 1, 0)
-        for z in 0..<terrain.size {
-            for x in 0..<terrain.size {
-                let biome = biomeIndex[terrain.biome(at: GridPoint(x: x, z: z))] ?? 0
-                let material = UInt32(biome * shades + Self.hash(x, z, 7) % shades)
-                mesh.addTriangle(corner(x, z), corner(x, z + 1), corner(x + 1, z), material: material, outward: up)
-                mesh.addTriangle(corner(x + 1, z), corner(x, z + 1), corner(x + 1, z + 1), material: material, outward: up)
+            var positions: [SIMD3<Float>] = []
+            var normals: [SIMD3<Float>] = []
+            var uvs: [SIMD2<Float>] = []
+            positions.reserveCapacity((columns + 1) * (rows + 1))
+            for row in 0...rows {
+                for column in 0...columns {
+                    let x = originX + Double(column) * step
+                    let z = originZ + Double(row) * step
+                    positions.append(SIMD3<Float>(Float(x), Float(surface.height(x: x, z: z)), Float(z)))
+                    normals.append(surface.normal(x: x, z: z, step: step))
+                    // RealityKit samples textures with v = 0 at the bottom of the image;
+                    // image rows run along z from the top, hence the flip.
+                    uvs.append(SIMD2<Float>(Float(x / terrain.extent), Float(1 - z / terrain.extent)))
+                }
             }
-        }
+            var indices: [UInt32] = []
+            indices.reserveCapacity(columns * rows * 6)
+            let width = UInt32(columns + 1)
+            for row in 0..<UInt32(rows) {
+                for column in 0..<UInt32(columns) {
+                    let a = row * width + column
+                    let b = a + 1
+                    let c = a + width
+                    let d = c + 1
+                    // Counter-clockwise seen from above.
+                    indices.append(contentsOf: [a, c, b, b, c, d])
+                }
+            }
 
-        guard let resource = try? mesh.makeMesh(named: "terrain") else { return nil }
-        let materials = biomes.flatMap { biome in
-            Self.shadeSteps.map { MaterialLibrary.shared.matte((Self.biomeColors[biome] ?? .selection).darkened(by: $0)) }
+            var descriptor = MeshDescriptor(name: "ground-\(key.x)-\(key.z)")
+            descriptor.positions = MeshBuffers.Positions(positions)
+            descriptor.normals = MeshBuffers.Normals(normals)
+            descriptor.textureCoordinates = MeshBuffers.TextureCoordinates(uvs)
+            descriptor.primitives = .triangles(indices)
+            guard let mesh = try? MeshResource.generate(from: [descriptor]) else { continue }
+            let chunk = ModelEntity(mesh: mesh, materials: [material])
+            parent.addChild(chunk)
+            groundChunks.append(chunk)
         }
-        return ModelEntity(mesh: resource, materials: materials)
+    }
+
+    /// Paints the ground texture on a background task and applies it when done.
+    private func paintTexture() {
+        let builder = TerrainTextureBuilder(surface: space.surface, size: Self.textureSize)
+        textureTask = Task { [weak self] in
+            let pixels = await Self.paint(builder)
+            guard !Task.isCancelled, let self else { return }
+            self.applyTexture(pixels: pixels, size: builder.size)
+        }
+    }
+
+    @concurrent
+    private nonisolated static func paint(_ builder: TerrainTextureBuilder) async -> [UInt8] {
+        builder.makePixels()
+    }
+
+    private func applyTexture(pixels: [UInt8], size: Int) {
+        guard
+            let image = TerrainTextureBuilder.makeImage(pixels: pixels, size: size),
+            let texture = try? TextureResource(image: image, options: .init(semantic: .color))
+        else { return }
+        var material = PhysicallyBasedMaterial()
+        material.baseColor = .init(texture: .init(texture))
+        material.roughness = 0.95
+        material.metallic = 0.0
+        for chunk in groundChunks {
+            chunk.model?.materials = [material]
+        }
     }
 
     private func makeWater() -> Entity {
         var water = PhysicallyBasedMaterial()
         water.baseColor = .init(tint: NSColor(Self.waterColor))
-        water.roughness = 0.2
+        water.roughness = 0.08
         water.metallic = 0.0
-        water.blending = .transparent(opacity: 0.8)
+        water.specular = 0.9
+        water.blending = .transparent(opacity: 0.82)
         let size = Float(space.terrain.extent)
         let entity = ModelEntity(mesh: .generatePlane(width: size, depth: size), materials: [water])
         entity.position = SIMD3<Float>(size / 2, Float(space.terrain.seaLevel) + 0.3, size / 2)
         return entity
     }
 
-    // MARK: - Trees
+    // MARK: - Vegetation
 
     private struct ChunkKey: Hashable {
         let x: Int
@@ -138,54 +199,88 @@ final class TerrainLayer: SceneLayer {
         return (0..<count).flatMap { z in (0..<count).map { x in ChunkKey(x: x, z: z) } }
     }
 
-    private func rebuildTrees(in key: ChunkKey) {
-        treeChunks[key]?.removeFromParent()
-        treeChunks[key] = nil
+    /// Forests get three trees per cell; grassland has bushes and the odd tree;
+    /// rocky ground has boulders. Positions are stable per cell, so nothing jumps
+    /// when a chunk is rebuilt.
+    private func rebuildVegetation(in key: ChunkKey) {
+        vegetationChunks[key]?.removeFromParent()
+        vegetationChunks[key] = nil
 
         let terrain = space.terrain
+        let surface = space.surface
         let occupied = occupiedCellsByChunk[key] ?? []
-        var mesh = TriangleMeshBuilder(estimatedTriangles: Self.chunkSize * Self.chunkSize * 40)
+        var mesh = TriangleMeshBuilder(estimatedTriangles: Self.chunkSize * Self.chunkSize * 60)
         let startX = key.x * Self.chunkSize
         let startZ = key.z * Self.chunkSize
+
+        func spot(_ x: Int, _ z: Int, _ index: Int) -> (base: SIMD3<Float>, seed: Int) {
+            let seed = Self.hash(x, z, index)
+            let jitterX = Double(seed % 1000) / 1000 * 0.8 + 0.1
+            let jitterZ = Double((seed / 1000) % 1000) / 1000 * 0.8 + 0.1
+            let px = (Double(x) + jitterX) * terrain.cellSize
+            let pz = (Double(z) + jitterZ) * terrain.cellSize
+            return (SIMD3<Float>(Float(px), Float(surface.height(x: px, z: pz)), Float(pz)), seed)
+        }
 
         for z in startZ..<min(startZ + Self.chunkSize, terrain.size) {
             for x in startX..<min(startX + Self.chunkSize, terrain.size) {
                 let cell = GridPoint(x: x, z: z)
-                guard terrain.biome(at: cell) == .forest, !occupied.contains(cell) else { continue }
-                for index in 0..<2 {
-                    let seed = Self.hash(x, z, index)
-                    let jitterX = Double(seed % 1000) / 1000 * 0.7 + 0.15
-                    let jitterZ = Double((seed / 1000) % 1000) / 1000 * 0.7 + 0.15
-                    let point = WorldPoint(x: (Double(x) + jitterX) * terrain.cellSize, z: (Double(z) + jitterZ) * terrain.cellSize)
-                    let base = SIMD3<Float>(Float(point.x), Float(terrain.height(at: point)), Float(point.z))
-                    let size = 0.8 + Float(seed % 5) * 0.1
-                    if seed % 5 < 3 {
-                        Self.addConifer(to: &mesh, base: base, size: size)
-                    } else {
-                        Self.addDeciduous(to: &mesh, base: base, size: size, light: seed % 2 == 0)
+                guard !occupied.contains(cell) else { continue }
+                switch terrain.biome(at: cell) {
+                case .forest:
+                    for index in 0..<3 {
+                        let (base, seed) = spot(x, z, index)
+                        let size = 0.75 + Float(seed % 6) * 0.08
+                        if seed % 5 < 3 {
+                            Self.addConifer(to: &mesh, base: base, size: size)
+                        } else {
+                            Self.addDeciduous(to: &mesh, base: base, size: size, light: seed % 2 == 0)
+                        }
                     }
+                case .grass:
+                    let (base, seed) = spot(x, z, 7)
+                    if seed % 100 < 6 {
+                        Self.addDeciduous(to: &mesh, base: base, size: 0.9, light: true)
+                    } else if seed % 100 < 22 {
+                        Self.addBush(to: &mesh, base: base, size: 0.7 + Float(seed % 4) * 0.15)
+                    }
+                case .rock:
+                    let (base, seed) = spot(x, z, 9)
+                    if seed % 100 < 30 {
+                        Self.addBoulder(to: &mesh, base: base, size: 0.8 + Float(seed % 5) * 0.3)
+                    }
+                case .sand, .water, .snow:
+                    break
                 }
             }
         }
 
-        guard let resource = try? mesh.makeMesh(named: "trees-\(key.x)-\(key.z)") else { return }
-        let entity = ModelEntity(mesh: resource, materials: Self.treeColors.map { MaterialLibrary.shared.matte($0) })
+        guard let resource = try? mesh.makeMesh(named: "vegetation-\(key.x)-\(key.z)") else { return }
+        let entity = ModelEntity(mesh: resource, materials: Self.vegetationColors.map { MaterialLibrary.shared.matte($0) })
         parent.addChild(entity)
-        treeChunks[key] = entity
+        vegetationChunks[key] = entity
+    }
+
+    private static func addBush(to mesh: inout TriangleMeshBuilder, base: SIMD3<Float>, size: Float) {
+        addCrown(to: &mesh, center: base + SIMD3<Float>(0, 0.7 * size, 0), radius: 1.2 * size, height: 0.8 * size, sides: 5, material: Part.bush.rawValue)
+    }
+
+    private static func addBoulder(to mesh: inout TriangleMeshBuilder, base: SIMD3<Float>, size: Float) {
+        addCrown(to: &mesh, center: base + SIMD3<Float>(0, 0.3 * size, 0), radius: 1.1 * size, height: 0.9 * size, sides: 5, material: Part.boulder.rawValue)
     }
 
     /// A conifer: short trunk and two stacked six-sided cones.
     private static func addConifer(to mesh: inout TriangleMeshBuilder, base: SIMD3<Float>, size: Float) {
-        addPrism(to: &mesh, base: base, radius: 0.35 * size, height: 1.6 * size, sides: 4, material: TreePart.trunk.rawValue)
-        addCone(to: &mesh, base: base + SIMD3<Float>(0, 1.2 * size, 0), radius: 2.4 * size, height: 4.2 * size, sides: 6, material: TreePart.needles.rawValue)
-        addCone(to: &mesh, base: base + SIMD3<Float>(0, 3.6 * size, 0), radius: 1.7 * size, height: 3.6 * size, sides: 6, material: TreePart.needles.rawValue)
+        addPrism(to: &mesh, base: base, radius: 0.35 * size, height: 1.6 * size, sides: 4, material: Part.trunk.rawValue)
+        addCone(to: &mesh, base: base + SIMD3<Float>(0, 1.2 * size, 0), radius: 2.4 * size, height: 4.2 * size, sides: 6, material: Part.needles.rawValue)
+        addCone(to: &mesh, base: base + SIMD3<Float>(0, 3.6 * size, 0), radius: 1.7 * size, height: 3.6 * size, sides: 6, material: Part.needles.rawValue)
     }
 
     /// A broadleaf tree: trunk and a faceted, roughly round crown.
     private static func addDeciduous(to mesh: inout TriangleMeshBuilder, base: SIMD3<Float>, size: Float, light: Bool) {
-        addPrism(to: &mesh, base: base, radius: 0.35 * size, height: 3 * size, sides: 4, material: TreePart.trunk.rawValue)
+        addPrism(to: &mesh, base: base, radius: 0.35 * size, height: 3 * size, sides: 4, material: Part.trunk.rawValue)
         let center = base + SIMD3<Float>(0, 4.6 * size, 0)
-        let material = (light ? TreePart.lightLeaves : TreePart.leaves).rawValue
+        let material = (light ? Part.lightLeaves : Part.leaves).rawValue
         addCrown(to: &mesh, center: center, radius: 2.4 * size, height: 2.2 * size, sides: 6, material: material)
     }
 
