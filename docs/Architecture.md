@@ -98,7 +98,8 @@ simulation slightly but can never drop a frame.
 | 4 | `TransportSystem` | every tick | Drives vehicles along their lines; unloads goods wanted at a stop and loads goods wanted further down the line |
 | 5 | `PopulationSystem` | every 10 days | Feeds houses, grows or shrinks them |
 | 6 | `EconomySystem` | yearly | Taxes and upkeep |
-| 7 | `TownGrowthSystem` | every 5 days | Builds houses, markets and workshops in their zones next to roads when the town has demand |
+| 7 | `SettlementSystem` | daily | Raises the settlement level (hamlet, village, …) when the population reaches the next threshold; levels are never lost |
+| 8 | `TownGrowthSystem` | every 5 days | Builds houses, markets and workshops in their zones next to roads when their `ZoneDemand` reaches the growth threshold |
 
 The simulation is **deterministic**: the same seed, commands and number of ticks always
 produce the same world. Collections are iterated in a stable order (buildings in
@@ -186,6 +187,13 @@ an acceptable trade-off.
 The simulation emits `SimulationEvent` values instead of strings. Text is created in
 `GameText` and localized through `Localizable.xcstrings`, so the Core package stays
 free of presentation concerns and the game can be translated without touching rules.
+
+### Zone demand is the growth rule
+
+`ZoneDemand` turns the growth rules into a value from 0 to 1 per zone kind, with a
+reason and a flag for missing space. `TownGrowthSystem` builds when the value
+reaches 0.5, and the HUD shows the same values as demand bars. Because both read
+one function, the bars can never promise growth the town will not deliver.
 
 ### Hybrid logistics: carriers locally, lines for distance
 

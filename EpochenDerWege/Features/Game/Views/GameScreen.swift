@@ -22,6 +22,7 @@ struct GameScreen: View {
             VStack(spacing: 0) {
                 HStack(alignment: .top, spacing: 12) {
                     VStack(alignment: .leading, spacing: 10) {
+                        SettlementCard(settlement: viewModel.settlement)
                         StockStripView(stock: viewModel.hud.stock)
                         if let details = viewModel.inspector {
                             InspectorView(

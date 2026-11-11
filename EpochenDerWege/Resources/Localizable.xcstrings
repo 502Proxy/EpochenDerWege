@@ -1930,6 +1930,216 @@
           }
         }
       }
+    },
+    "Unlocked when your settlement becomes a %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Freigeschaltet ab der Stufe „%@“."
+          }
+        }
+      }
+    },
+    "Your settlement is now a %@!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Stufe erreicht: %@!"
+          }
+        }
+      }
+    },
+    "Your settlement is now a %@! New: %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Stufe erreicht: %@! Neu: %@."
+          }
+        }
+      }
+    },
+    "No demand at the moment.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zurzeit kein Bedarf."
+          }
+        }
+      }
+    },
+    "%lld jobs are open – people want to move in.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Arbeitsplätze sind frei – Menschen wollen zuziehen."
+          }
+        }
+      }
+    },
+    "Plenty of food – people want to move in.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reichlich Essen – Menschen wollen zuziehen."
+          }
+        }
+      }
+    },
+    "Too little food in the storehouses or houses badly supplied.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu wenig Essen im Lager oder Häuser schlecht versorgt."
+          }
+        }
+      }
+    },
+    "A new house is waiting for residents. They move in once food is delivered.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein neues Haus wartet auf Bewohner. Sie ziehen ein, sobald Essen geliefert wird."
+          }
+        }
+      }
+    },
+    "The population supports more businesses.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Bevölkerung trägt weitere Betriebe."
+          }
+        }
+      }
+    },
+    "Nothing to build here yet.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hier gibt es noch nichts zu bauen."
+          }
+        }
+      }
+    },
+    "No free space: draw more %@ next to roads.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein freier Platz: Zeichne mehr %@ an Straßen."
+          }
+        }
+      }
+    },
+    "R": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "W"
+          }
+        }
+      }
+    },
+    "C": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "G"
+          }
+        }
+      }
+    },
+    "I": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I"
+          }
+        }
+      }
+    },
+    "Next: %@ at %lld residents": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Stufe: %@ ab %lld Einwohnern"
+          }
+        }
+      }
+    },
+    "Hamlet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weiler"
+          }
+        }
+      }
+    },
+    "Village": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dorf"
+          }
+        }
+      }
+    },
+    "Small town": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kleinstadt"
+          }
+        }
+      }
+    },
+    "Town": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stadt"
+          }
+        }
+      }
+    },
+    "City": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Großstadt"
+          }
+        }
+      }
+    },
+    "Settlement": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siedlung"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

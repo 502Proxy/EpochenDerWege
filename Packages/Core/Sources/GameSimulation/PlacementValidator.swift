@@ -13,6 +13,9 @@ public enum PlacementValidator {
         ignoringCost: Bool = false
     ) -> Result<Double, PlacementError> {
         let terrain = world.terrain
+        if let level = definition.requiredLevel, level > world.settlementLevel {
+            return .failure(.requiresLevel(level))
+        }
         guard terrain.contains(cell) else { return .failure(.outOfBounds) }
         guard terrain.isLand(cell) else { return .failure(.water) }
         let slope = terrain.slopePercent(at: cell)

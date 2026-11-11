@@ -420,5 +420,32 @@
         "blue": 0.22
       }
     }
+  ],
+  "settlementLevels": [
+    {
+      "id": "hamlet",
+      "name": "Hamlet",
+      "minimumPopulation": 0
+    },
+    {
+      "id": "village",
+      "name": "Village",
+      "minimumPopulation": 40
+    },
+    {
+      "id": "smallTown",
+      "name": "Small town",
+      "minimumPopulation": 100
+    },
+    {
+      "id": "town",
+      "name": "Town",
+      "minimumPopulation": 250
+    },
+    {
+      "id": "city",
+      "name": "City",
+      "minimumPopulation": 600
+    }
   ]
 }

@@ -50,6 +50,10 @@ final class GameViewModel {
     private(set) var openPanels: [GamePanel] = []
     /// Roads and buildings for the mini map.
     private(set) var miniMap = MiniMapContent()
+    /// Demand per zone kind, as the town sees it.
+    private(set) var zoneDemand: [ZoneKind: ZoneDemand] = [:]
+    /// Size class of the settlement and progress to the next.
+    private(set) var settlement = SettlementProgress()
     /// Where the camera looks; reported by the scene.
     private(set) var camera: CameraPose?
 
@@ -92,6 +96,11 @@ final class GameViewModel {
         if selectedTool != nil {
             selectBuilding(nil)
         }
+    }
+
+    /// Whether the settlement has reached the level a building needs.
+    func isUnlocked(_ type: BuildingTypeID) -> Bool {
+        (catalog.building(type)?.requiredLevel ?? 0) <= settlement.level
     }
 
     /// The building type of the active tool, if it places buildings.
@@ -307,6 +316,17 @@ final class GameViewModel {
         let lineSummaries = LineSummary.make(for: world)
         if lineSummaries != lines {
             lines = lineSummaries
+        }
+        var demand: [ZoneKind: ZoneDemand] = [:]
+        for kind in ZoneKind.allCases {
+            demand[kind] = ZoneDemand.compute(for: kind, in: world)
+        }
+        if demand != zoneDemand {
+            zoneDemand = demand
+        }
+        let progress = SettlementProgress(world: world)
+        if progress != settlement {
+            settlement = progress
         }
         let mapContent = MiniMapContent(world: world)
         if mapContent != miniMap {

@@ -21,6 +21,8 @@ public enum SimulationEvent: Hashable, Sendable {
     case lineRejected
     case vehicleBought(VehicleTypeID, cost: Int)
     case vehicleSold(VehicleTypeID, refund: Int)
+    /// The settlement grew into a new size class (index into the catalog's levels).
+    case settlementLevelReached(Int)
 }
 
 /// An event with its position in the event stream.
