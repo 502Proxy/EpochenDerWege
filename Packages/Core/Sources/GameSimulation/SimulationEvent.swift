@@ -4,7 +4,7 @@ import GameDomain
 ///
 /// Events carry data, not text, so the presentation layer decides how to phrase and
 /// localize them (observer pattern: the UI reads new events from each snapshot).
-public enum SimulationEvent: Hashable, Sendable {
+public enum SimulationEvent: Hashable, Sendable, Codable {
     case settlementFounded(population: Int)
     case buildingPlaced(BuildingTypeID, cost: Int)
     case buildingDemolished(BuildingTypeID, refund: Int)
@@ -30,7 +30,7 @@ public enum SimulationEvent: Hashable, Sendable {
 }
 
 /// An event with its position in the event stream.
-public struct EventRecord: Hashable, Sendable, Identifiable {
+public struct EventRecord: Hashable, Sendable, Identifiable, Codable {
     /// Strictly increasing across the game. Readers remember the last sequence they handled.
     public let sequence: Int
     public let tick: Int

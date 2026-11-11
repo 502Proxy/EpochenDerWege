@@ -215,6 +215,7 @@ enum GameText {
         case .goods: String(localized: "Goods")
         case .buildings: String(localized: "Buildings")
         case .lines: String(localized: "Lines")
+        case .saves: String(localized: "Save and load")
         }
     }
 

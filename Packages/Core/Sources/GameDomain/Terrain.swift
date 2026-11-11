@@ -13,7 +13,7 @@ public enum Biome: String, CaseIterable, Sendable, Codable {
 /// Heights are stored on the `(size + 1)²` cell corners, biomes on the `size²` cells.
 /// Terrain is generated once per world (see `TerrainGenerator` in `GameSimulation`)
 /// and never changes, so it can be shared freely between threads.
-public struct Terrain: Sendable {
+public struct Terrain: Sendable, Codable {
     /// Number of cells along each side of the map.
     public let size: Int
     /// Edge length of one cell in metres.
@@ -54,6 +54,44 @@ public struct Terrain: Sendable {
             heights: Array(repeating: height, count: (size + 1) * (size + 1)),
             biomes: Array(repeating: biome, count: size * size)
         )
+    }
+
+    // MARK: - Codable
+
+    private enum CodingKeys: String, CodingKey {
+        case size, cellSize, seaLevel, heights, biomes, deposits
+    }
+
+    /// Biomes and deposits come in large patches and are stored run-length encoded.
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let size = try container.decode(Int.self, forKey: .size)
+        let heights = try container.decode([Double].self, forKey: .heights)
+        let biomes = try container.decode(RunLengthEncoded<Biome>.self, forKey: .biomes)
+        let deposits = try container.decode(RunLengthEncoded<Deposit?>.self, forKey: .deposits)
+        guard size > 0, heights.count == (size + 1) * (size + 1), biomes.count == size * size,
+              deposits.count == 0 || deposits.count == size * size
+        else {
+            throw DecodingError.dataCorruptedError(forKey: .size, in: container, debugDescription: "Terrain data does not match its size")
+        }
+        self.init(
+            size: size,
+            cellSize: try container.decode(Double.self, forKey: .cellSize),
+            seaLevel: try container.decode(Double.self, forKey: .seaLevel),
+            heights: heights,
+            biomes: biomes.values,
+            deposits: deposits.values
+        )
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(size, forKey: .size)
+        try container.encode(cellSize, forKey: .cellSize)
+        try container.encode(seaLevel, forKey: .seaLevel)
+        try container.encode(heights, forKey: .heights)
+        try container.encode(RunLengthEncoded(biomes), forKey: .biomes)
+        try container.encode(RunLengthEncoded(deposits), forKey: .deposits)
     }
 
     /// Returns a copy with the biome of one cell replaced.

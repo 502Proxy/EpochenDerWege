@@ -25,6 +25,7 @@ flowchart TB
         Root["App/GameSession<br/>composition root"]
     end
     subgraph Core["Packages/Core"]
+        Persistence["GamePersistence<br/>save games"]
         Simulation["GameSimulation<br/>world state, systems, commands, engine"]
         Data["GameData<br/>catalog repository, validation"]
         Domain["GameDomain<br/>entities and value types"]
@@ -33,6 +34,8 @@ flowchart TB
     Rendering --> VM
     Root --> VM
     Root --> Data
+    Root --> Persistence
+    Persistence --> Simulation
     VM --> Simulation
     Rendering --> Simulation
     Simulation --> Domain
@@ -44,9 +47,10 @@ flowchart TB
 | `GameDomain` | Entities and value types: `Building`, `Carrier`, `Terrain`, `Inventory`, `GameCatalog`, IDs | Swift standard library |
 | `GameData` | Loading and validating the game catalog (`GameCatalogRepository`) | `GameDomain`, Foundation |
 | `GameSimulation` | `WorldState`, simulation systems, commands, world generation, `SimulationEngine` | `GameDomain`, Synchronization |
+| `GamePersistence` | Save games: `SaveGameRepository`, file format with summary header and compressed world | `GameSimulation`, Foundation |
 | App: `Features` | SwiftUI views, `GameViewModel`, text formatting and localization | everything in Core, SwiftUI |
 | App: `Rendering` | RealityKit scene, camera, input | everything in Core, RealityKit, AppKit |
-| App: `App` | `GameSession` wires concrete implementations together | everything |
+| App: `App` | `GameApp` (composition root, saves) creates a `GameSession` (engine and view model) per game | everything |
 
 The Core package never imports SwiftUI, AppKit or RealityKit. This is enforced by the
 package manifest: none of its targets link those frameworks.
@@ -111,7 +115,7 @@ reproducible and is a prerequisite for save games and replays.
 
 | Pattern | Where | Why |
 | --- | --- | --- |
-| Repository | `GameCatalogRepository`, `BundledCatalogRepository`, `JSONCatalogRepository` | The app does not care where game data comes from; tests and mods can supply their own |
+| Repository | `GameCatalogRepository`, `BundledCatalogRepository`, `JSONCatalogRepository`; `SaveGameRepository`, `FileSaveGameRepository` | The app does not care where game data and saves come from; tests and mods can supply their own |
 | Command | `GameCommand`, `PlaceBuildingCommand`, `DemolishBuildingCommand`, `BuildRoadCommand`, `DemolishRoadCommand`, `ZoneCommand`, `CreateLineCommand`, `BuyVehicleCommand` | All player actions are applied in one place between ticks; easy to log, replay or network later |
 | Strategy | `DeliveryPlanner`, `NearestConsumerPlanner` | How carriers pick targets can change (e.g. road routing) without touching the logistics system |
 | Single point of change | `WorldState.book(_:as:year:)` and `Ledger` | Every change of the treasury goes through one method that also records it, so the finance overview can never miss a booking |
@@ -123,7 +127,7 @@ reproducible and is a prerequisite for save games and replays.
 | Singleton + flyweight | `MaterialLibrary.shared` | One shared cache of materials and meshes for all layers. It holds no game state, only rendering resources, which is why a singleton is acceptable here |
 | MVVM | `GameViewModel` + SwiftUI views | Views are declarative and dumb; state and intents live in the view model |
 | Design tokens | `GameTheme`, `gamePanel()`, `HUDButtonStyle`, `PanelHeader` | All HUD colours, fonts and shapes come from one place, so the look can change without touching every view |
-| Composition root | `GameSession` | The only place that creates concrete implementations; everything else gets dependencies injected |
+| Composition root | `GameApp` | The only place that creates concrete implementations; everything else gets dependencies injected. Loading a game replaces the whole `GameSession`, so nothing of the old game leaks into the new one |
 
 Singletons are deliberately rare. Anything with game state is injected so it can be
 replaced in tests.
@@ -175,6 +179,15 @@ with a custom camera. `ARView` (in non-AR mode on macOS) provides `ray(through:)
 plain `NSView` event handling for all of these today. The rendering code is isolated
 behind `SceneView`, so switching to `RealityView` later only touches that file and the
 coordinator.
+
+### Save file format
+
+A save is one file: a magic number with format version, a small JSON summary (name,
+date, year, population, treasury) and the `WorldState` as a binary property list,
+compressed with LZFSE. The save list reads only the summaries. `WorldState` is
+`Codable`; lookup tables are rebuilt on load, and biomes and deposits are stored
+run-length encoded. A restored game continues exactly like the original, which the
+tests check by running both side by side.
 
 ### Value-type world state
 

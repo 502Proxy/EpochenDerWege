@@ -43,7 +43,7 @@ struct BottomBarView: View {
             Spacer(minLength: 12)
 
             HStack(spacing: 4) {
-                ForEach(GamePanel.allCases) { panel in
+                ForEach(GamePanel.windows) { panel in
                     Button {
                         viewModel.togglePanel(panel)
                     } label: {
@@ -57,6 +57,15 @@ struct BottomBarView: View {
 
                 BarDivider()
 
+                Button {
+                    viewModel.togglePanel(.saves)
+                } label: {
+                    Image(systemName: GamePanel.saves.symbol)
+                        .font(.system(size: 15, weight: .medium))
+                }
+                .buttonStyle(HUDButtonStyle(isActive: viewModel.isOpen(.saves), size: CGSize(width: 38, height: 38)))
+                .keyboardShortcut(KeyEquivalent(GamePanel.saves.shortcut), modifiers: [])
+                .help(Text("Save and load (K, quick save ⌘S)"))
                 OverlayMenu(viewModel: viewModel)
                 ControlsHelpButton()
             }
