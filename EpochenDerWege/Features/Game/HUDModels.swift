@@ -58,7 +58,7 @@ struct MiniMapContent: Equatable {
 }
 
 /// Where the camera looks, reported by the scene for the mini map.
-struct CameraView: Equatable {
+struct CameraPose: Equatable {
     /// Point the camera looks at, in cells (fractional).
     var x: Double
     var z: Double

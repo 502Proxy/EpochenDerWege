@@ -138,7 +138,7 @@ final class SceneCoordinator: NSObject {
 
         let look = renderer.space.worldPoint(fromScene: rig.target)
         let cellSize = renderer.space.terrain.cellSize
-        viewModel.reportCamera(CameraView(x: look.x / cellSize, z: look.z / cellSize, yaw: Double(rig.yaw)))
+        viewModel.reportCamera(CameraPose(x: look.x / cellSize, z: look.z / cellSize, yaw: Double(rig.yaw)))
     }
 
     private func applyCamera() {

@@ -74,7 +74,7 @@ struct PanelHeader<Accessory: View>: View {
     let onClose: (() -> Void)?
     @ViewBuilder var accessory: () -> Accessory
 
-    init(_ title: Text, symbol: String, onClose: (() -> Void)? = nil, @ViewBuilder accessory: @escaping () -> Accessory = { EmptyView() }) {
+    init(_ title: Text, symbol: String, onClose: (() -> Void)? = nil, @ViewBuilder accessory: @escaping () -> Accessory) {
         self.title = title
         self.symbol = symbol
         self.onClose = onClose
@@ -104,6 +104,12 @@ struct PanelHeader<Accessory: View>: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .background(GameTheme.raised.opacity(0.6))
+    }
+}
+
+extension PanelHeader where Accessory == EmptyView {
+    init(_ title: Text, symbol: String, onClose: (() -> Void)? = nil) {
+        self.init(title, symbol: symbol, onClose: onClose) { EmptyView() }
     }
 }
 

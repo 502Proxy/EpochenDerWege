@@ -63,7 +63,7 @@ struct MiniMapView: View {
 
     // MARK: - Drawing
 
-    private static func draw(_ content: MiniMapContent, camera: CameraView?, in context: inout GraphicsContext, size: CGSize) {
+    private static func draw(_ content: MiniMapContent, camera: CameraPose?, in context: inout GraphicsContext, size: CGSize) {
         let cell = size.width / CGFloat(max(content.mapSize, 1))
 
         var roads = Path()

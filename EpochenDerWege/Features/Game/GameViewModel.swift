@@ -51,7 +51,7 @@ final class GameViewModel {
     /// Roads and buildings for the mini map.
     private(set) var miniMap = MiniMapContent()
     /// Where the camera looks; reported by the scene.
-    private(set) var camera: CameraView?
+    private(set) var camera: CameraPose?
 
     let catalog: GameCatalog
 
@@ -156,7 +156,7 @@ final class GameViewModel {
 
     /// Called by the scene every frame. Only noticeable changes are published, so the
     /// mini map does not redraw on every frame.
-    func reportCamera(_ view: CameraView) {
+    func reportCamera(_ view: CameraPose) {
         if let camera, abs(camera.x - view.x) < 0.5, abs(camera.z - view.z) < 0.5, abs(camera.yaw - view.yaw) < 0.05 {
             return
         }

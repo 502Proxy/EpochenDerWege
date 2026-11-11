@@ -36,7 +36,7 @@ struct FloatingPanelView<Content: View>: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: GameTheme.cornerRadius))
         .gamePanel()
-        .simultaneousGesture(TapGesture().onEnded(onFocus))
+        .simultaneousGesture(TapGesture().onEnded { onFocus() })
         .offset(offset)
     }
 }
