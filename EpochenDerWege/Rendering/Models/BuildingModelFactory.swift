@@ -44,7 +44,13 @@ final class BuildingModelFactory {
 
     private static func build(_ definition: BuildingDefinition) -> (entity: Entity, markerHeight: Float) {
         switch definition.id.rawValue {
-        case "house": return house()
+        case "house": return hut()
+        case "citizenHouse": return citizenHouse()
+        case "townhouse": return townhouse()
+        case "sheepFarm": return sheepFarm()
+        case "weaver": return weaver()
+        case "vineyard": return vineyard()
+        case "winePress": return winePress()
         case "storehouse": return storehouse()
         case "woodcutter": return woodcutter()
         case "quarry": return quarry()
@@ -86,11 +92,109 @@ final class BuildingModelFactory {
         return cottage
     }
 
-    private static func house() -> (Entity, Float) {
+    // MARK: Houses – each tier is larger and better built than the one before.
+
+    /// Farmers: small timber hut with a thatched roof.
+    private static func hut() -> (Entity, Float) {
+        let root = Entity()
+        root.addChild(plinth(SIMD2(4.6, 4), top: 0.3))
+        root.addChild(cottage(width: 4, depth: 3.4, wallHeight: 2.3, roofHeight: 2, wall: P.timber, roof: P.thatch, base: 0.3))
+        // Woodpile and a fence post.
+        root.addChild(ModelKit.log(length: 1.4, radius: 0.2, P.timber.darkened(by: 0.15), at: SIMD3<Float>(1.8, 0.45, 2.1), yaw: .pi / 2))
+        root.addChild(ModelKit.log(length: 1.4, radius: 0.2, P.timber.darkened(by: 0.05), at: SIMD3<Float>(2.2, 0.45, 2.1), yaw: .pi / 2))
+        return (root, 6)
+    }
+
+    /// Citizens: plastered house with a tiled roof and a chimney.
+    private static func citizenHouse() -> (Entity, Float) {
         let root = Entity()
         root.addChild(plinth(SIMD2(5.6, 4.6)))
         root.addChild(cottage(width: 5, depth: 4, wallHeight: 3, roofHeight: 2.2, wall: P.plaster, roof: P.roofTiles))
         root.addChild(ModelKit.box(SIMD3<Float>(0.6, 1.8, 0.6), P.darkStone, at: SIMD3<Float>(1.5, 4.9, -0.8)))
+        // Small garden bed.
+        root.addChild(ModelKit.box(SIMD3<Float>(1.6, 0.25, 0.8), P.furrow.darkened(by: 0.3), at: SIMD3<Float>(-1.6, 0.45, 2.6)))
+        return (root, 7.5)
+    }
+
+    /// Wealthy citizens: two storeys on a stone ground floor, with a side wing.
+    private static func townhouse() -> (Entity, Float) {
+        let root = Entity()
+        root.addChild(plinth(SIMD2(6.6, 5.4)))
+        // Stone ground floor, timber-framed upper floor, steep tiled roof.
+        root.addChild(ModelKit.box(SIMD3<Float>(6, 2.6, 4.8), P.stone, at: SIMD3<Float>(0, 1.7, 0)))
+        root.addChild(cottage(width: 6.2, depth: 5, wallHeight: 2.6, roofHeight: 2.8, wall: P.plaster, roof: P.roofTiles.darkened(by: 0.1), base: 3))
+        for x in [Float(-2), 0, 2] {
+            root.addChild(ModelKit.box(SIMD3<Float>(0.18, 2.6, 0.08), P.timber, at: SIMD3<Float>(x, 4.3, 2.53)))
+        }
+        root.addChild(ModelKit.box(SIMD3<Float>(1, 1.9, 0.08), P.darkWood, at: SIMD3<Float>(0, 1.35, 2.43)))
+        for x in [Float(-1.9), 1.9] {
+            root.addChild(ModelKit.box(SIMD3<Float>(0.8, 0.9, 0.08), P.window, at: SIMD3<Float>(x, 1.8, 2.43)))
+        }
+        root.addChild(ModelKit.box(SIMD3<Float>(0.7, 2, 0.7), P.darkStone, at: SIMD3<Float>(-2, 8.2, -1)))
+        return (root, 10.5)
+    }
+
+    // MARK: Clothing and wine
+
+    private static func sheepFarm() -> (Entity, Float) {
+        let root = Entity()
+        root.addChild(plinth(SIMD2(3.8, 3.2), offset: SIMD2(-1.8, -1.9)))
+        root.addChild(cottage(width: 3.4, depth: 2.8, wallHeight: 2.2, roofHeight: 1.7, wall: P.timber, roof: P.thatch, at: SIMD2(-1.8, -1.9), windows: false))
+        // Pasture with a fence and sheep.
+        for x in stride(from: Float(-3.4), through: 3.4, by: 1.7) {
+            root.addChild(ModelKit.box(SIMD3<Float>(0.12, 0.9, 0.12), P.darkWood, at: SIMD3<Float>(x, 0.45, 3.4)))
+        }
+        root.addChild(ModelKit.box(SIMD3<Float>(6.9, 0.1, 0.08), P.timber, at: SIMD3<Float>(0, 0.75, 3.4), cornerRadius: 0))
+        let wool = GameColor(red: 0.95, green: 0.94, blue: 0.88)
+        for (x, z) in [(Float(1.4), Float(-0.6)), (2.6, 1.2), (0.4, 1.8), (-1.6, 1.4)] {
+            root.addChild(ModelKit.sphere(radius: 0.45, wool, at: SIMD3<Float>(x, 0.55, z), scale: SIMD3<Float>(1.3, 0.9, 0.9)))
+            root.addChild(ModelKit.box(SIMD3<Float>(0.25, 0.3, 0.25), P.darkWood, at: SIMD3<Float>(x + 0.6, 0.7, z)))
+        }
+        return (root, 6)
+    }
+
+    private static func weaver() -> (Entity, Float) {
+        let root = Entity()
+        root.addChild(plinth(SIMD2(6, 4.8)))
+        root.addChild(cottage(width: 5.4, depth: 4.2, wallHeight: 3, roofHeight: 2, wall: P.plaster, roof: P.thatch))
+        // Cloth drying on a rack.
+        root.addChild(ModelKit.box(SIMD3<Float>(0.15, 2, 0.15), P.darkWood, at: SIMD3<Float>(-2.6, 1, 2.9)))
+        root.addChild(ModelKit.box(SIMD3<Float>(0.15, 2, 0.15), P.darkWood, at: SIMD3<Float>(0.2, 1, 2.9)))
+        root.addChild(ModelKit.box(SIMD3<Float>(2.9, 0.1, 0.1), P.darkWood, at: SIMD3<Float>(-1.2, 1.95, 2.9), cornerRadius: 0))
+        let colors = [GameColor(red: 0.55, green: 0.35, blue: 0.6), GameColor(red: 0.8, green: 0.3, blue: 0.25), GameColor(red: 0.3, green: 0.45, blue: 0.75)]
+        for (index, color) in colors.enumerated() {
+            root.addChild(ModelKit.box(SIMD3<Float>(0.8, 1.2, 0.04), color, at: SIMD3<Float>(-2.1 + Float(index) * 0.9, 1.3, 2.9), cornerRadius: 0))
+        }
+        return (root, 7.5)
+    }
+
+    private static func vineyard() -> (Entity, Float) {
+        let root = Entity()
+        root.addChild(plinth(SIMD2(3.4, 3), offset: SIMD2(-2, -2.2)))
+        root.addChild(cottage(width: 3, depth: 2.6, wallHeight: 2.2, roofHeight: 1.5, wall: P.plaster, roof: P.roofTiles, at: SIMD2(-2, -2.2), windows: false))
+        // Rows of vines on posts.
+        let leaves = GameColor(red: 0.32, green: 0.5, blue: 0.2)
+        let grapes = GameColor(red: 0.42, green: 0.22, blue: 0.48)
+        for row in 0..<4 {
+            let z = -0.6 + Float(row) * 1.2
+            root.addChild(ModelKit.box(SIMD3<Float>(4.8, 1.0, 0.45), leaves, at: SIMD3<Float>(0.9, 0.8, z), cornerRadius: 0.2))
+            for x in [Float(-0.6), 1.0, 2.6] {
+                root.addChild(ModelKit.sphere(radius: 0.18, grapes, at: SIMD3<Float>(x, 0.55, z + 0.25)))
+            }
+        }
+        return (root, 5.5)
+    }
+
+    private static func winePress() -> (Entity, Float) {
+        let root = Entity()
+        root.addChild(plinth(SIMD2(6, 5)))
+        root.addChild(cottage(width: 5.4, depth: 4.4, wallHeight: 3, roofHeight: 2.2, wall: P.stone, roof: P.roofTiles, at: SIMD2(0, -0.2)))
+        // Barrels in front.
+        for (index, x) in [Float(-1.8), -0.8, 1.6].enumerated() {
+            let barrel = ModelKit.log(length: 1.1, radius: 0.45, P.timber.darkened(by: 0.1 * Double(index)), at: SIMD3<Float>(x, 0.75, 2.8))
+            root.addChild(barrel)
+        }
+        root.addChild(ModelKit.cylinder(height: 1.1, radius: 0.5, P.timber, at: SIMD3<Float>(2.6, 0.95, 2.2)))
         return (root, 7.5)
     }
 

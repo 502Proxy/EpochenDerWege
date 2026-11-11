@@ -13,7 +13,7 @@ enum StopDemand {
             building.category != .stop
                 && building.category != .storage
                 && stop.center.distance(to: building.center) <= range
-                && NearestConsumerPlanner.demand(of: building, for: good, rules: world.rules) > 0
+                && NearestConsumerPlanner.demand(of: building, for: good, in: world) > 0
         }
     }
 

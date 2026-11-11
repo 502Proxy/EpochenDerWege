@@ -1,6 +1,6 @@
 import GameDomain
 
-/// Feeds houses, grows or shrinks their population.
+/// Feeds houses, grows or shrinks their population and moves houses between tiers.
 public struct PopulationSystem: SimulationSystem {
     public init() {}
 
@@ -9,17 +9,28 @@ public struct PopulationSystem: SimulationSystem {
         let rules = world.rules
         let year = world.clock.year
         var departures: [BuildingID] = []
+        var tierChanges: [SimulationEvent] = []
+        var statistics = world.goodsStatistics
 
         for index in world.buildings.indices where world.buildings[index].category == .housing {
             var house = world.buildings[index]
-            if Self.checkSupply(of: &house, rules: rules, statistics: &world.goodsStatistics, year: year) == .shrank {
+            if Self.checkSupply(of: &house, rules: rules, statistics: &statistics, year: year) == .shrank {
                 departures.append(house.id)
+            }
+            switch HouseTiers.check(&house, in: world, statistics: &statistics) {
+            case .upgraded(let type): tierChanges.append(.houseUpgraded(house.id, to: type))
+            case .downgraded(let type): tierChanges.append(.houseDowngraded(house.id, to: type))
+            case nil: break
             }
             world.buildings[index] = house
         }
+        world.goodsStatistics = statistics
 
         for id in departures {
             world.emit(.residentLeft(id))
+        }
+        for event in tierChanges {
+            world.emit(event)
         }
         WorkforceSystem.assignWorkers(in: &world)
     }

@@ -2140,6 +2140,186 @@
           }
         }
       }
+    },
+    "Hut": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hütte"
+          }
+        }
+      }
+    },
+    "Townhouse": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stadthaus"
+          }
+        }
+      }
+    },
+    "Sheep Farm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schäferei"
+          }
+        }
+      }
+    },
+    "Weaver": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weberei"
+          }
+        }
+      }
+    },
+    "Vineyard": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weinberg"
+          }
+        }
+      }
+    },
+    "Wine Press": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kelterei"
+          }
+        }
+      }
+    },
+    "Wool": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wolle"
+          }
+        }
+      }
+    },
+    "Clothing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kleidung"
+          }
+        }
+      }
+    },
+    "Grapes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trauben"
+          }
+        }
+      }
+    },
+    "Wine": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wein"
+          }
+        }
+      }
+    },
+    "Needs: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bedarf: %@"
+          }
+        }
+      }
+    },
+    "Next tier": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Stufe"
+          }
+        }
+      }
+    },
+    "Unlocked at": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Freigeschaltet ab"
+          }
+        }
+      }
+    },
+    "Also needs": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Braucht zusätzlich"
+          }
+        }
+      }
+    },
+    "Upgrade": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufstieg"
+          }
+        }
+      }
+    },
+    "Residents need %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewohner brauchen %@"
+          }
+        }
+      }
+    },
+    "A house became a %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Haus ist aufgestiegen: %@."
+          }
+        }
+      }
+    },
+    "A house fell back to a %@ – its residents miss goods.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Haus ist abgestiegen: %@ – den Bewohnern fehlen Waren."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -36,7 +36,10 @@
         "good": "bread",
         "amount": 30
       }
-    ]
+    ],
+    "needPerResidentPerCheck": 0.25,
+    "upgradeChecks": 3,
+    "downgradeChecks": 3
   },
   "goods": [
     {
@@ -98,6 +101,46 @@
         "green": 0.65,
         "blue": 0.85
       }
+    },
+    {
+      "id": "wool",
+      "name": "Wool",
+      "basePrice": 3,
+      "color": {
+        "red": 0.93,
+        "green": 0.92,
+        "blue": 0.86
+      }
+    },
+    {
+      "id": "clothing",
+      "name": "Clothing",
+      "basePrice": 10,
+      "color": {
+        "red": 0.55,
+        "green": 0.35,
+        "blue": 0.6
+      }
+    },
+    {
+      "id": "grapes",
+      "name": "Grapes",
+      "basePrice": 3,
+      "color": {
+        "red": 0.45,
+        "green": 0.25,
+        "blue": 0.5
+      }
+    },
+    {
+      "id": "wine",
+      "name": "Wine",
+      "basePrice": 12,
+      "color": {
+        "red": 0.6,
+        "green": 0.12,
+        "blue": 0.2
+      }
     }
   ],
   "buildings": [
@@ -122,7 +165,7 @@
     },
     {
       "id": "house",
-      "name": "House",
+      "name": "Hut",
       "category": "housing",
       "cost": 150,
       "upkeepPerYear": 0,
@@ -137,7 +180,58 @@
         "red": 0.85,
         "green": 0.75,
         "blue": 0.6
-      }
+      },
+      "upgradesTo": "citizenHouse"
+    },
+    {
+      "id": "citizenHouse",
+      "name": "House",
+      "category": "housing",
+      "cost": 0,
+      "upkeepPerYear": 0,
+      "workers": 0,
+      "inputs": [],
+      "outputs": [],
+      "cycleDays": 0,
+      "storagePerGood": 8,
+      "maxCarriers": 0,
+      "maxResidents": 6,
+      "color": {
+        "red": 0.92,
+        "green": 0.86,
+        "blue": 0.72
+      },
+      "upgradesTo": "townhouse",
+      "needs": [
+        "clothing"
+      ],
+      "taxPerResidentPerYear": 2,
+      "requiredLevel": 1
+    },
+    {
+      "id": "townhouse",
+      "name": "Townhouse",
+      "category": "housing",
+      "cost": 0,
+      "upkeepPerYear": 0,
+      "workers": 0,
+      "inputs": [],
+      "outputs": [],
+      "cycleDays": 0,
+      "storagePerGood": 10,
+      "maxCarriers": 0,
+      "maxResidents": 8,
+      "color": {
+        "red": 0.95,
+        "green": 0.9,
+        "blue": 0.8
+      },
+      "needs": [
+        "clothing",
+        "wine"
+      ],
+      "taxPerResidentPerYear": 4,
+      "requiredLevel": 2
     },
     {
       "id": "woodcutter",
@@ -320,6 +414,134 @@
         "green": 0.55,
         "blue": 0.75
       }
+    },
+    {
+      "id": "sheepFarm",
+      "name": "Sheep Farm",
+      "category": "production",
+      "cost": 400,
+      "upkeepPerYear": 10,
+      "workers": 3,
+      "inputs": [],
+      "outputs": [
+        {
+          "good": "wool",
+          "amount": 2
+        }
+      ],
+      "cycleDays": 5,
+      "storagePerGood": 20,
+      "maxCarriers": 1,
+      "maxResidents": 0,
+      "resource": {
+        "biome": "grass",
+        "radius": 2,
+        "idealCount": 12
+      },
+      "color": {
+        "red": 0.85,
+        "green": 0.85,
+        "blue": 0.78
+      },
+      "requiredLevel": 1
+    },
+    {
+      "id": "weaver",
+      "name": "Weaver",
+      "category": "production",
+      "cost": 550,
+      "upkeepPerYear": 15,
+      "workers": 2,
+      "inputs": [
+        {
+          "good": "wool",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "good": "clothing",
+          "amount": 1
+        }
+      ],
+      "cycleDays": 3,
+      "storagePerGood": 20,
+      "maxCarriers": 1,
+      "maxResidents": 0,
+      "color": {
+        "red": 0.6,
+        "green": 0.42,
+        "blue": 0.65
+      },
+      "allowedZones": [
+        "commercial",
+        "industrial"
+      ],
+      "requiredLevel": 1
+    },
+    {
+      "id": "vineyard",
+      "name": "Vineyard",
+      "category": "production",
+      "cost": 450,
+      "upkeepPerYear": 12,
+      "workers": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "good": "grapes",
+          "amount": 2
+        }
+      ],
+      "cycleDays": 5,
+      "storagePerGood": 20,
+      "maxCarriers": 1,
+      "maxResidents": 0,
+      "resource": {
+        "biome": "grass",
+        "radius": 2,
+        "idealCount": 12
+      },
+      "color": {
+        "red": 0.5,
+        "green": 0.32,
+        "blue": 0.55
+      },
+      "requiredLevel": 2
+    },
+    {
+      "id": "winePress",
+      "name": "Wine Press",
+      "category": "production",
+      "cost": 650,
+      "upkeepPerYear": 20,
+      "workers": 2,
+      "inputs": [
+        {
+          "good": "grapes",
+          "amount": 2
+        }
+      ],
+      "outputs": [
+        {
+          "good": "wine",
+          "amount": 1
+        }
+      ],
+      "cycleDays": 3,
+      "storagePerGood": 20,
+      "maxCarriers": 1,
+      "maxResidents": 0,
+      "color": {
+        "red": 0.62,
+        "green": 0.18,
+        "blue": 0.25
+      },
+      "allowedZones": [
+        "commercial",
+        "industrial"
+      ],
+      "requiredLevel": 2
     },
     {
       "id": "market",

@@ -157,6 +157,10 @@ enum GameText {
             String(localized: "Ox cart sold for \(refund) thalers.")
         case .settlementLevelReached(let level):
             levelUpMessage(level, catalog: catalog)
+        case .houseUpgraded(_, let type):
+            String(localized: "A house became a \(buildingName(type, in: catalog)).")
+        case .houseDowngraded(_, let type):
+            String(localized: "A house fell back to a \(buildingName(type, in: catalog)) – its residents miss goods.")
         }
     }
 
@@ -207,6 +211,8 @@ enum GameText {
         case .lineCreated: (.good, "point.topleft.down.to.point.bottomright.curvepath")
         case .vehicleBought, .vehicleSold: (.neutral, "cart.fill")
         case .settlementLevelReached: (.good, "star.fill")
+        case .houseUpgraded: (.good, "arrow.up.circle.fill")
+        case .houseDowngraded: (.warning, "arrow.down.circle.fill")
         }
     }
 
@@ -278,6 +284,9 @@ enum GameText {
         }
         if definition.maxResidents > 0 {
             parts.append(String(localized: "Up to \(definition.maxResidents) residents"))
+        }
+        if let needs = definition.needs, !needs.isEmpty {
+            parts.append(String(localized: "Residents need \(needs.map { goodName($0, in: catalog) }.formatted(.list(type: .and)))"))
         }
         return parts.joined(separator: " · ")
     }

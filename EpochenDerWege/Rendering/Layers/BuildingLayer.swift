@@ -25,7 +25,12 @@ final class BuildingLayer: SceneLayer {
         var alive = Set<BuildingID>()
         for building in context.world.buildings {
             alive.insert(building.id)
-            let visual = visuals[building.id] ?? makeVisual(for: building)
+            var visual = visuals[building.id] ?? makeVisual(for: building)
+            // A house that moved to another tier gets the model of its new type.
+            if visual.type != building.definition.id {
+                visual.root.removeFromParent()
+                visual = makeVisual(for: building)
+            }
             visuals[building.id] = visual
             visual.show(MarkerState(building))
             if let rotor = visual.rotor, building.status == .working {
@@ -62,7 +67,7 @@ final class BuildingLayer: SceneLayer {
         model.root.addChild(marker)
 
         parent.addChild(model.root)
-        return Visual(root: model.root, marker: marker, rotor: model.rotor)
+        return Visual(type: building.definition.id, root: model.root, marker: marker, rotor: model.rotor)
     }
 
     /// What the marker above a building shows.
@@ -103,12 +108,14 @@ final class BuildingLayer: SceneLayer {
     }
 
     private final class Visual {
+        let type: BuildingTypeID
         let root: Entity
         let marker: ModelEntity
         let rotor: Entity?
         private var state: MarkerState = .hidden
 
-        init(root: Entity, marker: ModelEntity, rotor: Entity?) {
+        init(type: BuildingTypeID, root: Entity, marker: ModelEntity, rotor: Entity?) {
+            self.type = type
             self.root = root
             self.marker = marker
             self.rotor = rotor

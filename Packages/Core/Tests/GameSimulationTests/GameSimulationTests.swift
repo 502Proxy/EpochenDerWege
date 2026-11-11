@@ -224,6 +224,27 @@ struct EconomyLoopTests {
 
 @Suite("Engine")
 struct EngineTests {
+    /// Polls the engine's snapshots until `condition` holds or the timeout passes.
+    ///
+    /// The engine runs on the shared cooperative thread pool. While other suites run
+    /// CPU-heavy simulations in parallel, its first ticks can come late, so a fixed
+    /// sleep is not reliable.
+    private func latestFrame(
+        of engine: SimulationEngine,
+        timeout: Duration = .seconds(10),
+        until condition: (WorldState) -> Bool
+    ) async throws -> SimulationFrame {
+        let deadline = ContinuousClock.now + timeout
+        while ContinuousClock.now < deadline {
+            let frame = engine.snapshots.value
+            if condition(frame.world) {
+                return frame
+            }
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        return engine.snapshots.value
+    }
+
     @Test func runsTicksAndAppliesCommandsInTheBackground() async throws {
         let simulation = try Fixtures.flatSimulation()
         let engine = SimulationEngine(simulation: simulation)
@@ -232,10 +253,11 @@ struct EngineTests {
         engine.submit(ZoneCommand(cells: [GridPoint(x: 17, z: 16)], kind: .industrial))
         engine.submit(PlaceBuildingCommand(buildingType: "mill", cell: GridPoint(x: 17, z: 16)))
 
-        try await Task.sleep(for: .milliseconds(400))
+        let frame = try await latestFrame(of: engine) { world in
+            world.clock.tick > 0 && world.building(at: GridPoint(x: 17, z: 16)) != nil
+        }
         engine.stop()
 
-        let frame = engine.snapshots.value
         #expect(frame.world.clock.tick > 0)
         #expect(frame.world.building(at: GridPoint(x: 17, z: 16))?.definition.id == "mill")
     }
@@ -247,12 +269,15 @@ struct EngineTests {
         engine.submit(ZoneCommand(cells: [GridPoint(x: 17, z: 16)], kind: .industrial))
         engine.submit(PlaceBuildingCommand(buildingType: "mill", cell: GridPoint(x: 17, z: 16)))
 
-        try await Task.sleep(for: .milliseconds(300))
+        let frame = try await latestFrame(of: engine) { world in
+            world.building(at: GridPoint(x: 17, z: 16)) != nil
+        }
+        // Give a running clock the chance to show itself before checking it stood still.
+        try await Task.sleep(for: .milliseconds(200))
         engine.stop()
 
-        let frame = engine.snapshots.value
-        #expect(frame.world.clock.tick == 0)
         #expect(frame.world.building(at: GridPoint(x: 17, z: 16)) != nil)
+        #expect(engine.snapshots.value.world.clock.tick == 0)
     }
 
     @Test func interpolationFractionIsClamped() throws {

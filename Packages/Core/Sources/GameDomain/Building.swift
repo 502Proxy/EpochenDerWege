@@ -33,7 +33,8 @@ public enum DeliveryPriority: Int, CaseIterable, Comparable, Hashable, Sendable,
 /// simulation. The simulation owns the authoritative copy inside its world state.
 public struct Building: Identifiable, Hashable, Sendable, Codable {
     public let id: BuildingID
-    public let definition: BuildingDefinition
+    /// The building type. Changes only when a house moves to another tier.
+    public private(set) var definition: BuildingDefinition
     public let cell: GridPoint
     public let center: WorldPoint
 
@@ -63,6 +64,10 @@ public struct Building: Identifiable, Hashable, Sendable, Codable {
     public var isPaused = false
     /// How eagerly carriers deliver here.
     public var priority: DeliveryPriority = .normal
+    /// Supply checks in a row a house has met all needs of its next tier.
+    public var upgradeProgress = 0
+    /// Supply checks in a row a house has missed one of its own needs.
+    public var missingNeedChecks = 0
 
     /// Whether the player may pause the building and set its priority.
     public var isConfigurable: Bool {
@@ -79,6 +84,25 @@ public struct Building: Identifiable, Hashable, Sendable, Codable {
     }
 
     public var category: BuildingCategory { definition.category }
+
+    /// Turns the building into another type of the same footprint, e.g. a house into
+    /// the next tier. Stock is kept as far as the new storage allows.
+    public mutating func convert(to newDefinition: BuildingDefinition) {
+        var newInput = Inventory(capacityPerGood: newDefinition.storagePerGood)
+        for item in input.sortedItems {
+            newInput.add(item.good, amount: item.amount)
+        }
+        var newOutput = Inventory(capacityPerGood: newDefinition.storagePerGood)
+        for item in output.sortedItems {
+            newOutput.add(item.good, amount: item.amount)
+        }
+        definition = newDefinition
+        input = newInput
+        output = newOutput
+        residents = min(residents, newDefinition.maxResidents)
+        upgradeProgress = 0
+        missingNeedChecks = 0
+    }
 
     public var workerRatio: Double {
         definition.workers == 0 ? 1 : Double(assignedWorkers) / Double(definition.workers)
