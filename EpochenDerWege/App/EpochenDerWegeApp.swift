@@ -8,8 +8,10 @@ struct EpochenDerWegeApp: App {
         WindowGroup("Epochen der Wege") {
             Group {
                 switch launch {
-                case .ready(let session):
-                    GameScreen(session: session)
+                case .ready(let app):
+                    GameScreen(app: app, session: app.session)
+                        // A new or loaded game rebuilds the whole screen, scene included.
+                        .id(ObjectIdentifier(app.session))
                 case .failed(let message):
                     LaunchErrorView(message: message)
                 }
@@ -22,12 +24,12 @@ struct EpochenDerWegeApp: App {
 
 /// Result of assembling the app's dependencies at launch.
 enum AppLaunch {
-    case ready(GameSession)
+    case ready(GameApp)
     case failed(String)
 
     static func start() -> AppLaunch {
         do {
-            return .ready(try GameSession.makeDefault())
+            return .ready(try GameApp.makeDefault())
         } catch {
             return .failed(String(describing: error))
         }

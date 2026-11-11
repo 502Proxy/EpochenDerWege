@@ -2440,6 +2440,166 @@
           }
         }
       }
+    },
+    "Saved as “%@”.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gespeichert als „%@“."
+          }
+        }
+      }
+    },
+    "Game loaded.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spielstand geladen."
+          }
+        }
+      }
+    },
+    "Save and load": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speichern und Laden"
+          }
+        }
+      }
+    },
+    "Save and load (K, quick save ⌘S)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speichern und Laden (K, Schnellspeichern ⌘S)"
+          }
+        }
+      }
+    },
+    "Quick save": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schnellspeichern"
+          }
+        }
+      }
+    },
+    "Name of the save": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name des Spielstands"
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speichern"
+          }
+        }
+      }
+    },
+    "No saves yet.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Spielstände."
+          }
+        }
+      }
+    },
+    "New game on a new map": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neues Spiel auf neuer Karte"
+          }
+        }
+      }
+    },
+    "Load this save? Unsaved progress is lost.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesen Spielstand laden? Nicht gespeicherter Fortschritt geht verloren."
+          }
+        }
+      }
+    },
+    "Load": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laden"
+          }
+        }
+      }
+    },
+    "Delete this save?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesen Spielstand löschen?"
+          }
+        }
+      }
+    },
+    "Delete": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen"
+          }
+        }
+      }
+    },
+    "Start a new game? Unsaved progress is lost.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neues Spiel starten? Nicht gespeicherter Fortschritt geht verloren."
+          }
+        }
+      }
+    },
+    "New game": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neues Spiel"
+          }
+        }
+      }
+    },
+    "Year %lld · %lld residents · %lld thalers": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jahr %lld · %lld Einwohner · %lld Taler"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

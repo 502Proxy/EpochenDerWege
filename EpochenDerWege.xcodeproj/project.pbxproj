@@ -10,6 +10,7 @@
 		E0D0000000000000000000A1 /* GameSimulation in Frameworks */ = {isa = PBXBuildFile; productRef = E0D0000000000000000000A2 /* GameSimulation */; };
 		E0D0000000000000000000A4 /* GameDomain in Frameworks */ = {isa = PBXBuildFile; productRef = E0D0000000000000000000A5 /* GameDomain */; };
 		E0D0000000000000000000A6 /* GameData in Frameworks */ = {isa = PBXBuildFile; productRef = E0D0000000000000000000A7 /* GameData */; };
+		E0D0000000000000000000A8 /* GamePersistence in Frameworks */ = {isa = PBXBuildFile; productRef = E0D0000000000000000000A9 /* GamePersistence */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 				E0D0000000000000000000A1 /* GameSimulation in Frameworks */,
 				E0D0000000000000000000A4 /* GameDomain in Frameworks */,
 				E0D0000000000000000000A6 /* GameData in Frameworks */,
+				E0D0000000000000000000A8 /* GamePersistence in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +79,7 @@
 				E0D0000000000000000000A2 /* GameSimulation */,
 				E0D0000000000000000000A5 /* GameDomain */,
 				E0D0000000000000000000A7 /* GameData */,
+				E0D0000000000000000000A9 /* GamePersistence */,
 			);
 			productName = EpochenDerWege;
 			productReference = E0D0000000000000000000B1 /* EpochenDerWege.app */;
@@ -293,6 +296,10 @@
 		E0D0000000000000000000A7 /* GameData */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = GameData;
+		};
+		E0D0000000000000000000A9 /* GamePersistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GamePersistence;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

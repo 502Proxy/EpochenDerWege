@@ -3,9 +3,12 @@ import GameSimulation
 
 /// Windows that float above the map. Several can be open at once.
 enum GamePanel: String, CaseIterable, Identifiable {
-    case finances, goods, buildings, lines
+    case finances, goods, buildings, lines, saves
 
     var id: Self { self }
+
+    /// Panels with a button and a key in the bottom bar's panel group.
+    static let windows: [GamePanel] = [.finances, .goods, .buildings, .lines]
 
     var symbol: String {
         switch self {
@@ -13,6 +16,7 @@ enum GamePanel: String, CaseIterable, Identifiable {
         case .goods: "shippingbox"
         case .buildings: "building.2"
         case .lines: "point.topleft.down.to.point.bottomright.curvepath"
+        case .saves: "externaldrive.fill"
         }
     }
 
@@ -23,6 +27,7 @@ enum GamePanel: String, CaseIterable, Identifiable {
         case .goods: "g"
         case .buildings: "b"
         case .lines: "l"
+        case .saves: "k"
         }
     }
 }

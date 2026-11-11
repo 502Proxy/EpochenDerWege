@@ -7,6 +7,7 @@ import PackageDescription
 /// - `GameData`: loads and validates game data (repository pattern).
 /// - `GameSimulation`: world state, simulation systems, commands and the
 ///   background engine.
+/// - `GamePersistence`: saving and loading games (repository pattern).
 ///
 /// None of these modules import SwiftUI, AppKit or RealityKit.
 let package = Package(
@@ -16,6 +17,7 @@ let package = Package(
         .library(name: "GameDomain", targets: ["GameDomain"]),
         .library(name: "GameData", targets: ["GameData"]),
         .library(name: "GameSimulation", targets: ["GameSimulation"]),
+        .library(name: "GamePersistence", targets: ["GamePersistence"]),
     ],
     targets: [
         .target(name: "GameDomain"),
@@ -28,9 +30,14 @@ let package = Package(
             name: "GameSimulation",
             dependencies: ["GameDomain"]
         ),
+        .target(
+            name: "GamePersistence",
+            dependencies: ["GameDomain", "GameSimulation"]
+        ),
         .testTarget(name: "GameDomainTests", dependencies: ["GameDomain"]),
         .testTarget(name: "GameDataTests", dependencies: ["GameData"]),
         .testTarget(name: "GameSimulationTests", dependencies: ["GameSimulation", "GameData"]),
+        .testTarget(name: "GamePersistenceTests", dependencies: ["GamePersistence", "GameSimulation", "GameData"]),
     ],
     swiftLanguageModes: [.v6]
 )

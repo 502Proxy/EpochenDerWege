@@ -50,6 +50,8 @@ If Xcode asks for signing, choose *Sign to Run Locally* or your own team under
 | G | Goods overview |
 | B | Building list |
 | L | Transport lines |
+| K | Save and load, new game |
+| ⌘S | Quick save |
 | Click on the mini map | Move the camera there |
 | Space | Pause |
 
@@ -71,6 +73,7 @@ Packages/Core/                  Game logic, no UI frameworks
   Sources/GameData/             Game data loading and validation
     Resources/antiquity.json    All balancing values for the antiquity era
   Sources/GameSimulation/       World state, systems, commands, engine, world generation
+  Sources/GamePersistence/      Save games (file format, repository)
   Tests/                        Swift Testing suites per module
 docs/
   GameDesign.md                 Game design document
@@ -109,7 +112,9 @@ Playable today:
 - Pause and 1× / 2× / 4× speed
 - Game interface in its own dark style: bottom bar with build categories, key figures, date and speed; windows that float above the map and can be dragged; mini map with roads, buildings and camera; notifications with icons
 
-Known simplifications of the prototype: carriers walk in straight lines within their short range, farmers and citizens are not yet distinguished, buildings cost only money, and there is no save game yet.
+- Save and load: named saves and a quick save (⌘S) in `~/Library/Application Support/EpochenDerWege/Saves`; a new game starts on a new map
+
+Known simplifications of the prototype: carriers walk in straight lines within their short range and buildings cost only money.
 
 ## Contributing
 

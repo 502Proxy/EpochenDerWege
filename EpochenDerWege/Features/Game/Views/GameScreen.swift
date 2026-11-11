@@ -6,6 +6,7 @@ import SwiftUI
 /// the selected building below the stock, the tool palette above the bottom bar on
 /// the left, the mini map above it on the right, and floating panels in the middle.
 struct GameScreen: View {
+    let app: GameApp
     let session: GameSession
 
     @State private var openCategory: ToolCategory?
@@ -82,6 +83,31 @@ struct GameScreen: View {
                 openCategory = ToolCategory.of(tool, in: viewModel.catalog)
             }
         }
+        .overlay(alignment: .top) {
+            // Feedback for a quick save while the saves panel is closed.
+            if let message = app.message, !viewModel.isOpen(.saves) {
+                Label(message.text, systemImage: message.isError ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
+                    .font(GameTheme.body)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .gamePanel(cornerRadius: 18)
+                    .padding(.top, 12)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .task(id: app.message) {
+            guard app.message != nil else { return }
+            try? await Task.sleep(for: .seconds(3))
+            app.clearMessage()
+        }
+        .background {
+            // Quick save without opening the panel.
+            Button("Quick save") {
+                Task { await app.save(named: GameApp.quickSaveName) }
+            }
+            .keyboardShortcut("s", modifiers: .command)
+            .hidden()
+        }
         .task {
             await viewModel.run()
         }
@@ -98,6 +124,8 @@ struct GameScreen: View {
             BuildingListView(viewModel: viewModel)
         case .lines:
             LinesView(viewModel: viewModel)
+        case .saves:
+            SavesView(app: app)
         }
     }
 

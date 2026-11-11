@@ -6,7 +6,7 @@ import GameDomain
 /// handed out (a *snapshot*) is immutable from the reader's point of view and can be
 /// sent across threads. Copies are cheap because the collections inside use
 /// copy-on-write and the terrain is never mutated.
-public struct WorldState: Sendable {
+public struct WorldState: Sendable, Codable {
     public let catalog: GameCatalog
     public let terrain: Terrain
 
@@ -61,6 +61,86 @@ public struct WorldState: Sendable {
     }
 
     public var rules: GameRules { catalog.rules }
+
+    // MARK: - Codable
+
+    private enum CodingKeys: String, CodingKey {
+        case catalog, terrain, clock, treasury, ledger, goodsStatistics, buildings, carriers, unemployed
+        case startCell, roads, tunnels, lines, vehicles, zones, towns, settlementLevel, events
+        case nextBuildingID, nextCarrierID, nextEventSequence, nextLineID, nextVehicleID, nextTownID
+    }
+
+    /// Restores a saved world. Lookup tables are rebuilt from the buildings.
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        catalog = try container.decode(GameCatalog.self, forKey: .catalog)
+        terrain = try container.decode(Terrain.self, forKey: .terrain)
+        clock = try container.decode(GameClock.self, forKey: .clock)
+        treasury = try container.decode(Int.self, forKey: .treasury)
+        ledger = try container.decode(Ledger.self, forKey: .ledger)
+        goodsStatistics = try container.decode(GoodsStatistics.self, forKey: .goodsStatistics)
+        buildings = try container.decode([Building].self, forKey: .buildings)
+        carriers = try container.decode([Carrier].self, forKey: .carriers)
+        unemployed = try container.decode(Int.self, forKey: .unemployed)
+        startCell = try container.decodeIfPresent(GridPoint.self, forKey: .startCell)
+        roads = try container.decode(Set<GridPoint>.self, forKey: .roads)
+        tunnels = try container.decode(Set<GridPoint>.self, forKey: .tunnels)
+        lines = try container.decode([TransportLine].self, forKey: .lines)
+        vehicles = try container.decode([Vehicle].self, forKey: .vehicles)
+        // Zones are stored as a sorted list of cell and kind, so the same world always gives the same file.
+        zones = Dictionary(try container.decode([ZoneEntry].self, forKey: .zones).map { ($0.cell, $0.kind) }, uniquingKeysWith: { first, _ in first })
+        towns = try container.decode([NeighbourTown].self, forKey: .towns)
+        settlementLevel = try container.decode(Int.self, forKey: .settlementLevel)
+        events = try container.decode([EventRecord].self, forKey: .events)
+        nextBuildingID = try container.decode(Int.self, forKey: .nextBuildingID)
+        nextCarrierID = try container.decode(Int.self, forKey: .nextCarrierID)
+        nextEventSequence = try container.decode(Int.self, forKey: .nextEventSequence)
+        nextLineID = try container.decode(Int.self, forKey: .nextLineID)
+        nextVehicleID = try container.decode(Int.self, forKey: .nextVehicleID)
+        nextTownID = try container.decode(Int.self, forKey: .nextTownID)
+        for (index, building) in buildings.enumerated() {
+            indexByID[building.id] = index
+            occupancy[building.cell] = building.id
+        }
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(catalog, forKey: .catalog)
+        try container.encode(terrain, forKey: .terrain)
+        try container.encode(clock, forKey: .clock)
+        try container.encode(treasury, forKey: .treasury)
+        try container.encode(ledger, forKey: .ledger)
+        try container.encode(goodsStatistics, forKey: .goodsStatistics)
+        try container.encode(buildings, forKey: .buildings)
+        try container.encode(carriers, forKey: .carriers)
+        try container.encode(unemployed, forKey: .unemployed)
+        try container.encodeIfPresent(startCell, forKey: .startCell)
+        // Sorted, so the same world always produces the same file.
+        try container.encode(roads.sorted(by: Self.cellOrder), forKey: .roads)
+        try container.encode(tunnels.sorted(by: Self.cellOrder), forKey: .tunnels)
+        try container.encode(lines, forKey: .lines)
+        try container.encode(vehicles, forKey: .vehicles)
+        try container.encode(zones.keys.sorted(by: Self.cellOrder).map { ZoneEntry(cell: $0, kind: zones[$0] ?? .residential) }, forKey: .zones)
+        try container.encode(towns, forKey: .towns)
+        try container.encode(settlementLevel, forKey: .settlementLevel)
+        try container.encode(events, forKey: .events)
+        try container.encode(nextBuildingID, forKey: .nextBuildingID)
+        try container.encode(nextCarrierID, forKey: .nextCarrierID)
+        try container.encode(nextEventSequence, forKey: .nextEventSequence)
+        try container.encode(nextLineID, forKey: .nextLineID)
+        try container.encode(nextVehicleID, forKey: .nextVehicleID)
+        try container.encode(nextTownID, forKey: .nextTownID)
+    }
+
+    private struct ZoneEntry: Codable {
+        let cell: GridPoint
+        let kind: ZoneKind
+    }
+
+    private static func cellOrder(_ a: GridPoint, _ b: GridPoint) -> Bool {
+        (a.z, a.x) < (b.z, b.x)
+    }
 
     // MARK: - Queries
 
