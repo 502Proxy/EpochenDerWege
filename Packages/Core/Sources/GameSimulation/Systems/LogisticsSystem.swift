@@ -39,8 +39,9 @@ public struct NearestConsumerPlanner: DeliveryPlanner {
         let rules = world.rules
         var best: (target: DeliveryTarget, score: Double)?
 
-        // Town stops trade only with vehicles, never with carriers.
-        for candidate in world.buildings where candidate.id != source.id && candidate.townID == nil {
+        // Only buildings within carrier range are candidates; town stops trade only with vehicles.
+        for candidate in world.buildings(within: rules.carrierRangeMeters, of: source.center)
+        where candidate.id != source.id && candidate.townID == nil {
             if source.category == .storage && candidate.category == .storage { continue }
             // Stops only take goods a line can bring somewhere they are wanted, and never
             // pass goods to another stop by carrier.
