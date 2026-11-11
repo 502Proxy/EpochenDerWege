@@ -4,18 +4,9 @@ import SwiftUI
 /// Production, consumption, stock and sales per good.
 struct GoodsView: View {
     let goods: [GoodRow]
-    let onClose: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Goods")
-                    .font(.title2.bold())
-                Spacer()
-                Button("Done", action: onClose)
-                    .keyboardShortcut(.cancelAction)
-            }
-
             Table(goods) {
                 TableColumn("Good") { row in
                     HStack(spacing: 6) {
@@ -30,7 +21,7 @@ struct GoodsView: View {
                 TableColumn("Net") { row in
                     Text(row.balanceThisYear, format: .number.sign(strategy: .always(includingZero: false)))
                         .monospacedDigit()
-                        .foregroundStyle(row.balanceThisYear < 0 ? Color.red : row.balanceThisYear > 0 ? Color.green : Color.secondary)
+                        .foregroundStyle(row.balanceThisYear < 0 ? GameTheme.negative : row.balanceThisYear > 0 ? GameTheme.positive : GameTheme.secondaryText)
                 }
                 TableColumn("In stock") { row in number(row.inStock) }
                 TableColumn("Sales") { row in number(row.salesThisYear) }
@@ -43,10 +34,9 @@ struct GoodsView: View {
 
             Text("Figures for the current year. Net = produced − consumed; a negative value means the economy uses more than it makes.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(GameTheme.secondaryText)
         }
-        .padding(20)
-        .frame(width: 720, height: 420)
+        .frame(width: 700, height: 360)
     }
 
     private func number(_ value: Int) -> some View {

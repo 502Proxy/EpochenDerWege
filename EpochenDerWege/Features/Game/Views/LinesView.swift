@@ -7,9 +7,6 @@ struct LinesView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Lines")
-                .font(.title3.bold())
-
             if viewModel.lines.isEmpty {
                 Text("No lines yet. Build stops next to roads, then use the line tool (key 1) to click them one after another.")
                     .font(.callout)
@@ -30,8 +27,7 @@ struct LinesView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(16)
-        .frame(width: 360)
+        .frame(width: 380)
     }
 }
 
@@ -114,9 +110,9 @@ struct PendingLineBar: View {
             }
             .disabled(viewModel.pendingLineStops.isEmpty)
         }
-        .font(.callout)
+        .font(GameTheme.body)
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
-        .background(.regularMaterial, in: Capsule())
+        .gamePanel(cornerRadius: 20)
     }
 }

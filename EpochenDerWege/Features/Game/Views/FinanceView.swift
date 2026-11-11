@@ -6,7 +6,6 @@ import SwiftUI
 /// balance over time.
 struct FinanceView: View {
     let summary: FinanceSummary
-    let onClose: () -> Void
 
     @State private var tab = Tab.overview
 
@@ -16,14 +15,6 @@ struct FinanceView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text("Finances")
-                    .font(.title2.bold())
-                Spacer()
-                Button("Done", action: onClose)
-                    .keyboardShortcut(.cancelAction)
-            }
-
             Picker("View", selection: $tab) {
                 Text("Overview").tag(Tab.overview)
                 Text("Sales by good").tag(Tab.sales)
@@ -46,8 +37,7 @@ struct FinanceView: View {
                 }
             }
         }
-        .padding(20)
-        .frame(width: 640, height: 520)
+        .frame(width: 620, height: 440)
     }
 
     // MARK: - Tabs
@@ -87,13 +77,14 @@ struct FinanceView: View {
             if summary.history.count > 1 {
                 Chart(summary.history) { point in
                     AreaMark(x: .value("Year", point.year), y: .value("Balance", point.balance))
-                        .foregroundStyle(.linearGradient(colors: [.accentColor.opacity(0.3), .clear], startPoint: .top, endPoint: .bottom))
+                        .foregroundStyle(.linearGradient(colors: [GameTheme.accent.opacity(0.35), .clear], startPoint: .top, endPoint: .bottom))
                     LineMark(x: .value("Year", point.year), y: .value("Balance", point.balance))
                         .interpolationMethod(.monotone)
+                        .foregroundStyle(GameTheme.accent)
                 }
                 .chartXAxisLabel("Year")
                 .chartYAxisLabel("Thalers")
-                .frame(height: 360)
+                .frame(height: 320)
             } else {
                 Text("The balance chart fills up as days pass.")
                     .foregroundStyle(.secondary)
@@ -144,6 +135,6 @@ struct FinanceView: View {
         Text(value, format: .number.sign(strategy: .always(includingZero: false)))
             .monospacedDigit()
             .fontWeight(bold ? .bold : .regular)
-            .foregroundStyle(value > 0 ? Color.green : value < 0 ? Color.red : Color.secondary)
+            .foregroundStyle(value > 0 ? GameTheme.positive : value < 0 ? GameTheme.negative : GameTheme.secondaryText)
     }
 }

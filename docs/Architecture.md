@@ -120,6 +120,7 @@ reproducible and is a prerequisite for save games and replays.
 | Object pool | `CarrierLayer` | Carriers appear and disappear constantly; entities are recycled instead of reallocated |
 | Singleton + flyweight | `MaterialLibrary.shared` | One shared cache of materials and meshes for all layers. It holds no game state, only rendering resources, which is why a singleton is acceptable here |
 | MVVM | `GameViewModel` + SwiftUI views | Views are declarative and dumb; state and intents live in the view model |
+| Design tokens | `GameTheme`, `gamePanel()`, `HUDButtonStyle`, `PanelHeader` | All HUD colours, fonts and shapes come from one place, so the look can change without touching every view |
 | Composition root | `GameSession` | The only place that creates concrete implementations; everything else gets dependencies injected |
 
 Singletons are deliberately rare. Anything with game state is injected so it can be
@@ -153,6 +154,16 @@ replaced in tests.
 | HUD refreshed 5× per second, not every frame; observation only fires on change | `GameViewModel` |
 
 ## Decisions
+
+### Game interface
+
+The HUD is a layer of SwiftUI views over the 3D scene. Which floating panels are
+open, and in which order, is presentation state in `GameViewModel.openPanels`;
+their positions are view state in `GameScreen`. The mini map paints its terrain
+once with `TerrainTextureBuilder` on a background task and draws roads, buildings
+and the camera with a `Canvas`. The scene reports the camera to the view model
+through `reportCamera(_:)`, which only publishes noticeable changes, so the mini map
+does not redraw every frame.
 
 ### ARView instead of RealityView
 

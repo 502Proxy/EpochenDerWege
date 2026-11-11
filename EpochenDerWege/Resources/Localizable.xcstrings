@@ -371,6 +371,16 @@
         }
       }
     },
+    "Click to move the camera": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klicken, um die Kamera zu bewegen"
+          }
+        }
+      }
+    },
     "Click: build or select": {
       "localizations": {
         "de": {
@@ -447,6 +457,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Linie erstellen"
+          }
+        }
+      }
+    },
+    "Day %lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tag %lld"
           }
         }
       }
@@ -587,6 +607,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ausgaben"
+          }
+        }
+      }
+    },
+    "F, G, B, L: finances, goods, buildings, lines": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "F, G, B, L: Finanzen, Waren, Gebäude, Linien"
           }
         }
       }
@@ -1577,6 +1607,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lager und Haltestellen"
+          }
+        }
+      }
+    },
+    "Storehouses are empty": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lager sind leer"
           }
         }
       }
