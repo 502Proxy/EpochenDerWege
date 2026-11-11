@@ -1,5 +1,6 @@
 import AppKit
 import GameDomain
+import GameSimulation
 import RealityKit
 import simd
 
