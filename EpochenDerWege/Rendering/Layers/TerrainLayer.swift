@@ -65,7 +65,7 @@ final class TerrainLayer: SceneLayer {
 
         // Vegetation gives way to buildings and roads.
         var occupied: [ChunkKey: Set<GridPoint>] = [:]
-        for cell in world.buildings.map(\.cell) + Array(world.roads) {
+        for cell in world.buildings.map(\.cell) + Array(world.roads) + world.towns.flatMap(\.footprint) {
             occupied[ChunkKey(cell), default: []].insert(cell)
         }
         let changed = Set(occupied.keys).union(occupiedCellsByChunk.keys).filter {
@@ -226,6 +226,27 @@ final class TerrainLayer: SceneLayer {
             for x in startX..<min(startX + Self.chunkSize, terrain.size) {
                 let cell = GridPoint(x: x, z: z)
                 guard !occupied.contains(cell) else { continue }
+                switch terrain.deposit(at: cell) {
+                case .stone:
+                    for index in 0..<3 {
+                        let (base, seed) = spot(x, z, 20 + index)
+                        Self.addBoulder(to: &mesh, base: base, size: 0.9 + Float(seed % 5) * 0.25)
+                    }
+                    continue
+                case .vines:
+                    // Three rows of vines across the cell.
+                    for row in 0..<3 {
+                        for column in 0..<3 {
+                            let px = (Double(x) + 0.2 + Double(column) * 0.3) * terrain.cellSize
+                            let pz = (Double(z) + 0.2 + Double(row) * 0.3) * terrain.cellSize
+                            let base = SIMD3<Float>(Float(px), Float(surface.height(x: px, z: pz)), Float(pz))
+                            Self.addBush(to: &mesh, base: base, size: 0.55)
+                        }
+                    }
+                    continue
+                case nil:
+                    break
+                }
                 switch terrain.biome(at: cell) {
                 case .forest:
                     for index in 0..<3 {

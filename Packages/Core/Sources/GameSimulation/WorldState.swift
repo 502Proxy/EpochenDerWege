@@ -34,6 +34,8 @@ public struct WorldState: Sendable {
     public internal(set) var vehicles: [Vehicle] = []
     /// Zoned cells. A zone stays when a building is placed on it.
     public internal(set) var zones: [GridPoint: ZoneKind] = [:]
+    /// Neutral towns on the map, in founding order.
+    public internal(set) var towns: [NeighbourTown] = []
     /// Highest settlement level reached, as an index into `catalog.settlementLevels`. Never goes down.
     public internal(set) var settlementLevel = 0
     /// Recent events, oldest first. Capped to `maximumEventCount`.
@@ -46,6 +48,7 @@ public struct WorldState: Sendable {
     private var nextEventSequence = 1
     private var nextLineID = 1
     private var nextVehicleID = 1
+    private var nextTownID = 1
 
     /// How many events are kept for the UI.
     public static let maximumEventCount = 32
@@ -72,6 +75,20 @@ public struct WorldState: Sendable {
     /// Whether a building stands on the cell.
     public func isOccupied(_ cell: GridPoint) -> Bool {
         occupancy[cell] != nil
+    }
+
+    /// Whether the cell belongs to a neighbouring town.
+    public func isTownCell(_ cell: GridPoint) -> Bool {
+        towns.contains { $0.footprint.contains(cell) }
+    }
+
+    public func town(_ id: TownID) -> NeighbourTown? {
+        towns.first { $0.id == id }
+    }
+
+    /// The town a stop belongs to, if it is a town's stop.
+    public func town(owningStop stopID: BuildingID) -> NeighbourTown? {
+        building(stopID)?.townID.flatMap(town)
     }
 
     public func hasRoad(at cell: GridPoint) -> Bool {
@@ -145,6 +162,11 @@ public struct WorldState: Sendable {
             indexByID[buildings[i].id] = i
         }
         return removed
+    }
+
+    mutating func makeTownID() -> TownID {
+        defer { nextTownID += 1 }
+        return TownID(nextTownID)
     }
 
     mutating func makeLineID() -> LineID {

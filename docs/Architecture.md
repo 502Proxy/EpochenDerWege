@@ -98,8 +98,9 @@ simulation slightly but can never drop a frame.
 | 4 | `TransportSystem` | every tick | Drives vehicles along their lines; unloads goods wanted at a stop and loads goods wanted further down the line |
 | 5 | `PopulationSystem` | every 10 days | Feeds houses, grows or shrinks them; `HouseTiers` uses up clothing and wine and moves houses up or down a tier |
 | 6 | `EconomySystem` | yearly | Taxes and upkeep |
-| 7 | `SettlementSystem` | daily | Raises the settlement level (hamlet, village, …) when the population reaches the next threshold; levels are never lost |
-| 8 | `TownGrowthSystem` | every 5 days | Builds houses, markets and workshops in their zones next to roads when their `ZoneDemand` reaches the growth threshold |
+| 7 | `TradeSystem` | every 10 days | Neighbouring towns put their goods on their stop and renew what they want to buy; vehicles trade with them when they call |
+| 8 | `SettlementSystem` | daily | Raises the settlement level (hamlet, village, …) when the population reaches the next threshold; levels are never lost |
+| 9 | `TownGrowthSystem` | every 5 days | Builds houses, markets and workshops in their zones next to roads when their `ZoneDemand` reaches the growth threshold |
 
 The simulation is **deterministic**: the same seed, commands and number of ticks always
 produce the same world. Collections are iterated in a stable order (buildings in
@@ -194,6 +195,14 @@ free of presentation concerns and the game can be translated without touching ru
 reason and a flag for missing space. `TownGrowthSystem` builds when the value
 reaches 0.5, and the HUD shows the same values as demand bars. Because both read
 one function, the bars can never promise growth the town will not deliver.
+
+### The region is placed around the start
+
+`RegionPlanner` runs once when a world is created. It puts stone deposits and vine
+slopes 22–45 cells from the start and neighbouring towns 34–60 cells away, all beyond
+the carriers' 150 m. Towns are data (`TownTemplate` in the catalog) plus one real
+stop building owned by the town (`Building.townID`), so lines, routing and
+vehicles need no special cases except at the moment of trade.
 
 ### Hybrid logistics: carriers locally, lines for distance
 

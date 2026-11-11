@@ -99,6 +99,7 @@ Playable today:
 - Processing businesses (mill, bakery) may only be built in commercial or industrial zones; raw material producers sit at their resources
 - Building with live preview and rules for terrain, slope, money and nearby resources
 - Production chains: grain → flour → bread, fish, wood, stone, wool → clothing, grapes → wine
+- A region instead of a lone village: stone deposits and vine slopes lie beyond carrier range, and two or three neighbouring towns (fishing village, mining town, wine village, farming village) trade at their own stop: they sell their goods at base price and pay 1.5 × for what they want. Their names show on the mini map
 - Carriers visibly transport goods within 150 m; for longer distances the player builds stops, creates lines and buys ox carts that drive on the road network (A* pathfinding)
 - Workers, food supply, growth and hunger
 - Map overlays (key O): supply of houses and efficiency of businesses, carrier range of storehouses and stops

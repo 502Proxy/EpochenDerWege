@@ -7,6 +7,8 @@ public enum PlacementError: Error, Hashable, Sendable, Codable {
     case occupied
     case insufficientFunds(cost: Int)
     case missingResource(Biome)
+    /// The building needs a deposit (e.g. stone) nearby.
+    case missingDeposit(Deposit)
     /// The building may only be placed in one of these zones.
     case requiresZone([ZoneKind])
     /// The building must stand next to a road.

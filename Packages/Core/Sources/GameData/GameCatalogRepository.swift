@@ -116,6 +116,12 @@ public enum CatalogValidator {
             }
         }
 
+        for template in catalog.townTemplates {
+            for amount in template.sells + template.buys where !goods.contains(amount.good) {
+                throw GameDataError.unknownGood(amount.good, referencedBy: "town template \(template.id)")
+            }
+        }
+
         let levels = catalog.settlementLevels
         if levels.first?.minimumPopulation != 0 {
             throw GameDataError.invalidValue("the first settlement level must start at 0 residents")

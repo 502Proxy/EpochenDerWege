@@ -19,7 +19,7 @@ struct LineSummary: Equatable, Identifiable {
             return LineSummary(
                 id: line.id,
                 number: line.number,
-                stopNames: line.stops.map { String(localized: "Stop \($0.rawValue)") },
+                stopNames: line.stops.map { GameText.stopName($0, in: world) },
                 vehicles: vehicles.count,
                 cargo: vehicles.reduce(0) { $0 + $1.load },
                 capacity: vehicles.reduce(0) { $0 + $1.definition.capacity },

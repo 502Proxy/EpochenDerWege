@@ -70,6 +70,7 @@ final class SceneRenderer {
             MapOverlayLayer(parent: root, space: space),
             RoadLayer(parent: root, space: space),
             BuildingLayer(parent: root, space: space),
+            TownLayer(parent: root, space: space),
             CarrierLayer(parent: root, space: space),
             VehicleLayer(parent: root, space: space),
             SelectionLayer(parent: root, space: space),

@@ -8,6 +8,10 @@ import GameDomain
 enum StopDemand {
     static func isWanted(_ good: GoodID, near stopID: BuildingID, in world: WorldState) -> Bool {
         guard let stop = world.building(stopID) else { return false }
+        // A town's stop wants what the town buys.
+        if let townID = stop.townID {
+            return world.town(townID)?.buys(good) ?? false
+        }
         let range = world.rules.carrierRangeMeters
         return world.buildings.contains { building in
             building.category != .stop
@@ -97,6 +101,11 @@ public struct TransportSystem: SimulationSystem {
     static func exchangeCargo(_ vehicle: inout Vehicle, atBuildingIndex stopIndex: Int, line: TransportLine, world: inout WorldState) {
         let stopID = world.buildings[stopIndex].id
         let otherStops = line.stops.filter { $0 != stopID }
+
+        if let townID = world.buildings[stopIndex].townID {
+            TradeSystem.trade(&vehicle, withTown: townID, atBuildingIndex: stopIndex, otherStops: otherStops, world: &world)
+            return
+        }
 
         // Unload what is wanted here, or what no other stop on the line wants any more.
         for good in vehicle.cargo.keys.sorted() {

@@ -45,7 +45,8 @@ public struct DemolishBuildingCommand: GameCommand {
     }
 
     public func execute(in world: inout WorldState) {
-        guard let removed = world.removeBuilding(buildingID) else { return }
+        // Towns keep their stops.
+        guard world.building(buildingID)?.townID == nil, let removed = world.removeBuilding(buildingID) else { return }
         let refund = removed.definition.cost * world.rules.demolitionRefundPercent / 100
         world.book(refund, as: .refunds, detail: .building(removed.definition.id))
 

@@ -47,6 +47,8 @@ struct MiniMapContent: Equatable {
     var mapSize = 1
     var roads: [GridPoint] = []
     var buildings: [Marker] = []
+    /// Neighbouring towns with their names.
+    var towns: [(name: String, cell: GridPoint)] = []
 
     init() {}
 
@@ -54,6 +56,15 @@ struct MiniMapContent: Equatable {
         mapSize = world.terrain.size
         roads = world.roads.sorted { ($0.z, $0.x) < ($1.z, $1.x) }
         buildings = world.buildings.map { Marker(cell: $0.cell, color: $0.definition.color) }
+        towns = world.towns.map { ($0.name, $0.center) }
+    }
+
+    static func == (lhs: MiniMapContent, rhs: MiniMapContent) -> Bool {
+        lhs.mapSize == rhs.mapSize
+            && lhs.roads == rhs.roads
+            && lhs.buildings == rhs.buildings
+            && lhs.towns.map(\.name) == rhs.towns.map(\.name)
+            && lhs.towns.map(\.cell) == rhs.towns.map(\.cell)
     }
 }
 

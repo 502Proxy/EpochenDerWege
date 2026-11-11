@@ -64,6 +64,8 @@ public struct Building: Identifiable, Hashable, Sendable, Codable {
     public var isPaused = false
     /// How eagerly carriers deliver here.
     public var priority: DeliveryPriority = .normal
+    /// The neighbouring town that owns this building (its stop); `nil` for the player's buildings.
+    public var townID: TownID?
     /// Supply checks in a row a house has met all needs of its next tier.
     public var upgradeProgress = 0
     /// Supply checks in a row a house has missed one of its own needs.
