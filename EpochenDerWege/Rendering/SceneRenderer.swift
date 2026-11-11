@@ -112,12 +112,19 @@ final class SceneRenderer {
 /// Conversions between simulation coordinates and the scene.
 struct SceneSpace {
     let terrain: Terrain
+    /// The smooth visible ground; see `TerrainSurface`.
+    let surface: TerrainSurface
+
+    init(terrain: Terrain) {
+        self.terrain = terrain
+        surface = TerrainSurface(terrain: terrain)
+    }
 
     var halfExtent: Float { Float(terrain.extent / 2) }
 
     /// Position below the root anchor (simulation coordinates) on the ground surface.
     func local(_ point: WorldPoint, lift: Float = 0) -> SIMD3<Float> {
-        SIMD3<Float>(Float(point.x), Float(terrain.surfaceHeight(at: point)) + lift, Float(point.z))
+        SIMD3<Float>(Float(point.x), Float(surface.surfaceHeight(at: point)) + lift, Float(point.z))
     }
 
     /// Absolute scene position (for the camera) of a ground point.
@@ -137,7 +144,7 @@ struct SceneSpace {
 
         func isAboveGround(_ t: Float) -> Bool {
             let p = origin + direction * t
-            return p.y > Float(terrain.surfaceHeight(at: worldPoint(fromScene: p)))
+            return p.y > Float(surface.surfaceHeight(at: worldPoint(fromScene: p)))
         }
 
         guard isAboveGround(0) else { return nil }

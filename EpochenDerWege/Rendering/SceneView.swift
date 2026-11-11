@@ -132,7 +132,7 @@ final class SceneCoordinator: NSObject {
         }
 
         // The camera follows the terrain height below its target, smoothed.
-        let ground = Float(frame.world.terrain.surfaceHeight(at: renderer.space.worldPoint(fromScene: rig.target)))
+        let ground = Float(renderer.space.surface.surfaceHeight(at: renderer.space.worldPoint(fromScene: rig.target)))
         rig.target.y += (ground - rig.target.y) * min(1, Float(deltaTime) * 8)
         applyCamera()
     }
